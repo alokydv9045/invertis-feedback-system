@@ -7,233 +7,9 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   GraduationCap, Users, BookOpen, Building2, BarChart2,
-  ArrowRight, CheckCircle2, Clock, ClipboardList, Shield, PlusCircle
+  ArrowRight, CheckCircle2, Clock, ClipboardList, Shield, PlusCircle, Zap, User, Search, Settings
 } from 'lucide-react';
 
-function StatCard({ icon: Icon, label, value, color }) {
-  return (
-    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
-      <div className={`h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
-        <Icon size={20} className="text-white" />
-      </div>
-      <div>
-        <div className="text-2xl font-black text-slate-900 dark:text-slate-100">{value ?? '—'}</div>
-        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{label}</div>
-      </div>
-    </div>
-  );
-}
-
-// ── ADMIN DASHBOARD ────────────────────────────────────────────────────────────
-function AdminDashboard() {
-  const navigate = useNavigate();
-  const [stats, setStats] = useState(null);
-
-  useEffect(() => {
-    api.get('/tlfq/stats').then(r => setStats(r.data)).catch(() => {});
-  }, []);
-
-  const cards = stats ? [
-    { icon: Users, label: 'Total Students', value: stats.totalStudents, color: 'bg-emerald-600' },
-    { icon: GraduationCap, label: 'Total Faculty (Records)', value: stats.totalFaculty, color: 'bg-blue-600' },
-    { icon: BookOpen, label: 'Courses', value: stats.totalCourses, color: 'bg-indigo-600' },
-    { icon: Building2, label: 'Departments', value: stats.totalDepts, color: 'bg-violet-600' },
-    { icon: ClipboardList, label: 'Active TLFQs', value: stats.totalTlfqs, color: 'bg-amber-600' },
-    { icon: BarChart2, label: 'Completion Rate', value: `${stats.completionRate}%`, color: 'bg-rose-600' },
-  ] : [];
-
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <Shield size={20} className="text-primary dark:text-violet-400" />
-          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100">System Control Tower</h1>
-        </div>
-        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">University-wide overview and management hub.</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {stats ? cards.map((c, i) => <StatCard key={i} {...c} />) : (
-          Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-24 bg-slate-50 dark:bg-slate-800 animate-pulse rounded-2xl border border-slate-100 dark:border-slate-700" />
-          ))
-        )}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 shadow-sm">
-        <h3 className="text-base font-black text-slate-900 dark:text-slate-200 mb-6 flex items-center gap-2">
-          <PlusCircle size={18} className="text-primary dark:text-indigo-400" /> Quick Actions
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {[
-            { label: 'Create New TLFQ', desc: 'Design & assign questionnaire', path: '/admin/courses', icon: ClipboardList, color: 'text-indigo-400' },
-            { label: 'Full Analytics', desc: 'University-wide reports', path: '/admin/analytics', icon: BarChart2, color: 'text-blue-400' },
-            { label: 'Manage Directory', desc: 'Departments, courses, faculty', path: '/admin/directory', icon: Building2, color: 'text-violet-400' },
-          ].map(({ label, desc, path, icon: Icon, color }) => (
-            <button
-              key={path}
-              onClick={() => navigate(path)}
-              className="flex items-center gap-4 p-5 bg-slate-50 dark:bg-slate-900 hover:bg-white dark:hover:bg-slate-750 border border-slate-100 dark:border-slate-700 hover:border-primary/30 dark:hover:border-slate-600 rounded-2xl transition-all text-left cursor-pointer group shadow-sm hover:shadow-md"
-            >
-              <Icon size={20} className={color.replace('text-indigo-400', 'text-primary dark:text-indigo-400').replace('text-blue-400', 'text-secondary dark:text-blue-400').replace('text-violet-400', 'text-tertiary dark:text-violet-400')} />
-              <div className="flex-1">
-                <div className="text-sm font-black text-slate-900 dark:text-slate-200 tracking-tight">{label}</div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-0.5">{desc}</div>
-              </div>
-              <ArrowRight size={16} className="text-slate-300 dark:text-slate-600 group-hover:text-primary dark:group-hover:text-slate-400 transition-colors" />
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── HOD DASHBOARD ──────────────────────────────────────────────────────────────
-function HODOverview() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <Building2 size={20} className="text-secondary dark:text-blue-400" />
-          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100">Department Overview</h1>
-        </div>
-        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Welcome back, {user?.name}. View analytics for your department.</p>
-      </div>
-
-      <div className="bg-white dark:bg-slate-800 border border-secondary/10 dark:border-blue-900/40 rounded-[2.5rem] p-10 flex flex-col items-center text-center gap-6 shadow-xl shadow-slate-200 dark:shadow-none">
-        <div className="h-20 w-20 bg-secondary/10 dark:bg-blue-900/40 rounded-3xl flex items-center justify-center">
-          <BarChart2 size={32} className="text-secondary dark:text-blue-400" />
-        </div>
-        <div>
-          <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Department Analytics</h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 max-w-md leading-relaxed font-medium">
-            View faculty performance, course ratings, anonymous student comments, and feedback completion rates for your department.
-          </p>
-        </div>
-        <button
-          onClick={() => navigate('/hod/analytics')}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer shadow-lg shadow-blue-950/50"
-        >
-          View Analytics <ArrowRight size={16} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ── STUDENT DASHBOARD ──────────────────────────────────────────────────────────
-function StudentDashboard() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api.get('/tlfq/courses')
-      .then(r => setCourses(r.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  const pendingCount = courses.reduce((a, c) => a + (c.pending_count || 0), 0);
-  const completedCount = courses.reduce((a, c) => a + (c.completed_count || 0), 0);
-
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Good day, {user?.name} 👋</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">Your enrolled courses and pending feedback questionnaires.</p>
-      </div>
-
-      {/* Summary pills */}
-      <div className="flex gap-3 flex-wrap">
-        <div className="flex items-center gap-2 bg-amber-900/30 border border-amber-800/50 text-amber-300 text-xs font-bold px-4 py-2 rounded-full">
-          <Clock size={13} /> {pendingCount} Pending
-        </div>
-        <div className="flex items-center gap-2 bg-emerald-900/30 border border-emerald-800/50 text-emerald-300 text-xs font-bold px-4 py-2 rounded-full">
-          <CheckCircle2 size={13} /> {completedCount} Completed
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[1, 2, 3].map(n => <div key={n} className="h-48 bg-slate-800 animate-pulse rounded-2xl border border-slate-700" />)}
-        </div>
-      ) : courses.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-12 text-center shadow-sm">
-          <GraduationCap size={40} className="text-slate-200 dark:text-slate-600 mx-auto mb-4" />
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-bold">No courses enrolled. Contact admin for enrollment.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {courses.map(course => (
-            <motion.div
-              key={course.id}
-              whileHover={{ y: -6 }}
-              className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 flex flex-col gap-6 shadow-sm hover:shadow-xl transition-all duration-300"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest bg-primary/5 dark:bg-indigo-900/50 text-primary dark:text-indigo-300 border border-primary/10 dark:border-indigo-800/50 px-3 py-1 rounded-xl">
-                    {course.code}
-                  </span>
-                  <h2 className="text-lg font-black text-slate-900 dark:text-slate-100 mt-3 tracking-tight line-clamp-1">{course.name}</h2>
-                </div>
-                <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0">
-                  {course.pending_count > 0 && (
-                    <span className="text-xs font-bold bg-amber-900/40 text-amber-300 border border-amber-800/40 px-2 py-0.5 rounded-md flex items-center gap-1">
-                      <Clock size={11} /> {course.pending_count} pending
-                    </span>
-                  )}
-                  {course.completed_count > 0 && (
-                    <span className="text-xs font-bold bg-emerald-900/40 text-emerald-300 border border-emerald-800/40 px-2 py-0.5 rounded-md flex items-center gap-1">
-                      <CheckCircle2 size={11} /> {course.completed_count} done
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* TLFQs inside the course */}
-              {(course.tlfqs || []).length > 0 && (
-                <div className="flex flex-col gap-2">
-                  {course.tlfqs.map(tlfq => (
-                    <button
-                      key={tlfq.id}
-                      onClick={() => !tlfq.completed && navigate(`/courses/${course.id}/tlfq/${tlfq.id}`)}
-                      disabled={tlfq.completed}
-                      className={`flex items-center justify-between p-4 rounded-2xl text-left text-xs border transition-all duration-300 ${
-                        tlfq.completed
-                          ? 'bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-700 text-slate-400 dark:text-slate-500 cursor-default'
-                          : 'bg-white dark:bg-slate-900 border-primary/5 dark:border-indigo-800/40 hover:border-primary/40 hover:bg-primary/[0.02] dark:hover:bg-indigo-950/30 text-slate-700 dark:text-slate-200 cursor-pointer shadow-sm hover:shadow-md'
-                      }`}
-                    >
-                      <div>
-                        <div className="font-semibold text-xs">{tlfq.faculty_name}</div>
-                        <div className="text-slate-500 text-xs mt-0.5 line-clamp-1">{tlfq.title}</div>
-                      </div>
-                      {tlfq.completed
-                        ? <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0" />
-                        : <ArrowRight size={14} className="text-indigo-400 flex-shrink-0" />
-                      }
-                    </button>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── MAIN DASHBOARD ─────────────────────────────────────────────────────────────
 export default function Dashboard() {
   const { user } = useAuth();
 
@@ -244,15 +20,244 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+    <div className="min-h-screen bg-[#f5f7fa] flex flex-col font-sans">
+      <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 p-6 md:p-8">
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
-            {renderContent()}
-          </motion.div>
-        </main>
+        <div className="flex-1 flex flex-col">
+          <Navbar />
+          <main className="p-8">
+            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
+              {renderContent()}
+            </motion.div>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminDashboard() {
+  const navigate = useNavigate();
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    api.get('/tlfq/stats').then(r => setStats(r.data)).catch(() => {});
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1a2233]">System Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Management overview for Invertis Feedback System</p>
+        </div>
+        <button onClick={() => navigate('/admin/courses')} className="bg-[#2d3fe0] hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded transition-all shadow-sm active:scale-95 flex items-center gap-2">
+          <PlusCircle size={16} /> New Evaluation
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Students', value: stats?.totalStudents, icon: Users, color: 'text-blue-500' },
+          { label: 'Total Courses', value: stats?.totalCourses, icon: BookOpen, color: 'text-[#f15a24]' },
+          { label: 'Completion Rate', value: `${stats?.completionRate || 0}%`, icon: BarChart2, color: 'text-emerald-500' },
+          { label: 'Active TLFQs', value: stats?.totalTlfqs, icon: ClipboardList, color: 'text-indigo-500' },
+        ].map((s, i) => (
+          <div key={i} className="bg-white border border-[#e2e8f0] rounded-lg shadow-sm p-6 flex items-center gap-4">
+            <div className={`h-12 w-12 rounded-lg bg-[#f5f7fa] flex items-center justify-center ${s.color}`}>
+              <s.icon size={24} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{s.label}</p>
+              <p className="text-2xl font-bold text-[#1a2233] mt-1">{s.value ?? '—'}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white border border-[#e2e8f0] rounded-lg shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-[#e2e8f0] bg-[#f5f7fa]/50 flex justify-between items-center">
+            <h3 className="font-bold text-[#1a2233]">System Management</h3>
+            <Search size={16} className="text-gray-400" />
+          </div>
+          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { label: 'Faculty Management', desc: 'Manage instructor records', path: '/admin/directory', icon: Users },
+              { label: 'Evaluation Reports', desc: 'Detailed analytics per course', path: '/admin/analytics', icon: BarChart2 },
+              { label: 'Department Setup', desc: 'Structure university hierarchy', path: '/admin/directory', icon: Building2 },
+              { label: 'System Settings', desc: 'Configure global parameters', path: '/admin/settings', icon: Settings },
+            ].map((action, i) => (
+              <div 
+                key={i} 
+                onClick={() => navigate(action.path)}
+                className="p-5 border border-[#e2e8f0] rounded-lg hover:border-[#2d3fe0] hover:bg-[#f5f7fa] transition-all cursor-pointer group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="h-10 w-10 rounded bg-[#f5f7fa] flex items-center justify-center text-gray-400 group-hover:text-[#2d3fe0] transition-colors">
+                    <action.icon size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[#1a2233]">{action.label}</p>
+                    <p className="text-[10px] text-gray-500 mt-1">{action.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white border border-[#e2e8f0] rounded-lg shadow-sm p-6">
+          <h3 className="font-bold text-[#1a2233] mb-6">Recent System Activity</h3>
+          <div className="space-y-6">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="flex gap-4">
+                <div className="h-2 w-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-bold text-[#1a2233]">New Evaluation Created</p>
+                  <p className="text-[10px] text-gray-500 mt-1">HOD CSE created evaluation for Semester 4.</p>
+                  <p className="text-[9px] text-gray-400 mt-1 font-bold">2 hours ago</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HODOverview() {
+  const navigate = useNavigate();
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1a2233]">Department Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Overview of department feedback metrics</p>
+        </div>
+      </div>
+      <div className="bg-white border border-[#e2e8f0] rounded-lg shadow-sm p-12 text-center flex flex-col items-center">
+        <div className="h-20 w-20 bg-[#f5f7fa] rounded-full flex items-center justify-center text-[#2d3fe0] mb-6">
+          <BarChart2 size={40} />
+        </div>
+        <h2 className="text-xl font-bold text-[#1a2233]">Department Analytics</h2>
+        <p className="text-sm text-gray-500 mt-2 max-w-md">View detailed performance reports of faculty members and courses in your department.</p>
+        <button onClick={() => navigate('/hod/analytics')} className="bg-[#2d3fe0] hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded transition-all shadow-sm active:scale-95 mt-8">
+          Launch Analytics Hub
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StudentDashboard() {
+  const navigate = useNavigate();
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/tlfq/courses').then(r => setCourses(r.data)).catch(() => {}).finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-8">
+      <header className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1a2233]">Student Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1 font-medium">Access your evaluation portal and feedback history</p>
+        </div>
+        <div className="hidden md:flex items-center gap-2">
+          <div className="text-right">
+            <p className="text-xs font-bold text-[#1a2233]">Semester 4</p>
+            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Active session</p>
+          </div>
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { label: 'Faculty Performance', desc: 'Evaluate teaching methodologies, communication, and overall engagement.', icon: Users },
+          { label: 'Curriculum Feedback', desc: 'Provide insights on syllabus relevance, study materials, and practical application.', icon: ClipboardList },
+          { label: 'Infrastructure', desc: 'Report issues or suggest improvements for campus facilities, labs, and library.', icon: Building2 },
+        ].map((card, i) => (
+          <div key={i} className="bg-white border border-[#e2e8f0] rounded-lg shadow-sm p-8 flex flex-col group hover:border-[#2d3fe0] transition-all cursor-pointer">
+            <div className="h-12 w-12 rounded bg-[#f5f7fa] flex items-center justify-center text-[#1a2233] group-hover:bg-[#2d3fe0] group-hover:text-white transition-all mb-6">
+              <card.icon size={24} />
+            </div>
+            <h3 className="text-lg font-bold text-[#1a2233] mb-3">{card.label}</h3>
+            <p className="text-xs text-gray-500 leading-relaxed font-medium">{card.desc}</p>
+            <div className="mt-8 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#2d3fe0]">
+              Begin Evaluation <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white border border-[#e2e8f0] rounded-lg shadow-sm">
+          <div className="p-6 border-b border-[#e2e8f0] flex justify-between items-center">
+            <h3 className="font-bold text-[#1a2233]">Pending Evaluations</h3>
+            <span className="text-[10px] font-black bg-[#f15a24] text-white px-2 py-1 rounded">Action Required</span>
+          </div>
+          <div className="p-0">
+            {loading ? (
+              <div className="p-12 text-center text-gray-400 text-xs font-bold uppercase tracking-widest animate-pulse">Loading course data...</div>
+            ) : courses.length === 0 ? (
+              <div className="p-12 text-center text-gray-400 text-xs font-bold uppercase tracking-widest">No active evaluations</div>
+            ) : (
+              courses.map(course => (
+                <div key={course.id} className="p-6 border-b border-[#e2e8f0] last:border-0 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                      <p className="text-[10px] font-black text-[#f15a24] uppercase tracking-widest mb-1">{course.code}</p>
+                      <h4 className="text-sm font-bold text-[#1a2233]">{course.name}</h4>
+                    </div>
+                    <div className="flex flex-col gap-2 min-w-[200px]">
+                      {(course.tlfqs || []).map(tlfq => (
+                        <button
+                          key={tlfq.id}
+                          onClick={() => !tlfq.completed && navigate(`/courses/${course.id}/tlfq/${tlfq.id}`)}
+                          className={`flex items-center justify-between px-4 py-2 rounded text-[11px] font-bold border transition-all ${
+                            tlfq.completed
+                              ? 'bg-gray-50 text-gray-400 border-gray-100'
+                              : 'bg-white text-[#2d3fe0] border-[#2d3fe0]/20 hover:border-[#2d3fe0] hover:bg-[#2d3fe0] hover:text-white'
+                          }`}
+                        >
+                          <span>{tlfq.faculty_name}</span>
+                          {tlfq.completed ? <CheckCircle2 size={12} /> : <ArrowRight size={12} />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white border border-[#e2e8f0] rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-bold text-[#1a2233]">Recent Activity</h3>
+            <span className="text-[10px] font-bold text-gray-400 underline cursor-pointer">View All</span>
+          </div>
+          <div className="space-y-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded border border-[#e2e8f0]/50">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded bg-white border border-[#e2e8f0] flex items-center justify-center">
+                    <CheckCircle2 size={14} className="text-emerald-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#1a2233]">Prof. A. Sharma</p>
+                    <p className="text-[9px] text-gray-500 mt-0.5">Feedback Completed</p>
+                  </div>
+                </div>
+                <span className="text-[9px] font-bold text-gray-400">Oct 12, 2024</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

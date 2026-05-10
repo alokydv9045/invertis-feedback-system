@@ -1,39 +1,57 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-white text-slate-900 font-sans select-none antialiased transition-colors duration-200;
-  }
-  
-  .dark body {
-    @apply bg-slate-950 text-slate-100;
+    background-color: #f5f7fa; /* Manual erp-gray to avoid apply issues */
+    @apply text-slate-800 font-sans select-none antialiased transition-colors duration-200;
   }
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+.erp-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-.dark .glass {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.erp-button-primary {
+  background-color: #2d3fe0;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.erp-button-primary:hover {
+  background-color: #1e2bc0;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+.erp-input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
 }
-::-webkit-scrollbar-thumb {
-  @apply bg-indigo-300 dark:bg-indigo-900 rounded-full hover:bg-indigo-400 dark:hover:bg-indigo-800;
+
+.erp-input:focus {
+  outline: none;
+  border-color: #2d3fe0;
+  box-shadow: 0 0 0 3px rgba(45, 63, 224, 0.1);
+}
+
+/* Custom scrollbars for Navy Sidebar */
+.navy-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.navy-scroll::-webkit-scrollbar-track {
+  background: #1a2233;
+}
+.navy-scroll::-webkit-scrollbar-thumb {
+  background: #2d3fe0;
+  border-radius: 10px;
 }

@@ -1,53 +1,48 @@
 import { motion } from 'framer-motion';
 
-export default function RatingScale({ value, onChange }) {
-  const getRatingLabel = (num) => {
-    switch (num) {
-      case 1: return 'Very Poor';
-      case 2: return 'Poor';
-      case 3: return 'Below Avg';
-      case 4: return 'Neutral';
-      case 5: return 'Above Avg';
-      case 6: return 'Very Good';
-      case 7: return 'Excellent';
-      default: return '';
-    }
-  };
+const RATINGS = [
+  { id: 5, label: 'Excellent', icon: 'fa-face-grin-stars', color: 'group-hover:border-emerald-500 group-hover:text-emerald-500', active: 'border-emerald-500 bg-emerald-50 text-emerald-600' },
+  { id: 4, label: 'Good', icon: 'fa-face-smile', color: 'group-hover:border-blue-500 group-hover:text-blue-500', active: 'border-blue-500 bg-blue-50 text-blue-600' },
+  { id: 3, label: 'Average', icon: 'fa-face-meh', color: 'group-hover:border-orange-500 group-hover:text-orange-500', active: 'border-orange-600 bg-orange-50 text-orange-600' },
+  { id: 2, label: 'Fair', icon: 'fa-face-frown', color: 'group-hover:border-orange-400 group-hover:text-orange-400', active: 'border-orange-400 bg-orange-50 text-orange-500' },
+  { id: 1, label: 'Poor', icon: 'fa-face-dizzy', color: 'group-hover:border-red-500 group-hover:text-red-500', active: 'border-red-500 bg-red-50 text-red-600' },
+];
 
+export default function RatingScale({ value, onChange }) {
   return (
-    <div className="flex flex-col gap-2 select-none">
-      <div className="flex flex-wrap gap-2.5 items-center">
-        {[1, 2, 3, 4, 5, 6, 7].map((num) => {
-          const isSelected = value === num;
+    <div className="flex flex-col gap-6 select-none">
+      <p className="text-sm text-gray-500 font-medium">Please rate based on your experience this semester:</p>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {RATINGS.map((rating) => {
+          const isSelected = value === rating.id;
 
           return (
-            <motion.button
+            <button
+              key={rating.id}
               type="button"
-              key={num}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => onChange(num)}
-              className={`w-12 h-12 flex items-center justify-center rounded-2xl text-base font-bold transition-all duration-200 shadow-sm cursor-pointer border ${
+              onClick={() => onChange(rating.id)}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all group ${
                 isSelected
-                  ? 'bg-indigo-600 border-indigo-600 text-white scale-110 shadow-lg shadow-indigo-300 dark:shadow-indigo-950/40 ring-4 ring-indigo-100 dark:ring-indigo-900/30'
-                  : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-300 dark:hover:border-indigo-700 border-slate-200 dark:border-slate-700'
+                  ? rating.active + ' shadow-sm scale-105'
+                  : 'border-transparent hover:bg-white hover:border-gray-200 hover:shadow-sm'
               }`}
             >
-              {num}
-            </motion.button>
+              <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center mb-3 text-2xl transition-all ${
+                isSelected 
+                  ? 'bg-current text-white border-transparent' 
+                  : 'border-gray-300 text-gray-400 bg-white ' + rating.color
+              }`}>
+                <i className={`fa-regular ${rating.icon}`}></i>
+              </div>
+              <span className={`text-xs font-bold transition-colors ${
+                isSelected ? 'text-current' : 'text-gray-500 group-hover:text-gray-700'
+              }`}>
+                {rating.label}
+              </span>
+            </button>
           );
         })}
       </div>
-
-      {value && (
-        <motion.p
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mt-1"
-        >
-          Selected: {value} — {getRatingLabel(value)}
-        </motion.p>
-      )}
     </div>
   );
 }
