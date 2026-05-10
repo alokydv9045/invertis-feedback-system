@@ -12,13 +12,13 @@ import {
 
 function StatCard({ icon: Icon, label, value, color }) {
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex items-center gap-4">
+    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
       <div className={`h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
         <Icon size={20} className="text-white" />
       </div>
       <div>
-        <div className="text-2xl font-black text-slate-100">{value ?? '—'}</div>
-        <div className="text-xs text-slate-400 font-medium mt-0.5">{label}</div>
+        <div className="text-2xl font-black text-slate-900 dark:text-slate-100">{value ?? '—'}</div>
+        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">{label}</div>
       </div>
     </div>
   );
@@ -46,25 +46,25 @@ function AdminDashboard() {
     <div className="flex flex-col gap-6">
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <Shield size={20} className="text-violet-400" />
-          <h1 className="text-2xl font-black text-slate-100">System Control Tower</h1>
+          <Shield size={20} className="text-primary dark:text-violet-400" />
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100">System Control Tower</h1>
         </div>
-        <p className="text-sm text-slate-400">University-wide overview and management hub.</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">University-wide overview and management hub.</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {stats ? cards.map((c, i) => <StatCard key={i} {...c} />) : (
           Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-24 bg-slate-800 animate-pulse rounded-2xl border border-slate-700" />
+            <div key={i} className="h-24 bg-slate-50 dark:bg-slate-800 animate-pulse rounded-2xl border border-slate-100 dark:border-slate-700" />
           ))
         )}
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-        <h3 className="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
-          <PlusCircle size={17} className="text-indigo-400" /> Quick Actions
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 shadow-sm">
+        <h3 className="text-base font-black text-slate-900 dark:text-slate-200 mb-6 flex items-center gap-2">
+          <PlusCircle size={18} className="text-primary dark:text-indigo-400" /> Quick Actions
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
@@ -75,14 +75,14 @@ function AdminDashboard() {
             <button
               key={path}
               onClick={() => navigate(path)}
-              className="flex items-center gap-3 p-4 bg-slate-900 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl transition-all text-left cursor-pointer group"
+              className="flex items-center gap-4 p-5 bg-slate-50 dark:bg-slate-900 hover:bg-white dark:hover:bg-slate-750 border border-slate-100 dark:border-slate-700 hover:border-primary/30 dark:hover:border-slate-600 rounded-2xl transition-all text-left cursor-pointer group shadow-sm hover:shadow-md"
             >
-              <Icon size={18} className={color} />
+              <Icon size={20} className={color.replace('text-indigo-400', 'text-primary dark:text-indigo-400').replace('text-blue-400', 'text-secondary dark:text-blue-400').replace('text-violet-400', 'text-tertiary dark:text-violet-400')} />
               <div className="flex-1">
-                <div className="text-sm font-bold text-slate-200">{label}</div>
-                <div className="text-xs text-slate-500">{desc}</div>
+                <div className="text-sm font-black text-slate-900 dark:text-slate-200 tracking-tight">{label}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-0.5">{desc}</div>
               </div>
-              <ArrowRight size={15} className="text-slate-600 group-hover:text-slate-400 transition-colors" />
+              <ArrowRight size={16} className="text-slate-300 dark:text-slate-600 group-hover:text-primary dark:group-hover:text-slate-400 transition-colors" />
             </button>
           ))}
         </div>
@@ -100,19 +100,19 @@ function HODOverview() {
     <div className="flex flex-col gap-6">
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <Building2 size={20} className="text-blue-400" />
-          <h1 className="text-2xl font-black text-slate-100">Department Overview</h1>
+          <Building2 size={20} className="text-secondary dark:text-blue-400" />
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100">Department Overview</h1>
         </div>
-        <p className="text-sm text-slate-400">Welcome back, {user?.name}. View analytics for your department.</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Welcome back, {user?.name}. View analytics for your department.</p>
       </div>
 
-      <div className="bg-slate-800 border border-blue-900/40 rounded-2xl p-8 flex flex-col items-center text-center gap-4">
-        <div className="h-16 w-16 bg-blue-900/40 rounded-2xl flex items-center justify-center">
-          <BarChart2 size={28} className="text-blue-400" />
+      <div className="bg-white dark:bg-slate-800 border border-secondary/10 dark:border-blue-900/40 rounded-[2.5rem] p-10 flex flex-col items-center text-center gap-6 shadow-xl shadow-slate-200 dark:shadow-none">
+        <div className="h-20 w-20 bg-secondary/10 dark:bg-blue-900/40 rounded-3xl flex items-center justify-center">
+          <BarChart2 size={32} className="text-secondary dark:text-blue-400" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-slate-100">Department Analytics</h3>
-          <p className="text-sm text-slate-400 mt-1 max-w-md">
+          <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Department Analytics</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 max-w-md leading-relaxed font-medium">
             View faculty performance, course ratings, anonymous student comments, and feedback completion rates for your department.
           </p>
         </div>
@@ -147,8 +147,8 @@ function StudentDashboard() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-black text-slate-100">Good day, {user?.name} 👋</h1>
-        <p className="text-sm text-slate-400 mt-1">Your enrolled courses and pending feedback questionnaires.</p>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Good day, {user?.name} 👋</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">Your enrolled courses and pending feedback questionnaires.</p>
       </div>
 
       {/* Summary pills */}
@@ -166,24 +166,24 @@ function StudentDashboard() {
           {[1, 2, 3].map(n => <div key={n} className="h-48 bg-slate-800 animate-pulse rounded-2xl border border-slate-700" />)}
         </div>
       ) : courses.length === 0 ? (
-        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-10 text-center">
-          <GraduationCap size={36} className="text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">No courses enrolled. Contact admin for enrollment.</p>
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-12 text-center shadow-sm">
+          <GraduationCap size={40} className="text-slate-200 dark:text-slate-600 mx-auto mb-4" />
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-bold">No courses enrolled. Contact admin for enrollment.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {courses.map(course => (
             <motion.div
               key={course.id}
-              whileHover={{ y: -2 }}
-              className="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex flex-col gap-4"
+              whileHover={{ y: -6 }}
+              className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-6 flex flex-col gap-6 shadow-sm hover:shadow-xl transition-all duration-300"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-xs font-bold bg-indigo-900/50 text-indigo-300 border border-indigo-800/50 px-2.5 py-1 rounded-lg">
+                  <span className="text-[10px] font-black uppercase tracking-widest bg-primary/5 dark:bg-indigo-900/50 text-primary dark:text-indigo-300 border border-primary/10 dark:border-indigo-800/50 px-3 py-1 rounded-xl">
                     {course.code}
                   </span>
-                  <h2 className="text-base font-extrabold text-slate-100 mt-2 line-clamp-1">{course.name}</h2>
+                  <h2 className="text-lg font-black text-slate-900 dark:text-slate-100 mt-3 tracking-tight line-clamp-1">{course.name}</h2>
                 </div>
                 <div className="flex flex-col items-end gap-1 ml-2 flex-shrink-0">
                   {course.pending_count > 0 && (
@@ -207,10 +207,10 @@ function StudentDashboard() {
                       key={tlfq.id}
                       onClick={() => !tlfq.completed && navigate(`/courses/${course.id}/tlfq/${tlfq.id}`)}
                       disabled={tlfq.completed}
-                      className={`flex items-center justify-between p-3 rounded-xl text-left text-xs border transition-all ${
+                      className={`flex items-center justify-between p-4 rounded-2xl text-left text-xs border transition-all duration-300 ${
                         tlfq.completed
-                          ? 'bg-slate-900 border-slate-700 text-slate-500 cursor-default'
-                          : 'bg-slate-900 border-indigo-800/40 hover:border-indigo-600 hover:bg-indigo-950/30 text-slate-200 cursor-pointer'
+                          ? 'bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-700 text-slate-400 dark:text-slate-500 cursor-default'
+                          : 'bg-white dark:bg-slate-900 border-primary/5 dark:border-indigo-800/40 hover:border-primary/40 hover:bg-primary/[0.02] dark:hover:bg-indigo-950/30 text-slate-700 dark:text-slate-200 cursor-pointer shadow-sm hover:shadow-md'
                       }`}
                     >
                       <div>
@@ -244,7 +244,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       <Navbar />
       <div className="flex flex-col md:flex-row flex-1">
         <Sidebar />

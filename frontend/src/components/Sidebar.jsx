@@ -20,9 +20,9 @@ const ROLE_LINKS = {
 };
 
 const ROLE_BADGES = {
-  admin: { label: 'System Admin', icon: Shield, colors: 'bg-violet-900/40 text-violet-300 border-violet-800' },
-  hod: { label: 'Head of Dept.', icon: Building2, colors: 'bg-blue-900/40 text-blue-300 border-blue-800' },
-  student: { label: 'Student', icon: GraduationCap, colors: 'bg-emerald-900/40 text-emerald-300 border-emerald-800' },
+  admin: { label: 'System Admin', icon: Shield, colors: 'bg-primary/5 dark:bg-violet-900/40 text-primary dark:text-violet-300 border-primary/10 dark:border-violet-800' },
+  hod: { label: 'Head of Dept.', icon: Building2, colors: 'bg-secondary/10 dark:bg-blue-900/40 text-secondary dark:text-blue-400 border-secondary/10 dark:border-blue-800' },
+  student: { label: 'Student', icon: GraduationCap, colors: 'bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800' },
 };
 
 export default function Sidebar() {
@@ -32,10 +32,10 @@ export default function Sidebar() {
   const badge = ROLE_BADGES[user?.role];
 
   return (
-    <div className="w-full md:w-60 bg-slate-900 border-r border-slate-800 p-4 flex flex-col gap-2 min-h-[calc(100vh-65px)] select-none">
+    <div className="w-full md:w-64 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 p-6 flex flex-col gap-3 min-h-[calc(100vh-65px)] select-none shadow-[1px_0_10px_rgba(0,0,0,0.02)] z-10">
       {/* Role badge */}
       {badge && (
-        <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold mb-2 ${badge.colors}`}>
+        <div className={`flex items-center gap-2 px-4 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest mb-4 shadow-sm ${badge.colors}`}>
           <badge.icon size={14} />
           {badge.label}
         </div>
@@ -48,14 +48,13 @@ export default function Sidebar() {
           return (
             <Link to={link.to} key={link.to}>
               <motion.div
-                whileHover={{ x: 4 }}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl cursor-pointer text-sm font-semibold transition-all border ${
-                  isActive
-                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-950/40'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800 border-transparent'
-                }`}
+                whileHover={{ x: 6 }}
+                className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl cursor-pointer text-sm font-black transition-all border ${isActive
+                    ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20 dark:shadow-indigo-950/40'
+                    : 'text-slate-400 dark:text-slate-400 hover:text-primary dark:hover:text-slate-100 hover:bg-primary/[0.03] dark:hover:bg-slate-800 border-transparent'
+                  }`}
               >
-                <Icon size={17} className={isActive ? 'text-white' : 'text-slate-500'} />
+                <Icon size={18} className={isActive ? 'text-white' : 'text-slate-300 dark:text-slate-500'} />
                 {link.label}
               </motion.div>
             </Link>
@@ -63,9 +62,9 @@ export default function Sidebar() {
         })}
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4 mt-auto">
-        <p className="text-xs text-slate-500 leading-relaxed">
-          All feedback is <span className="text-slate-300 font-semibold">anonymous</span>. Student identities are never disclosed in reports.
+      <div className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-[2rem] p-5 mt-auto">
+        <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed font-bold uppercase tracking-wider">
+          Feedback is <span className="text-slate-900 dark:text-slate-300">ANONYMOUS</span>.
         </p>
       </div>
     </div>

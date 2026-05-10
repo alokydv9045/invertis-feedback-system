@@ -6,7 +6,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState(localStorage.getItem('tlfq_theme') || 'dark');
+  const [theme, setTheme] = useState(localStorage.getItem('tlfq_theme') || 'light');
 
   useEffect(() => {
     if (theme === 'dark') {

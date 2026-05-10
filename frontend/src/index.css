@@ -4,10 +4,10 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 font-sans select-none antialiased transition-colors duration-200;
+    @apply bg-white text-slate-900 font-sans select-none antialiased transition-colors duration-200;
   }
   
-  body.dark {
+  .dark body {
     @apply bg-slate-950 text-slate-100;
   }
 }
