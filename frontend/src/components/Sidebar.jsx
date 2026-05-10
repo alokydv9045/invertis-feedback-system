@@ -25,61 +25,87 @@ const ROLE_LINKS = {
 };
 
 const ROLE_BADGES = {
-  admin: { label: 'System Admin', icon: Shield, colors: 'bg-violet-900/40 text-violet-300 border-violet-800' },
-  hod: { label: 'Head of Dept.', icon: Building2, colors: 'bg-blue-900/40 text-blue-300 border-blue-800' },
-  student: { label: 'Student', icon: GraduationCap, colors: 'bg-emerald-900/40 text-emerald-300 border-emerald-800' },
+  admin: { label: 'System Admin', icon: Shield, colors: 'bg-violet-50 text-violet-600 border-violet-100' },
+  hod: { label: 'Head of Dept.', icon: Building2, colors: 'bg-blue-50 text-blue-600 border-blue-100' },
+  student: { label: 'Student', icon: GraduationCap, colors: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
 };
 
-export default function Sidebar() {
-  const { user } = useAuth();
+export default function Sidebar({ isOpen, onClose }) {
+  const { user, logout } = useAuth();
   const location = useLocation();
-  const links = ROLE_LINKS[user?.role] || ROLE_LINKS.student;
-  const badge = ROLE_BADGES[user?.role];
+  const links = [
+    { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { to: '/admin/students', label: 'Feedback', icon: 'forum' },
+    { to: '/admin/analytics', label: 'NPS Analytics', icon: 'leaderboard' },
+    { to: '/admin/directory', label: 'Control Tower', icon: 'terminal' },
+    { to: '/admin/settings', label: 'Settings', icon: 'settings' },
+  ];
+
+  if (user?.role !== 'admin') {
+    return null; 
+  }
 
   return (
-    <div className="w-full md:w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2 min-h-[calc(100vh-65px)] select-none transition-colors duration-300">
-      {/* Role badge */}
-      {badge && (
-        <div className={`flex items-center gap-2 px-3.5 py-2.5 rounded-2xl border text-[10px] font-black uppercase tracking-wider mb-4 ${
-          user.role === 'admin' ? 'bg-violet-50 dark:bg-violet-900/40 text-violet-600 dark:text-violet-300 border-violet-100 dark:border-violet-800' :
-          user.role === 'hod' ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 border-blue-100 dark:border-blue-800' :
-          'bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800'
-        }`}>
-          <badge.icon size={14} />
-          {badge.label}
-        </div>
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[60] md:hidden backdrop-blur-sm transition-opacity"
+          onClick={onClose}
+        />
       )}
 
-      <div className="flex flex-col gap-1 flex-1">
-        {links.map((link) => {
-          const Icon = link.icon;
-          const isActive = location.pathname === link.to;
-          return (
-            <Link to={link.to} key={link.to}>
-              <motion.div
-                whileHover={{ x: 4 }}
-                className={`flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold transition-all border ${
-                  isActive
-                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-slate-100 hover:bg-indigo-50/50 dark:hover:bg-slate-800 border-transparent'
-                }`}
-              >
-                <Icon size={18} className={isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'} />
-                {link.label}
-              </motion.div>
-            </Link>
-          );
-        })}
-      </div>
+      <aside className={`
+        fixed left-0 top-0 h-screen w-64 bg-white border-r border-[#e0e0e0] shadow-sm p-4 gap-2 z-[70] transition-transform duration-300
+        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <div className="mb-8 px-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-black text-[#ff6b00]">Feedback Admin</h1>
+            <p className="text-[12px] font-medium text-[#474747]/70 uppercase tracking-widest">System Control v2.4</p>
+          </div>
+          <button onClick={onClose} className="md:hidden p-2 text-[#474747]">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
 
-      <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 mt-auto">
-        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 leading-relaxed uppercase tracking-wide">
-          Confidentiality
-        </p>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          Feedback is strictly <span className="text-indigo-500 dark:text-slate-300 font-bold">anonymous</span>.
-        </p>
-      </div>
-    </div>
+        <nav className="flex-grow flex flex-col gap-2">
+          {links.map((link) => {
+            const isActive = location.pathname === link.to;
+            return (
+              <Link to={link.to} key={link.to} onClick={onClose}>
+                <div
+                  className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    isActive
+                      ? 'bg-[#ff6b00] text-white shadow-md scale-[0.98]'
+                      : 'text-[#474747] hover:text-[#ff6b00] hover:bg-[#f5f5f5]'
+                  }`}
+                >
+                  <span className="material-symbols-outlined">{link.icon}</span>
+                  <span className="text-xs font-bold uppercase tracking-wider">{link.label}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="mt-auto flex flex-col gap-2 pt-8 border-t border-[#e0e0e0]">
+          <button className="bg-[#ff6b00] text-white py-3 rounded-xl font-bold text-sm mb-4 hover:opacity-90 transition-opacity cursor-pointer shadow-lg shadow-[#ff6b00]/10 active:scale-95">
+            Export Report
+          </button>
+          <button className="flex items-center gap-4 text-[#474747] hover:text-[#ff6b00] px-4 py-3 transition-all cursor-pointer">
+            <span className="material-symbols-outlined">help</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Help Center</span>
+          </button>
+          <button 
+            onClick={() => { logout(); onClose(); }}
+            className="flex items-center gap-4 text-[#474747] hover:text-[#ff6b00] px-4 py-3 transition-all cursor-pointer"
+          >
+            <span className="material-symbols-outlined">logout</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Log Out</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

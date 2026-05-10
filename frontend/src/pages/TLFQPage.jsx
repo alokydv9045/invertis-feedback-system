@@ -5,7 +5,6 @@ import Sidebar from '../components/Sidebar';
 import RatingScale from '../components/RatingScale';
 import api from '../services/api';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Send, RefreshCw, Volume2, Mic, CheckCircle2, Lock, GraduationCap } from 'lucide-react';
 
 export default function TLFQPage() {
   const { id, tlfqId } = useParams();
@@ -21,6 +20,7 @@ export default function TLFQPage() {
   const [submitted, setSubmitted] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [listening, setListening] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Load draft
   useEffect(() => {
@@ -102,36 +102,36 @@ export default function TLFQPage() {
   // ── Success screen
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-500">
-        <Navbar />
-        <div className="flex flex-col md:flex-row flex-1">
-          <Sidebar />
+      <div className="min-h-screen bg-white text-[#1A1A1A] flex flex-col font-sans transition-colors duration-300">
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <div className="flex-1 flex flex-col md:ml-64 min-w-0 transition-all duration-300">
+          <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
           <main className="flex-1 p-6 flex items-center justify-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] p-12 max-w-lg w-full text-center flex flex-col items-center gap-8 shadow-2xl"
+              className="bg-white border border-[#e0e0e0] rounded-[24px] p-12 max-w-lg w-full text-center flex flex-col items-center gap-8 shadow-2xl shadow-black/5"
             >
-              <div className="h-24 w-24 bg-emerald-50 dark:bg-emerald-900/20 rounded-[2rem] flex items-center justify-center border border-emerald-100 dark:border-emerald-900/40">
-                <CheckCircle2 size={48} className="text-emerald-500" />
+              <div className="h-24 w-24 bg-[#ff6b00]/5 rounded-[24px] flex items-center justify-center border border-[#ff6b00]/10">
+                <span className="material-symbols-outlined text-[56px] text-[#ff6b00]">check_circle</span>
               </div>
               <div>
-                <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Submission Successful</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-4 leading-relaxed font-medium">
+                <h2 className="text-3xl font-black text-[#1A1A1A] tracking-tight">Submission Successful</h2>
+                <p className="text-[11px] text-[#474747] font-bold uppercase tracking-widest mt-4 leading-relaxed opacity-60">
                   Your feedback has been recorded anonymously. Your contribution is vital for our continuous academic improvement.
                 </p>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-6 w-full text-left">
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
-                  <Lock size={12} className="text-emerald-500" /> Security Protocol Active
+              <div className="bg-[#f9f9f9] border border-[#e0e0e0] rounded-2xl p-6 w-full text-left">
+                <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-[#474747] opacity-40 mb-3">
+                  <span className="material-symbols-outlined text-[14px] text-[#ff6b00]">verified_user</span> Security Protocol Active
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-600 font-bold leading-relaxed">Identity hashing completed. Response is now immutable and decoupled from your student profile.</p>
+                <p className="text-[10px] text-[#1A1A1A] font-bold leading-relaxed uppercase tracking-widest">Identity hashing completed. Response is now immutable and decoupled from your student profile.</p>
               </div>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-indigo-500/20 cursor-pointer flex items-center justify-center gap-3"
+                className="w-full bg-[#ff6b00] hover:opacity-90 text-white py-5 rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-[#ff6b00]/20 cursor-pointer flex items-center justify-center gap-3"
               >
-                <GraduationCap size={18} /> Back to My Courses
+                <span className="material-symbols-outlined text-[20px]">school</span> Back to My Courses
               </button>
             </motion.div>
           </main>
@@ -141,11 +141,11 @@ export default function TLFQPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-500">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
-        <Sidebar />
-        <main className="flex-1 p-6 md:p-10">
+    <div className="min-h-screen bg-white text-[#1A1A1A] flex flex-col font-sans transition-colors duration-300">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col md:ml-64 min-w-0 transition-all duration-300">
+        <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 p-6 md:p-10 overflow-y-auto">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-10 max-w-4xl mx-auto w-full">
 
             {/* Back + title */}
@@ -153,70 +153,70 @@ export default function TLFQPage() {
               <div>
                 <button
                   onClick={() => navigate(-1)}
-                  className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition mb-4 cursor-pointer uppercase tracking-widest"
+                  className="flex items-center gap-2 text-[10px] font-black text-[#474747] opacity-50 hover:opacity-100 hover:text-[#ff6b00] transition mb-4 cursor-pointer uppercase tracking-[0.2em]"
                 >
-                  <ArrowLeft size={14} /> Back to Course
+                  <span className="material-symbols-outlined text-[16px]">arrow_back</span> Back to Course
                 </button>
-                <h1 className="text-3xl md:text-4xl font-black tracking-tight">TLFQ Sheet</h1>
+                <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#1A1A1A]">TLFQ Sheet</h1>
               </div>
               <div className="flex gap-3">
-                <span className="flex items-center gap-2 text-[10px] font-black bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">
-                  <Lock size={12} /> Anonymous
+                <span className="flex items-center gap-2 text-[9px] font-black bg-[#ff6b00]/5 border border-[#ff6b00]/10 text-[#ff6b00] px-4 py-2 rounded-lg uppercase tracking-widest shadow-sm">
+                  <span className="material-symbols-outlined text-[14px]">lock</span> Anonymous
                 </span>
-                <span className="flex items-center gap-2 text-[10px] font-black bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/40 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">
-                  <RefreshCw size={12} className="animate-spin-slow" /> Auto-Save
+                <span className="flex items-center gap-2 text-[9px] font-black bg-[#1A1A1A]/5 border border-[#1A1A1A]/10 text-[#1A1A1A] px-4 py-2 rounded-lg uppercase tracking-widest shadow-sm">
+                  <span className="material-symbols-outlined text-[14px] animate-spin">refresh</span> Auto-Save
                 </span>
               </div>
             </div>
 
             {loading ? (
-              <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-24 flex flex-col items-center gap-4 shadow-sm">
-                <div className="h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-2" />
-                <span className="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Initializing Questionnaire...</span>
+              <div className="bg-white border border-[#e0e0e0] rounded-[16px] p-24 flex flex-col items-center gap-4 shadow-sm">
+                <div className="h-10 w-10 border-4 border-[#ff6b00] border-t-transparent rounded-full animate-spin mb-4" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#474747] opacity-40 animate-pulse">Initializing Questionnaire...</span>
               </div>
             ) : error && !evaluation ? (
-              <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 text-rose-600 dark:text-rose-400 p-8 rounded-[2rem] text-sm font-bold text-center shadow-sm">{error}</div>
+              <div className="bg-red-50 border border-red-100 text-red-600 p-8 rounded-xl text-[10px] font-black uppercase tracking-widest text-center shadow-sm">{error}</div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-10">
                 {/* Evaluation header */}
-                <div className="bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/40 rounded-[2.5rem] p-8 flex justify-between items-center shadow-sm">
+                <div className="bg-white border border-[#e0e0e0] rounded-[16px] p-8 flex justify-between items-center shadow-sm">
                   <div className="min-w-0">
-                    <h2 className="text-xl font-black text-slate-900 dark:text-slate-100 truncate">{evaluation?.title}</h2>
-                    <div className="flex items-center gap-4 mt-2">
-                       <div className="flex items-center gap-1.5">
-                          <Users size={12} className="text-slate-400" />
-                          <span className="text-[11px] text-slate-500 font-bold">{evaluation?.faculty_name}</span>
+                    <h2 className="text-xl font-black text-[#1A1A1A] truncate">{evaluation?.title}</h2>
+                    <div className="flex items-center gap-4 mt-3">
+                       <div className="flex items-center gap-2">
+                          <span className="material-symbols-outlined text-[16px] text-[#474747]">person</span>
+                          <span className="text-[10px] text-[#474747] font-black uppercase tracking-widest opacity-60">{evaluation?.faculty_name}</span>
                        </div>
-                       <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-                       <div className="flex items-center gap-1.5">
-                          <BookOpen size={12} className="text-slate-400" />
-                          <span className="text-[11px] text-slate-500 font-bold">{evaluation?.course_name}</span>
+                       <div className="h-1 w-1 rounded-full bg-[#e0e0e0]" />
+                       <div className="flex items-center gap-2">
+                          <span className="material-symbols-outlined text-[16px] text-[#474747]">menu_book</span>
+                          <span className="text-[10px] text-[#474747] font-black uppercase tracking-widest opacity-60">{evaluation?.course_name}</span>
                        </div>
                     </div>
                   </div>
                   <button
                     type="button" onClick={clearDraft}
-                    className="text-[10px] font-black text-slate-400 hover:text-rose-500 flex items-center gap-2 px-4 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition cursor-pointer uppercase tracking-widest shrink-0"
+                    className="text-[9px] font-black text-[#474747] hover:text-[#b3261e] flex items-center gap-2 px-4 py-2 hover:bg-[#b3261e]/5 rounded-lg transition cursor-pointer uppercase tracking-widest shrink-0 opacity-40 hover:opacity-100"
                   >
-                    <RefreshCw size={12} /> Reset Draft
+                    <span className="material-symbols-outlined text-[16px]">restart_alt</span> Reset
                   </button>
                 </div>
 
                 {error && (
-                  <div className="bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 text-rose-600 dark:text-rose-400 p-6 rounded-2xl text-xs font-black uppercase tracking-widest text-center">{error}</div>
+                  <div className="bg-red-50 border border-red-100 text-red-600 p-6 rounded-xl text-[10px] font-black uppercase tracking-widest text-center">{error}</div>
                 )}
 
                 {/* Progress */}
                 <div className="flex flex-col gap-3">
-                   <div className="flex items-center justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                   <div className="flex items-center justify-between text-[10px] font-black text-[#474747] uppercase tracking-widest opacity-40">
                      <span>Completion Status</span>
-                     <span>{Object.keys(answers).length} / {questions.length} Questions</span>
+                     <span>{Object.keys(answers).length} / {questions.length} Recorded</span>
                    </div>
-                   <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden shadow-inner">
+                   <div className="w-full bg-[#f1f1f1] rounded-full h-2.5 overflow-hidden shadow-inner border border-[#e0e0e0]">
                      <motion.div
                        initial={{ width: 0 }}
                        animate={{ width: `${(Object.keys(answers).length / Math.max(questions.length, 1)) * 100}%` }}
-                       className="bg-indigo-600 h-full rounded-full transition-all duration-500 shadow-lg shadow-indigo-500/40"
+                       className="bg-[#ff6b00] h-full rounded-full transition-all duration-500 shadow-lg shadow-[#ff6b00]/20"
                      />
                    </div>
                 </div>
@@ -226,24 +226,24 @@ export default function TLFQPage() {
                   {questions.map((q, idx) => (
                     <motion.div
                       key={q.id || q._id}
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 flex flex-col gap-8 shadow-sm hover:border-indigo-500/30 transition-all group"
+                      className="bg-white border border-[#e0e0e0] rounded-[24px] p-8 flex flex-col gap-8 shadow-sm hover:border-[#ff6b00]/20 transition-all group"
                     >
                       <div className="flex justify-between items-start gap-6">
                         <div className="flex gap-5">
-                          <span className="shrink-0 flex items-center justify-center h-10 w-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-black rounded-2xl text-sm border border-indigo-100 dark:border-indigo-800/30 shadow-sm">
+                          <span className="shrink-0 flex items-center justify-center h-10 w-10 bg-[#ff6b00]/5 text-[#ff6b00] font-black rounded-xl text-sm border border-[#ff6b00]/10 shadow-sm">
                             {idx + 1}
                           </span>
-                          <p className="text-base md:text-lg font-black text-slate-800 dark:text-slate-100 leading-tight pt-1.5">{q.question_text}</p>
+                          <p className="text-base md:text-lg font-black text-[#1A1A1A] leading-tight pt-1.5">{q.question_text}</p>
                         </div>
                         <button
                           type="button" onClick={() => speakQuestion(q.question_text)}
-                          className="shrink-0 h-10 w-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all border border-slate-100 dark:border-slate-700 cursor-pointer flex items-center justify-center"
+                          className="shrink-0 h-10 w-10 rounded-xl bg-[#f9f9f9] text-[#474747] hover:text-[#ff6b00] transition-all border border-[#e0e0e0] cursor-pointer flex items-center justify-center"
                           title="Narrate Question"
                         >
-                          <Volume2 size={18} />
+                          <span className="material-symbols-outlined text-[20px]">volume_up</span>
                         </button>
                       </div>
                       <div className="pl-0 md:pl-14">
@@ -257,22 +257,22 @@ export default function TLFQPage() {
                 </div>
 
                 {/* Comment box */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 flex flex-col gap-6 shadow-sm">
+                <div className="bg-white border border-[#e0e0e0] rounded-[24px] p-8 flex flex-col gap-6 shadow-sm">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <h3 className="text-lg font-black text-slate-900 dark:text-slate-100">Narrative Feedback</h3>
-                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 font-bold uppercase tracking-widest">Optional subjective input</p>
+                      <h3 className="text-lg font-black text-[#1A1A1A]">Narrative Feedback</h3>
+                      <p className="text-[10px] text-[#474747] mt-1 font-black uppercase tracking-widest opacity-40">Optional Subjective Input</p>
                     </div>
                     {voiceSupported && (
                       <button
                         type="button" onClick={startVoiceInput}
-                        className={`flex items-center gap-2 px-5 py-2.5 text-[10px] font-black rounded-xl transition border uppercase tracking-widest cursor-pointer shadow-sm ${
+                        className={`flex items-center gap-2 px-5 py-2.5 text-[9px] font-black rounded-xl transition border uppercase tracking-widest cursor-pointer shadow-sm ${
                           listening
-                            ? 'bg-rose-50 border-rose-200 text-rose-600 animate-pulse'
-                            : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                            ? 'bg-red-50 border-red-200 text-red-600 animate-pulse'
+                            : 'bg-[#f9f9f9] border-[#e0e0e0] text-[#474747] hover:bg-white hover:border-[#ff6b00]/30'
                         }`}
                       >
-                        <Mic size={14} /> {listening ? 'Listening...' : 'Voice Dictation'}
+                        <span className="material-symbols-outlined text-[16px]">{listening ? 'settings_voice' : 'mic'}</span> {listening ? 'Listening...' : 'Voice Dictation'}
                       </button>
                     )}
                   </div>
@@ -282,14 +282,14 @@ export default function TLFQPage() {
                        value={comment}
                        onChange={e => setComment(e.target.value)}
                        placeholder="Share any specific feedback about teaching style, course content, or improvement suggestions..."
-                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all leading-relaxed font-medium shadow-inner"
+                       className="w-full bg-[#f9f9f9] border border-[#e0e0e0] rounded-2xl p-6 text-sm text-[#1A1A1A] placeholder-[#474747]/30 focus:outline-none focus:border-[#ff6b00] transition-all leading-relaxed font-medium shadow-inner"
                      />
-                     <div className="absolute top-4 right-4 pointer-events-none opacity-10 group-focus-within:opacity-30 transition-opacity">
-                        <MessageSquare size={40} className="text-slate-400" />
+                     <div className="absolute top-4 right-4 pointer-events-none opacity-[0.03] group-focus-within:opacity-[0.08] transition-opacity">
+                        <span className="material-symbols-outlined text-[60px]">forum</span>
                      </div>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-950/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800/50">
-                     <Lock size={12} className="text-emerald-500" /> 
+                  <div className="flex items-center gap-2 text-[9px] font-black text-[#474747] opacity-40 uppercase tracking-widest bg-[#f9f9f9] p-3 rounded-lg border border-[#e0e0e0]">
+                     <span className="material-symbols-outlined text-[14px] text-[#ff6b00]">lock</span> 
                      System strictly protects narrator anonymity.
                   </div>
                 </div>
@@ -298,16 +298,16 @@ export default function TLFQPage() {
                 <div className="flex gap-6 pt-4">
                   <button
                     type="submit" disabled={submitting}
-                    className="flex-1 flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-5 rounded-[2rem] text-sm transition-all shadow-2xl shadow-indigo-500/30 cursor-pointer disabled:opacity-70 uppercase tracking-[0.2em]"
+                    className="flex-1 flex items-center justify-center gap-3 bg-[#ff6b00] hover:opacity-90 text-white font-black py-5 rounded-xl text-sm transition-all shadow-2xl shadow-[#ff6b00]/30 cursor-pointer disabled:opacity-70 uppercase tracking-[0.2em]"
                   >
                     {submitting
                       ? <span className="h-6 w-6 border-3 border-white border-t-transparent rounded-full animate-spin" />
-                      : <><Send size={18} /><span>Finalize Submission</span></>
+                      : <><span className="material-symbols-outlined text-[20px]">send</span><span>Finalize Submission</span></>
                     }
                   </button>
                   <button
                     type="button" onClick={() => navigate(-1)}
-                    className="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 font-black py-5 px-12 rounded-[2rem] text-sm border border-slate-200 dark:border-slate-800 transition cursor-pointer uppercase tracking-widest shadow-sm"
+                    className="bg-white hover:bg-[#f9f9f9] text-[#474747] font-black py-5 px-12 rounded-xl text-sm border border-[#e0e0e0] transition cursor-pointer uppercase tracking-widest shadow-sm"
                   >
                     Discard
                   </button>

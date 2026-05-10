@@ -14,6 +14,7 @@ export default function Analytics() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('faculty');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     api.get('/responses/analytics')
@@ -30,41 +31,43 @@ export default function Analytics() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-500">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
-        <Sidebar />
-        <main className="flex-1 p-6 md:p-10">
+    <div className="min-h-screen bg-white text-[#1A1A1A] flex flex-col font-sans transition-colors duration-300">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col md:ml-64 min-w-0 transition-all duration-300">
+        <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 p-6 md:p-10 overflow-y-auto">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-7xl mx-auto w-full">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <BarChart2 size={24} className="text-indigo-500" />
-                <h1 className="text-3xl font-black">University Analytics</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-[#ff6b00]/10 text-[#ff6b00] rounded-lg">
+                  <span className="material-symbols-outlined text-[24px]">leaderboard</span>
+                </div>
+                <h1 className="text-3xl font-black text-[#1A1A1A]">University Analytics</h1>
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Full visibility into all feedback data across departments.</p>
+              <p className="text-sm text-[#474747] font-medium ml-12">Full visibility into all feedback data across departments.</p>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800 flex-wrap overflow-x-auto no-scrollbar">
-              {tabs.map(({ id, label, icon: Icon }) => (
+            <div className="flex gap-4 border-b border-[#e0e0e0] flex-wrap overflow-x-auto no-scrollbar">
+              {tabs.map(({ id, label }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-2.5 px-6 py-4 text-sm font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${
+                  className={`flex items-center gap-2.5 px-6 py-4 text-xs font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${
                     activeTab === id
-                      ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-                      : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                      ? 'border-[#ff6b00] text-[#ff6b00]'
+                      : 'border-transparent text-[#474747] hover:text-[#1A1A1A]'
                   }`}
                 >
-                  <Icon size={16} /> {label}
+                  {label}
                 </button>
               ))}
             </div>
 
             {loading ? (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-24 flex flex-col items-center gap-4 shadow-sm">
-                <div className="h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">Aggregating Data...</span>
+              <div className="bg-white border border-[#e0e0e0] rounded-[16px] p-24 flex flex-col items-center gap-4 shadow-sm">
+                <div className="h-12 w-12 border-4 border-[#ff6b00] border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-[#474747] animate-pulse">Aggregating Data...</span>
               </div>
             ) : !data ? (
               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-20 text-center text-slate-500 dark:text-slate-400 font-bold shadow-sm">No analytics data available yet.</div>

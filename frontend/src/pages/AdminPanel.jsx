@@ -20,6 +20,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [courseId, setCourseId] = useState('');
   const [facultyId, setFacultyId] = useState('');
@@ -69,49 +70,45 @@ export default function AdminPanel() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-500">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
-        <Sidebar />
-        <main className="flex-1 p-6 md:p-10">
+    <div className="min-h-screen bg-white text-[#1A1A1A] flex flex-col font-sans transition-colors duration-300">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col md:ml-64 min-w-0 transition-all duration-300">
+        <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 p-6 md:p-10 overflow-y-auto">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-10 max-w-5xl mx-auto w-full">
             
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <ClipboardList size={28} className="text-indigo-600 dark:text-indigo-400" />
-                  <h1 className="text-3xl font-black tracking-tight">Evaluation Forge</h1>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-6">
+                <div className="p-3 bg-[#ff6b00]/10 text-[#ff6b00] rounded-xl">
+                  <span className="material-symbols-outlined text-[32px]">edit_note</span>
                 </div>
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Design and deploy high-fidelity academic feedback instruments.</p>
-              </div>
-              <div className="flex gap-3">
-                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm">
-                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Global Repository Sync: Active</span>
-                 </div>
+                <div>
+                  <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tight">Evaluation Forge</h1>
+                  <p className="text-sm text-[#474747] font-medium mt-1">Design and deploy high-fidelity academic feedback instruments.</p>
+                </div>
               </div>
             </div>
 
             {success && (
-              <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="p-6 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40 rounded-[2rem] text-sm font-black flex items-center gap-4 shadow-sm uppercase tracking-widest">
-                <div className="h-10 w-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-xl flex items-center justify-center shrink-0">
-                   <Check size={20} />
+              <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="p-6 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-[2rem] text-xs font-black flex items-center gap-4 shadow-sm uppercase tracking-widest">
+                <div className="h-10 w-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
+                   <span className="material-symbols-outlined">check_circle</span>
                 </div>
                 {success}
               </motion.div>
             )}
             
             {error && (
-              <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="p-6 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/40 rounded-[2rem] text-sm font-black text-center shadow-sm uppercase tracking-widest">
+              <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="p-6 bg-rose-50 text-rose-600 border border-rose-100 rounded-[2rem] text-xs font-black text-center shadow-sm uppercase tracking-widest">
                 {error}
               </motion.div>
             )}
-
+ 
             {loading ? (
-              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[3rem] p-32 flex flex-col items-center gap-4 shadow-sm">
-                <div className="h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4" />
-                <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">Synchronizing Data Pools...</span>
+              <div className="bg-white border border-[#e0e0e0] rounded-[24px] p-32 flex flex-col items-center gap-4 shadow-sm">
+                <div className="h-12 w-12 border-4 border-[#ff6b00] border-t-transparent rounded-full animate-spin mb-4" />
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-[#474747] animate-pulse">Synchronizing Data Pools...</span>
               </div>
             ) : (
               <form onSubmit={handleCreateTlfq} className="flex flex-col gap-10">

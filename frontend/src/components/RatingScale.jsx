@@ -15,8 +15,8 @@ export default function RatingScale({ value, onChange }) {
   };
 
   return (
-    <div className="flex flex-col gap-2 select-none">
-      <div className="flex flex-wrap gap-2.5 items-center">
+    <div className="flex flex-col gap-4 select-none">
+      <div className="flex flex-wrap gap-3 items-center">
         {[1, 2, 3, 4, 5, 6, 7].map((num) => {
           const isSelected = value === num;
 
@@ -24,13 +24,13 @@ export default function RatingScale({ value, onChange }) {
             <motion.button
               type="button"
               key={num}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => onChange(num)}
-              className={`w-12 h-12 flex items-center justify-center rounded-2xl text-base font-bold transition-all duration-200 shadow-sm cursor-pointer border ${
+              className={`w-12 h-12 flex items-center justify-center rounded-xl text-sm font-black transition-all duration-300 shadow-sm cursor-pointer border ${
                 isSelected
-                  ? 'bg-indigo-600 border-indigo-600 text-white scale-110 shadow-lg shadow-indigo-300 dark:shadow-indigo-950/40 ring-4 ring-indigo-100 dark:ring-indigo-900/30'
-                  : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-300 dark:hover:border-indigo-700 border-slate-200 dark:border-slate-700'
+                  ? 'bg-[#ff6b00] border-[#ff6b00] text-white scale-110 shadow-lg shadow-[#ff6b00]/30 ring-4 ring-[#ff6b00]/10'
+                  : 'bg-[#f9f9f9] text-[#474747] hover:bg-white hover:border-[#ff6b00]/30 border-[#e0e0e0]'
               }`}
             >
               {num}
@@ -40,13 +40,14 @@ export default function RatingScale({ value, onChange }) {
       </div>
 
       {value && (
-        <motion.p
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mt-1"
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex items-center gap-2 text-[10px] font-black text-[#ff6b00] uppercase tracking-[0.15em] bg-[#ff6b00]/5 px-4 py-2 rounded-lg border border-[#ff6b00]/10 w-fit"
         >
+          <span className="material-symbols-outlined text-[16px]">verified</span>
           Selected: {value} — {getRatingLabel(value)}
-        </motion.p>
+        </motion.div>
       )}
     </div>
   );

@@ -14,6 +14,7 @@ export default function ManageDirectory() {
   const [faculty, setFaculty] = useState([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState({ text: '', type: '' });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Create state
   const [deptName, setDeptName] = useState('');
@@ -115,18 +116,20 @@ export default function ManageDirectory() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-500">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
-        <Sidebar />
-        <main className="flex-1 p-6 md:p-10">
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-6xl">
+    <div className="min-h-screen bg-white text-[#1A1A1A] flex flex-col font-sans transition-colors duration-300">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col md:ml-64 min-w-0 transition-all duration-300">
+        <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-6xl w-full">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Settings size={24} className="text-indigo-500" />
-                <h1 className="text-3xl font-black">Directory Hub</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-[#ff6b00]/10 text-[#ff6b00] rounded-lg">
+                  <span className="material-symbols-outlined text-[24px]">settings</span>
+                </div>
+                <h1 className="text-3xl font-black text-[#1A1A1A]">Directory Hub</h1>
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Manage the structural entities of the feedback system.</p>
+              <p className="text-sm text-[#474747] font-medium ml-12">Manage the structural entities of the feedback system.</p>
             </div>
 
             {msg.text && (
@@ -138,18 +141,18 @@ export default function ManageDirectory() {
             )}
 
             {/* Tabs */}
-            <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800 flex-wrap overflow-x-auto no-scrollbar">
-              {TABS.map(({ id, label, icon: Icon }) => (
+            <div className="flex gap-4 border-b border-[#e0e0e0] flex-wrap overflow-x-auto no-scrollbar">
+              {TABS.map(({ id, label }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-2.5 px-6 py-4 text-sm font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${
+                  className={`flex items-center gap-2.5 px-6 py-4 text-xs font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${
                     activeTab === id
-                      ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-                      : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                      ? 'border-[#ff6b00] text-[#ff6b00]'
+                      : 'border-transparent text-[#474747] hover:text-[#1A1A1A]'
                   }`}
                 >
-                  <Icon size={16} /> {label}
+                  {label}
                 </button>
               ))}
             </div>

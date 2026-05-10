@@ -1,17 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { 
-  Users, Search, Filter, GraduationCap, 
-  Trash2, Edit, ChevronRight, UserCircle, 
-  Building2, Mail, Hash, Calendar, Loader2,
-  UserPlus, X, Save, Lock, Info, ArrowLeft
-} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 
-const inputCls = 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 w-full transition-all shadow-sm';
+const inputCls = 'bg-[#f9f9f9] border border-[#e0e0e0] rounded-xl px-5 py-4 text-xs font-bold text-[#1A1A1A] placeholder-[#474747]/30 focus:outline-none focus:border-[#ff6b00] w-full transition-all shadow-sm';
 
 export default function ManageStudents() {
   const { user } = useAuth();
@@ -20,6 +14,7 @@ export default function ManageStudents() {
   const [search, setSearch] = useState('');
   const [selectedDept, setSelectedDept] = useState('all');
   const [depts, setDepts] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Modal states
   const [showModal, setShowModal] = useState(false);
@@ -114,49 +109,35 @@ export default function ManageStudents() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-500">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
-        <Sidebar />
-        <main className="flex-1 p-6 md:p-10">
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-10 pb-10 max-w-7xl mx-auto w-full">
+    <div className="min-h-screen bg-white text-[#1A1A1A] flex flex-col font-sans transition-colors duration-300">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col md:ml-64 min-w-0 transition-all duration-300">
+        <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 pb-10 max-w-7xl mx-auto w-full">
             
-            {/* Header section with sophisticated design */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-10 rounded-[3rem] shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 blur-[120px] -mr-48 -mt-48 transition-opacity opacity-50 group-hover:opacity-100" />
-              <div className="z-10 flex items-start gap-8">
-                <button 
-                  onClick={() => window.history.back()}
-                  className="mt-1 h-14 w-14 flex items-center justify-center bg-slate-50 dark:bg-slate-800 hover:bg-indigo-600 text-slate-400 dark:text-slate-500 hover:text-white rounded-[1.5rem] transition-all cursor-pointer border border-slate-100 dark:border-slate-700 active:scale-90 shadow-sm"
-                >
-                  <ArrowLeft size={24} />
-                </button>
+            {/* Header section */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-white border border-[#e0e0e0] p-8 rounded-[24px] shadow-sm relative overflow-hidden">
+              <div className="z-10 flex items-center gap-6">
+                <div className="h-14 w-14 bg-[#ff6b00]/10 text-[#ff6b00] rounded-xl flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[32px]">group</span>
+                </div>
                 <div>
-                  <div className="flex items-center gap-4">
-                    <div className="h-2 w-2 rounded-full bg-indigo-500" />
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Student Directory</h1>
-                  </div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-4 max-w-lg font-bold leading-relaxed uppercase tracking-widest opacity-80">
+                  <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tight">Student Directory</h1>
+                  <p className="text-[#474747] text-[10px] mt-1 font-black uppercase tracking-[0.2em] opacity-60">
                     {user.role === 'admin' 
-                      ? 'Managing global academic identities across the TLFQ infrastructure.' 
-                      : `Reviewing departmental student roster and access protocol.`}
+                      ? 'Global academic identities management' 
+                      : `Departmental student roster protocol`}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-8 z-10">
-                <div className="hidden lg:flex flex-col items-end">
-                  <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">Active Profiles</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-slate-900 dark:text-white">{students.length}</span>
-                    <span className="text-xs font-black text-slate-400">Synced</span>
-                  </div>
-                </div>
+              <div className="flex items-center gap-6 z-10">
                 <button 
                   onClick={() => openModal()}
-                  className="flex items-center gap-3 px-10 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.15em] transition-all shadow-2xl shadow-indigo-500/30 hover:scale-[1.03] active:scale-95 cursor-pointer"
+                  className="flex items-center gap-3 px-8 py-4 bg-[#ff6b00] hover:opacity-90 text-white rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-lg shadow-[#ff6b00]/20 active:scale-95 cursor-pointer"
                 >
-                  <UserPlus size={18} />
+                  <span className="material-symbols-outlined">person_add</span>
                   <span>Onboard Student</span>
                 </button>
               </div>
@@ -165,11 +146,11 @@ export default function ManageStudents() {
             {/* Advanced Filters */}
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex-1 relative group">
-                <Search className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 transition-all" size={24} />
+                <span className="material-symbols-outlined absolute left-8 top-1/2 -translate-y-1/2 text-[#474747] opacity-30 group-focus-within:text-[#ff6b00] group-focus-within:opacity-100 transition-all text-[24px]">search</span>
                 <input 
                   type="text"
                   placeholder="Query names, ID tags, or digital handles..."
-                  className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] pl-20 pr-10 py-6 text-sm text-slate-800 dark:text-white font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all placeholder-slate-400 dark:placeholder-slate-700 shadow-sm"
+                  className="w-full bg-white border border-[#e0e0e0] rounded-[16px] pl-20 pr-10 py-6 text-sm text-[#1A1A1A] font-bold focus:outline-none focus:border-[#ff6b00] transition-all placeholder-[#474747]/30 shadow-sm"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -177,9 +158,9 @@ export default function ManageStudents() {
 
               {user.role === 'admin' && (
                 <div className="lg:w-96 relative group">
-                  <Filter className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 transition-all" size={22} />
+                  <span className="material-symbols-outlined absolute left-8 top-1/2 -translate-y-1/2 text-[#474747] opacity-30 group-focus-within:text-[#ff6b00] group-focus-within:opacity-100 transition-all text-[22px]">filter_list</span>
                   <select 
-                    className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] pl-20 pr-14 py-6 text-sm font-black text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 appearance-none cursor-pointer shadow-sm uppercase tracking-widest transition-all"
+                    className="w-full bg-white border border-[#e0e0e0] rounded-[16px] pl-20 pr-14 py-6 text-xs font-black text-[#1A1A1A] focus:outline-none focus:border-[#ff6b00] appearance-none cursor-pointer shadow-sm uppercase tracking-widest transition-all"
                     value={selectedDept}
                     onChange={(e) => setSelectedDept(e.target.value)}
                   >
@@ -188,9 +169,7 @@ export default function ManageStudents() {
                       <option key={d._id} value={d.name}>{d.name}</option>
                     ))}
                   </select>
-                  <div className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-focus-within:text-indigo-500 transition-colors">
-                     <ChevronRight className="rotate-90" size={20} />
-                  </div>
+                  <span className="material-symbols-outlined absolute right-8 top-1/2 -translate-y-1/2 text-[#474747] opacity-30 pointer-events-none transition-colors">expand_more</span>
                 </div>
               )}
             </div>
@@ -200,16 +179,16 @@ export default function ManageStudents() {
               <AnimatePresence mode='popLayout'>
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="h-32 bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] animate-pulse shadow-sm" />
+                    <div key={i} className="h-32 bg-[#f9f9f9] border border-[#e0e0e0] rounded-[16px] animate-pulse shadow-sm" />
                   ))
                 ) : filteredStudents.length === 0 ? (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[4rem] text-center shadow-sm">
-                    <div className="h-28 w-28 bg-slate-50 dark:bg-slate-800/50 rounded-[2.5rem] flex items-center justify-center mb-8 text-slate-200 dark:text-slate-700">
-                      <Users size={56} />
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-32 bg-white border border-[#e0e0e0] rounded-[24px] text-center shadow-sm">
+                    <div className="h-28 w-28 bg-[#f9f9f9] rounded-2xl flex items-center justify-center mb-8 text-[#e0e0e0]">
+                      <span className="material-symbols-outlined text-[56px]">group</span>
                     </div>
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">No Records Identified</h3>
-                    <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px] max-w-xs mx-auto">Try broadening your search criteria or scope selection.</p>
-                    <button onClick={() => {setSearch(''); setSelectedDept('all');}} className="mt-10 px-10 py-4 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[10px] font-black rounded-2xl uppercase tracking-[0.2em] transition-all border border-slate-100 dark:border-slate-700">Reset System View</button>
+                    <h3 className="text-2xl font-black text-[#1A1A1A] mb-3">No Records Identified</h3>
+                    <p className="text-[#474747] font-black uppercase tracking-widest text-[10px] max-w-xs mx-auto opacity-40">Try broadening your search criteria or scope selection.</p>
+                    <button onClick={() => {setSearch(''); setSelectedDept('all');}} className="mt-10 px-10 py-4 bg-[#f9f9f9] hover:bg-white text-[#474747] text-[10px] font-black rounded-xl uppercase tracking-[0.2em] transition-all border border-[#e0e0e0] cursor-pointer">Reset System View</button>
                   </motion.div>
                 ) : filteredStudents.map((student, idx) => (
                   <motion.div
@@ -219,22 +198,22 @@ export default function ManageStudents() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, scale: 0.98 }}
                     transition={{ delay: idx * 0.04 }}
-                    className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/40 rounded-[2.5rem] p-8 transition-all shadow-sm hover:shadow-2xl hover:shadow-indigo-500/5 flex flex-col lg:flex-row lg:items-center gap-10 relative overflow-hidden"
+                    className="group bg-white border border-[#e0e0e0] hover:border-[#ff6b00]/30 rounded-[16px] p-8 transition-all shadow-sm hover:shadow-xl flex flex-col lg:flex-row lg:items-center gap-10 relative overflow-hidden"
                   >
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute top-0 left-0 w-1.5 h-full bg-[#ff6b00] opacity-0 group-hover:opacity-100 transition-opacity" />
                     
                     {/* Identity block */}
                     <div className="flex items-center gap-8 lg:w-[35%] shrink-0">
-                      <div className="h-20 w-20 rounded-[2rem] bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-700 shadow-inner overflow-hidden">
-                        <GraduationCap size={40} className="group-hover:scale-110 transition-transform" />
+                      <div className="h-20 w-20 rounded-2xl bg-[#ff6b00]/5 border border-[#ff6b00]/10 flex items-center justify-center text-[#ff6b00] group-hover:bg-[#ff6b00] group-hover:text-white transition-all duration-700 shadow-inner overflow-hidden">
+                        <span className="material-symbols-outlined text-[40px] group-hover:scale-110 transition-transform">school</span>
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-black text-slate-900 dark:text-white text-2xl tracking-tight leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate mb-1">
+                        <h3 className="font-black text-[#1A1A1A] text-2xl tracking-tight leading-tight group-hover:text-[#ff6b00] transition-colors truncate mb-1">
                           {student.name}
                         </h3>
                         <div className="flex items-center gap-3">
-                           <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">ID: {student.college_id}</span>
-                           <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                           <span className="text-[10px] font-black text-[#474747] uppercase tracking-[0.2em] opacity-40">ID: {student.college_id}</span>
+                           <div className="h-1 w-1 rounded-full bg-[#e0e0e0]" />
                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Active</span>
                         </div>
                       </div>
@@ -243,33 +222,33 @@ export default function ManageStudents() {
                     {/* Meta data block */}
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10">
                       <div className="flex items-center gap-5">
-                        <div className="h-12 w-12 rounded-2xl bg-slate-50 dark:bg-slate-850 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 transition-all border border-slate-100 dark:border-slate-800 shrink-0 shadow-sm">
-                          <Building2 size={20} />
+                        <div className="h-12 w-12 rounded-xl bg-[#f9f9f9] flex items-center justify-center text-[#474747] group-hover:text-[#ff6b00] transition-all border border-[#e0e0e0] shrink-0 shadow-sm">
+                          <span className="material-symbols-outlined text-[20px]">domain</span>
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Unit</span>
-                          <span className="font-black text-slate-700 dark:text-slate-100 text-xs truncate uppercase tracking-tighter">{student.department_name}</span>
+                          <span className="text-[9px] font-black text-[#474747] uppercase tracking-widest mb-1 opacity-40">Unit</span>
+                          <span className="font-black text-[#1A1A1A] text-xs truncate uppercase tracking-tighter">{student.department_name}</span>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-5">
-                        <div className="h-12 w-12 rounded-2xl bg-slate-50 dark:bg-slate-850 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 transition-all border border-slate-100 dark:border-slate-800 shrink-0 shadow-sm">
-                          <Mail size={20} />
+                        <div className="h-12 w-12 rounded-xl bg-[#f9f9f9] flex items-center justify-center text-[#474747] group-hover:text-[#ff6b00] transition-all border border-[#e0e0e0] shrink-0 shadow-sm">
+                          <span className="material-symbols-outlined text-[20px]">alternate_email</span>
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Correspondence</span>
-                          <span className="font-bold text-slate-500 dark:text-slate-400 text-xs truncate">{student.email || 'N/A'}</span>
+                          <span className="text-[9px] font-black text-[#474747] uppercase tracking-widest mb-1 opacity-40">Correspondence</span>
+                          <span className="font-bold text-[#474747] text-xs truncate">{student.email || 'N/A'}</span>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-5">
-                        <div className="h-12 w-12 rounded-2xl bg-slate-50 dark:bg-slate-850 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 transition-all border border-slate-100 dark:border-slate-800 shrink-0 shadow-sm">
-                          <Hash size={20} />
+                        <div className="h-12 w-12 rounded-xl bg-[#f9f9f9] flex items-center justify-center text-[#474747] group-hover:text-[#ff6b00] transition-all border border-[#e0e0e0] shrink-0 shadow-sm">
+                          <span className="material-symbols-outlined text-[20px]">tag</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Load Status</span>
+                          <span className="text-[9px] font-black text-[#474747] uppercase tracking-widest mb-1 opacity-40">Load Status</span>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">{student.enrollment_count} Active Modules</span>
+                            <span className="text-xs font-black text-[#ff6b00]">{student.enrollment_count} Active Modules</span>
                           </div>
                         </div>
                       </div>
@@ -279,17 +258,17 @@ export default function ManageStudents() {
                     <div className="flex items-center justify-end gap-4 lg:w-[15%] shrink-0">
                       <button 
                         onClick={() => openModal(student)}
-                        className="h-14 w-14 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 rounded-[1.5rem] transition-all border border-slate-100 dark:border-slate-700 cursor-pointer shadow-sm active:scale-90"
+                        className="h-14 w-14 flex items-center justify-center bg-white text-[#474747] hover:text-[#ff6b00] hover:bg-[#ff6b00]/5 rounded-xl transition-all border border-[#e0e0e0] cursor-pointer shadow-sm active:scale-90"
                         title="Edit Profile"
                       >
-                        <Edit size={20} />
+                        <span className="material-symbols-outlined">edit</span>
                       </button>
                       <button 
                         onClick={() => handleDelete(student.id)}
-                        className="h-14 w-14 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/40 rounded-[1.5rem] transition-all border border-slate-100 dark:border-slate-700 cursor-pointer shadow-sm active:scale-90"
+                        className="h-14 w-14 flex items-center justify-center bg-white text-[#474747] hover:text-[#b3261e] hover:bg-[#b3261e]/5 rounded-xl transition-all border border-[#e0e0e0] cursor-pointer shadow-sm active:scale-90"
                         title="Purge Record"
                       >
-                        <Trash2 size={20} />
+                        <span className="material-symbols-outlined">delete</span>
                       </button>
                     </div>
                   </motion.div>
@@ -306,38 +285,38 @@ export default function ManageStudents() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     onClick={() => setShowModal(false)}
-                    className="absolute inset-0 bg-slate-950/60 backdrop-blur-xl"
+                    className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                   />
                   
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: 40 }}
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: 40 }}
-                    className="w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[4rem] shadow-[0_40px_100px_-15px_rgba(0,0,0,0.3)] relative z-10 overflow-hidden"
+                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                    className="w-full max-w-2xl bg-white border border-[#e0e0e0] rounded-[24px] shadow-2xl relative z-10 overflow-hidden"
                   >
-                    <div className="p-12">
-                      <div className="flex items-center justify-between mb-12">
+                    <div className="p-10">
+                      <div className="flex items-center justify-between mb-10">
                         <div>
                           <div className="flex items-center gap-3">
-                             <div className="h-2 w-2 rounded-full bg-indigo-500" />
-                             <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                             <div className="h-2 w-2 rounded-full bg-[#ff6b00]" />
+                             <h2 className="text-3xl font-black text-[#1A1A1A] tracking-tight">
                                {editingId ? 'Modify Record' : 'Student Intake'}
                              </h2>
                           </div>
-                          <p className="text-slate-500 dark:text-slate-400 text-[10px] mt-3 uppercase tracking-[0.2em] font-black opacity-80">Security Protocol Mapping: Enabled</p>
+                          <p className="text-[#474747] text-[10px] mt-3 uppercase tracking-[0.2em] font-black opacity-40">Security Protocol Mapping: Enabled</p>
                         </div>
                         <button 
                           onClick={() => setShowModal(false)}
-                          className="h-14 w-14 flex items-center justify-center bg-slate-50 dark:bg-slate-800 hover:bg-rose-600 text-slate-400 hover:text-white rounded-2xl transition-all cursor-pointer border border-slate-100 dark:border-slate-700"
+                          className="h-12 w-12 flex items-center justify-center bg-[#f9f9f9] hover:bg-[#b3261e] text-[#474747] hover:text-white rounded-xl transition-all cursor-pointer border border-[#e0e0e0]"
                         >
-                          <X size={26} />
+                          <span className="material-symbols-outlined">close</span>
                         </button>
                       </div>
 
                       <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div className="flex flex-col gap-3">
-                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Legal Name</label>
+                            <label className="text-[10px] font-black text-[#474747] uppercase tracking-widest ml-1 opacity-60">Legal Name</label>
                             <input 
                               type="text" required
                               className={inputCls}
@@ -347,7 +326,7 @@ export default function ManageStudents() {
                             />
                           </div>
                           <div className="flex flex-col gap-3">
-                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Academic ID Tag</label>
+                            <label className="text-[10px] font-black text-[#474747] uppercase tracking-widest ml-1 opacity-60">Academic ID Tag</label>
                             <input 
                               type="text" required
                               className={inputCls}
@@ -359,7 +338,7 @@ export default function ManageStudents() {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                          <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Institutional Handle</label>
+                          <label className="text-[10px] font-black text-[#474747] uppercase tracking-widest ml-1 opacity-60">Institutional Handle</label>
                           <input 
                             type="email"
                             className={inputCls}
@@ -370,7 +349,7 @@ export default function ManageStudents() {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                          <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Faculty Affiliation</label>
+                          <label className="text-[10px] font-black text-[#474747] uppercase tracking-widest ml-1 opacity-60">Faculty Affiliation</label>
                           <select 
                             disabled={user.role === 'hod'}
                             className={inputCls + ' cursor-pointer appearance-none'}
@@ -386,7 +365,7 @@ export default function ManageStudents() {
 
                         {!editingId && (
                           <div className="flex flex-col gap-3">
-                            <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Master Access Key</label>
+                            <label className="text-[10px] font-black text-[#474747] uppercase tracking-widest ml-1 opacity-60">Master Access Key</label>
                             <div className="relative">
                                <input 
                                  type="password" required
@@ -395,7 +374,7 @@ export default function ManageStudents() {
                                  onChange={e => setFormData({...formData, password: e.target.value})}
                                  placeholder="••••••••"
                                />
-                               <Lock className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                               <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-[#474747] opacity-30">lock</span>
                             </div>
                           </div>
                         )}
@@ -404,16 +383,19 @@ export default function ManageStudents() {
                           <button 
                             type="button"
                             onClick={() => setShowModal(false)}
-                            className="flex-1 px-8 py-5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-400 dark:text-slate-500 rounded-[2rem] font-black text-xs uppercase tracking-widest transition-all cursor-pointer border border-slate-100 dark:border-slate-700 shadow-sm"
+                            className="flex-1 px-8 py-5 bg-white hover:bg-[#f9f9f9] text-[#474747] rounded-xl font-black text-xs uppercase tracking-widest transition-all cursor-pointer border border-[#e0e0e0] shadow-sm"
                           >
                             Discard
                           </button>
                           <button 
                             type="submit"
                             disabled={modalLoading}
-                            className="flex-[2] px-8 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] transition-all shadow-2xl shadow-indigo-500/40 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 cursor-pointer disabled:opacity-50"
+                            className="flex-[2] px-8 py-5 bg-[#ff6b00] hover:opacity-90 text-white rounded-xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-2xl shadow-[#ff6b00]/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 cursor-pointer disabled:opacity-50"
                           >
-                            {modalLoading ? <Loader2 className="animate-spin" size={24} /> : <Save size={24} />}
+                            {modalLoading 
+                              ? <span className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> 
+                              : <span className="material-symbols-outlined">save</span>
+                            }
                             <span>{editingId ? 'Push Updates' : 'Sync Profile'}</span>
                           </button>
                         </div>

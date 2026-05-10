@@ -5,27 +5,18 @@ import Sidebar from '../components/Sidebar';
 import api from '../services/api';
 import { motion } from 'framer-motion';
 import {
-  BarChart2, Star, Users, BookOpen, Building2,
-  MessageSquare, TrendingUp, Award, ChevronDown
-} from 'lucide-react';
-import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  RadarChart, PolarGrid, PolarAngleAxis, Radar, Cell
+  Cell
 } from 'recharts';
 
-const COLORS = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
-
-function RatingBadge({ value, max = 7 }) {
-  const pct = (value / max) * 100;
-  const color = pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-rose-400';
-  return <span className={`text-lg font-black ${color}`}>{value.toFixed(1)}<span className="text-xs text-slate-500 font-normal">/{max}</span></span>;
-}
+const COLORS = ['#ff6b00', '#1A1A1A', '#474747', '#ff8533', '#2d2d2d'];
 
 export default function HODDashboard() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     api.get('/responses/analytics')
@@ -35,95 +26,95 @@ export default function HODDashboard() {
   }, []);
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: Building2 },
-    { id: 'faculty', label: 'Faculty Rankings', icon: Award },
-    { id: 'courses', label: 'Course Reports', icon: BookOpen },
-    { id: 'comments', label: 'Feedback Insights', icon: MessageSquare },
+    { id: 'overview', label: 'Overview', icon: 'domain' },
+    { id: 'faculty', label: 'Faculty Rankings', icon: 'award' },
+    { id: 'courses', label: 'Course Reports', icon: 'menu_book' },
+    { id: 'comments', label: 'Feedback Insights', icon: 'forum' },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-500">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
-        <Sidebar />
-        <main className="flex-1 p-6 md:p-10">
+    <div className="min-h-screen bg-white text-[#1A1A1A] flex flex-col font-sans transition-colors duration-300">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col md:ml-64 min-w-0 transition-all duration-300">
+        <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 p-6 md:p-10 overflow-y-auto">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-7xl mx-auto w-full">
 
             {/* Header */}
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <BarChart2 size={24} className="text-indigo-600 dark:text-indigo-400" />
-                <h1 className="text-3xl font-black tracking-tight">Department Portal</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="material-symbols-outlined text-[#ff6b00] text-[28px]">analytics</span>
+                <h1 className="text-3xl font-black tracking-tight text-[#1A1A1A]">Department Portal</h1>
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                Feedback insights for your department — all data is strictly anonymous.
+              <p className="text-xs font-bold text-[#474747] uppercase tracking-[0.2em] opacity-60">
+                Departmental Control Center • Real-time Feedback Stream
               </p>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800 flex-wrap overflow-x-auto no-scrollbar">
-              {tabs.map(({ id, label, icon: Icon }) => (
+            <div className="flex gap-4 border-b border-[#e0e0e0] flex-wrap overflow-x-auto no-scrollbar pt-4">
+              {tabs.map(({ id, label, icon }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-2.5 px-6 py-4 text-sm font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${
+                  className={`flex items-center gap-2.5 px-6 py-4 text-[11px] font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${
                     activeTab === id
-                      ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
-                      : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                      ? 'border-[#ff6b00] text-[#ff6b00]'
+                      : 'border-transparent text-[#474747] opacity-40 hover:opacity-100 hover:text-[#1A1A1A]'
                   }`}
                 >
-                  <Icon size={16} /> {label}
+                  <span className="material-symbols-outlined text-[18px]">{icon}</span> {label}
                 </button>
               ))}
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[1, 2, 3, 4].map(n => <div key={n} className="h-44 bg-white dark:bg-slate-900/50 animate-pulse rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm" />)}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {[1, 2, 3, 4].map(n => <div key={n} className="h-44 bg-[#f9f9f9] animate-pulse rounded-[16px] border border-[#e0e0e0]" />)}
               </div>
             ) : !data ? (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center text-slate-500 dark:text-slate-400 font-bold shadow-sm">No analytics available for this department.</div>
+              <div className="bg-white border border-[#e0e0e0] rounded-[16px] p-20 text-center text-[#474747] font-bold shadow-sm">No analytics available for this department.</div>
             ) : (
               <div className="flex flex-col gap-8">
                 {/* OVERVIEW TAB */}
                 {activeTab === 'overview' && (
                   <div className="flex flex-col gap-8">
                     {(data.deptOverview || []).map(dept => (
-                      <div key={dept.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-10 shadow-sm group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
-                           <Building2 size={120} />
+                      <div key={dept.id} className="bg-white border border-[#e0e0e0] rounded-[16px] p-8 shadow-sm group relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity">
+                           <span className="material-symbols-outlined text-[160px]">domain</span>
                         </div>
                         <div className="flex items-start justify-between mb-10 relative z-10">
                           <div>
-                            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{dept.name}</h3>
-                            <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1 rounded-lg border border-indigo-100 dark:border-indigo-800/30 uppercase tracking-widest">{dept.code}</span>
+                            <h3 className="text-2xl font-black text-[#1A1A1A] mb-3">{dept.name}</h3>
+                            <span className="text-[10px] font-black text-[#ff6b00] bg-[#ff6b00]/5 px-4 py-1.5 rounded-lg border border-[#ff6b00]/10 uppercase tracking-widest">{dept.code}</span>
                           </div>
                           <div className="text-right">
-                             <div className={`text-4xl font-black ${dept.avg_rating >= 5 ? 'text-emerald-500' : dept.avg_rating >= 3.5 ? 'text-amber-500' : 'text-rose-500'}`}>
+                             <div className={`text-5xl font-black ${dept.avg_rating >= 5 ? 'text-[#ff6b00]' : dept.avg_rating >= 3.5 ? 'text-[#1A1A1A]' : 'text-[#b3261e]'}`}>
                                 {dept.avg_rating.toFixed(1)}
-                                <span className="text-xs text-slate-400 font-bold uppercase ml-1">Avg</span>
+                                <span className="text-[10px] text-[#474747] font-black uppercase ml-2 tracking-widest opacity-40">Avg Rating</span>
                              </div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-6 relative z-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 relative z-10">
                           {[
-                            { icon: BookOpen, label: 'Course Modules', value: dept.course_count, color: 'text-blue-500' },
-                            { icon: Award, label: 'Faculty Records', value: dept.faculty_count, color: 'text-purple-500' },
-                            { icon: Users, label: 'Enrolled Students', value: dept.student_count, color: 'text-emerald-500' },
-                          ].map(({ icon: Icon, label, value, color }) => (
-                            <div key={label} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-[1.5rem] p-6 group-hover:border-indigo-500/20 transition-all text-center">
-                              <Icon size={18} className={`${color} mx-auto mb-2`} />
-                              <div className="text-2xl font-black text-slate-900 dark:text-slate-100">{value}</div>
-                              <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">{label}</div>
+                            { icon: 'menu_book', label: 'Course Modules', value: dept.course_count, color: 'text-[#ff6b00]' },
+                            { icon: 'award', label: 'Faculty Records', value: dept.faculty_count, color: 'text-[#1A1A1A]' },
+                            { icon: 'group', label: 'Enrolled Students', value: dept.student_count, color: 'text-[#ff6b00]' },
+                          ].map(({ icon, label, value, color }) => (
+                            <div key={label} className="bg-[#f9f9f9] border border-[#e0e0e0] rounded-xl p-6 group-hover:border-[#ff6b00]/20 transition-all text-center">
+                              <span className={`material-symbols-outlined ${color} mb-3 text-[24px]`}>{icon}</span>
+                              <div className="text-2xl font-black text-[#1A1A1A]">{value}</div>
+                              <div className="text-[10px] font-black text-[#474747] uppercase tracking-widest mt-2 opacity-50">{label}</div>
                             </div>
                           ))}
                         </div>
                       </div>
                     ))}
                     {(data.deptOverview || []).length === 0 && (
-                      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center">
-                        <Building2 size={48} className="text-slate-200 dark:text-slate-700 mx-auto mb-6" />
-                        <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">No active departmental records.</p>
+                      <div className="bg-white border border-[#e0e0e0] rounded-[16px] p-20 text-center">
+                        <span className="material-symbols-outlined text-[48px] text-[#e0e0e0] mb-6">domain_disabled</span>
+                        <p className="text-[#474747] font-bold uppercase tracking-widest text-[10px] opacity-40">No active departmental records.</p>
                       </div>
                     )}
                   </div>
@@ -132,32 +123,34 @@ export default function HODDashboard() {
                 {/* FACULTY TAB */}
                 {activeTab === 'faculty' && (
                   <div className="flex flex-col gap-8">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-sm">
-                      <h3 className="text-sm font-black text-slate-900 dark:text-slate-200 mb-8 flex items-center gap-3 uppercase tracking-wider">
-                        <TrendingUp size={18} className="text-indigo-600 dark:text-indigo-400" /> Faculty Performance Ranking
+                    <div className="bg-white border border-[#e0e0e0] rounded-[16px] p-8 shadow-sm">
+                      <h3 className="text-[11px] font-black text-[#1A1A1A] mb-8 flex items-center gap-3 uppercase tracking-wider">
+                        <span className="material-symbols-outlined text-[#ff6b00] text-[18px]">trending_up</span> Faculty Performance Ranking
                       </h3>
                       {(data.avgRatingPerFaculty || []).length === 0 ? (
-                        <div className="p-12 text-center text-slate-400 font-bold uppercase text-xs tracking-widest">No evaluation data recorded for faculty.</div>
+                        <div className="p-12 text-center text-[#474747] font-bold uppercase text-[10px] tracking-widest opacity-40">No evaluation data recorded for faculty.</div>
                       ) : (
                         <div className="h-80">
                           <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data.avgRatingPerFaculty} layout="vertical" margin={{ left: 10, right: 30 }}>
-                              <XAxis type="number" domain={[0, 7]} tick={{ fill: '#64748b', fontSize: 11, fontWeight: 'bold' }} stroke="#cbd5e1" />
-                              <YAxis type="category" dataKey="name" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 'bold' }} width={140} stroke="#cbd5e1" />
+                              <XAxis type="number" domain={[0, 7]} tick={{ fill: '#474747', fontSize: 10, fontWeight: '900' }} stroke="#e0e0e0" />
+                              <YAxis type="category" dataKey="name" tick={{ fill: '#474747', fontSize: 10, fontWeight: '900' }} width={140} stroke="#e0e0e0" />
                               <Tooltip
+                                cursor={{ fill: '#f5f5f5' }}
                                 contentStyle={{ 
-                                  backgroundColor: '#1e293b', 
+                                  backgroundColor: '#1A1A1A', 
                                   border: 'none', 
-                                  borderRadius: 16, 
-                                  color: '#f1f5f9',
-                                  boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+                                  borderRadius: 12, 
+                                  color: '#fff',
+                                  boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)'
                                 }}
-                                itemStyle={{ color: '#818cf8', fontWeight: 'bold' }}
+                                itemStyle={{ color: '#ff6b00', fontWeight: '900', fontSize: '12px' }}
+                                labelStyle={{ color: '#fff', marginBottom: '4px', fontSize: '10px', textTransform: 'uppercase', fontWeight: '900' }}
                                 formatter={(v) => [`${v}/7`, 'Avg. Rating']}
                               />
-                              <Bar dataKey="avg_rating" radius={[0, 10, 10, 0]} barSize={24}>
+                              <Bar dataKey="avg_rating" radius={[0, 8, 8, 0]} barSize={20}>
                                 {(data.avgRatingPerFaculty || []).map((_, i) => (
-                                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                                  <Cell key={i} fill={i % 2 === 0 ? '#ff6b00' : '#1A1A1A'} />
                                 ))}
                               </Bar>
                             </BarChart>
@@ -170,31 +163,31 @@ export default function HODDashboard() {
                       {(data.avgRatingPerFaculty || []).map((f, i) => (
                         <motion.div
                           key={f.id}
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/40 rounded-[2.5rem] p-7 transition-all shadow-sm hover:shadow-2xl hover:shadow-indigo-500/5 relative overflow-hidden"
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          className="group bg-white border border-[#e0e0e0] hover:border-[#ff6b00]/30 rounded-[16px] p-7 transition-all shadow-sm hover:shadow-xl relative overflow-hidden"
                         >
                           <div className="flex items-center gap-6">
-                            <div className={`h-16 w-16 rounded-2xl flex items-center justify-center text-xl font-black text-white shadow-xl transform group-hover:scale-110 transition-transform duration-500 ${
-                              i === 0 ? 'bg-gradient-to-br from-amber-300 to-amber-600' : 
-                              i === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-500' : 
-                              i === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-700' : 
-                              'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700'
+                            <div className={`h-14 w-14 rounded-xl flex items-center justify-center text-xl font-black text-white shadow-lg transform group-hover:scale-105 transition-transform duration-500 ${
+                              i === 0 ? 'bg-[#ff6b00]' : 
+                              i === 1 ? 'bg-[#1A1A1A]' : 
+                              i === 2 ? 'bg-[#474747]' : 
+                              'bg-[#f1f1f1] text-[#474747] border border-[#e0e0e0]'
                             }`}>
                               {i + 1}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-black text-slate-900 dark:text-white text-lg truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{f.name}</h3>
-                              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-black truncate uppercase tracking-[0.1em] mt-1.5">{f.total_responses} Evaluation Samples</div>
+                              <h3 className="font-black text-[#1A1A1A] text-lg truncate group-hover:text-[#ff6b00] transition-colors">{f.name}</h3>
+                              <div className="text-[10px] text-[#474747] font-black truncate uppercase tracking-[0.1em] mt-1.5 opacity-50">{f.total_responses} Evaluation Samples</div>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-                             <div className="flex items-center gap-1.5">
-                                <Star size={18} className="text-amber-400 fill-amber-400" />
-                                <span className={`text-2xl font-black ${f.avg_rating >= 5 ? 'text-emerald-500' : f.avg_rating >= 3.5 ? 'text-amber-500' : 'text-rose-500'}`}>
+                          <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#f5f5f5]">
+                             <div className="flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[#ff6b00] text-[18px]">star</span>
+                                <span className={`text-2xl font-black ${f.avg_rating >= 5 ? 'text-[#ff6b00]' : f.avg_rating >= 3.5 ? 'text-[#1A1A1A]' : 'text-[#b3261e]'}`}>
                                   {f.avg_rating.toFixed(1)}
                                 </span>
-                                <span className="text-xs text-slate-400 font-bold uppercase">Rating</span>
+                                <span className="text-[10px] text-[#474747] font-black uppercase tracking-widest opacity-40 ml-1">Rating</span>
                              </div>
                           </div>
                         </motion.div>
@@ -207,35 +200,35 @@ export default function HODDashboard() {
                 {activeTab === 'courses' && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {(data.submissionRates || []).map(c => (
-                      <div key={c.course_id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-sm group">
+                      <div key={c.course_id} className="bg-white border border-[#e0e0e0] rounded-[16px] p-8 shadow-sm group">
                         <div className="flex items-start justify-between mb-6">
                           <div className="min-w-0">
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="text-[10px] font-black bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-lg border border-indigo-100 dark:border-indigo-800/30 uppercase tracking-tighter">{c.course_code}</span>
-                              <h4 className="text-base font-black text-slate-900 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{c.course_name}</h4>
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="text-[10px] font-black bg-[#ff6b00]/5 text-[#ff6b00] px-3 py-1 rounded-lg border border-[#ff6b00]/10 uppercase tracking-tighter">{c.course_code}</span>
+                              <h4 className="text-base font-black text-[#1A1A1A] truncate group-hover:text-[#ff6b00] transition-colors">{c.course_name}</h4>
                             </div>
-                            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">{c.department_name}</p>
+                            <p className="text-[10px] text-[#474747] font-black uppercase tracking-widest opacity-50">{c.department_name}</p>
                           </div>
                           <div className="text-right shrink-0 ml-4">
-                            <span className={`text-3xl font-black ${c.rate >= 70 ? 'text-emerald-500' : c.rate >= 40 ? 'text-amber-500' : 'text-rose-500'}`}>{c.rate}%</span>
-                            <div className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Submission Rate</div>
+                            <span className={`text-3xl font-black ${c.rate >= 70 ? 'text-[#ff6b00]' : c.rate >= 40 ? 'text-[#1A1A1A]' : 'text-[#b3261e]'}`}>{c.rate}%</span>
+                            <div className="text-[9px] font-black text-[#474747] uppercase tracking-widest mt-1 opacity-40">Submission Rate</div>
                           </div>
                         </div>
-                        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
+                        <div className="w-full bg-[#f1f1f1] rounded-full h-2.5 overflow-hidden shadow-inner">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${c.rate}%` }}
                             transition={{ duration: 1, ease: 'easeOut' }}
-                            className={`h-full rounded-full ${c.rate >= 70 ? 'bg-emerald-500' : c.rate >= 40 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                            className={`h-full rounded-full ${c.rate >= 70 ? 'bg-[#ff6b00]' : c.rate >= 40 ? 'bg-[#1A1A1A]' : 'bg-[#b3261e]'}`}
                           />
                         </div>
-                        <div className="flex gap-6 mt-6 pt-4 border-t border-slate-50 dark:border-slate-800/50 text-[10px] font-black uppercase tracking-[0.1em]">
-                          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                             <div className="h-2 w-2 rounded-full bg-slate-300 dark:bg-slate-700" />
+                        <div className="flex gap-6 mt-8 pt-5 border-t border-[#f5f5f5] text-[10px] font-black uppercase tracking-[0.1em] opacity-60">
+                          <div className="flex items-center gap-2">
+                             <div className="h-2 w-2 rounded-full bg-[#e0e0e0]" />
                              <span>{c.enrolled} Enrolled</span>
                           </div>
-                          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
-                             <div className="h-2 w-2 rounded-full bg-indigo-500" />
+                          <div className="flex items-center gap-2 text-[#ff6b00]">
+                             <div className="h-2 w-2 rounded-full bg-[#ff6b00]" />
                              <span>{c.submitted} Received</span>
                           </div>
                         </div>
@@ -247,32 +240,30 @@ export default function HODDashboard() {
                 {/* COMMENTS TAB */}
                 {activeTab === 'comments' && (
                   <div className="flex flex-col gap-6">
-                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40 rounded-2xl p-5 flex items-center gap-4 text-xs font-bold text-amber-700 dark:text-amber-400">
-                      <div className="h-10 w-10 bg-amber-100 dark:bg-amber-900/50 rounded-xl flex items-center justify-center shrink-0">
-                         <MessageSquare size={20} />
-                      </div>
+                    <div className="bg-[#ff6b00]/5 border border-[#ff6b00]/10 rounded-xl p-5 flex items-center gap-4 text-[10px] font-black text-[#ff6b00] uppercase tracking-widest">
+                      <span className="material-symbols-outlined text-[20px]">security</span>
                       All student feedback narratives are fully anonymous. Systems ensure zero identity traceability for subjective responses.
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {(data.recentComments || []).length === 0 ? (
-                        <div className="col-span-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center shadow-sm">
-                           <MessageSquare size={48} className="text-slate-200 dark:text-slate-700 mx-auto mb-6" />
-                           <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">No feedback narratives received yet.</p>
+                        <div className="col-span-full bg-white border border-[#e0e0e0] rounded-[16px] p-20 text-center shadow-sm">
+                           <span className="material-symbols-outlined text-[48px] text-[#e0e0e0] mb-6">forum</span>
+                           <p className="text-[#474747] font-bold uppercase tracking-widest text-[10px] opacity-40">No feedback narratives received yet.</p>
                         </div>
                       ) : (
                         (data.recentComments || []).map((c, i) => (
                           <motion.div 
                             key={i} 
                             initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-all"
+                            whileInView={{ opacity: 1, y: 0 }}
+                            className="bg-white border border-[#e0e0e0] rounded-[16px] p-8 shadow-sm hover:shadow-xl transition-all"
                           >
-                            <div className="flex items-center gap-2 mb-6">
-                               <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-                               <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{c.faculty_name}</span>
+                            <div className="flex items-center gap-3 mb-6">
+                               <div className="h-1.5 w-1.5 rounded-full bg-[#ff6b00]" />
+                               <span className="text-[10px] font-black text-[#474747] uppercase tracking-widest opacity-60">{c.faculty_name}</span>
                             </div>
-                            <p className="text-sm text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">"{c.comment}"</p>
-                            <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-50 dark:border-slate-800/50 text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">
+                            <p className="text-sm text-[#1A1A1A] italic leading-relaxed font-medium">"{c.comment}"</p>
+                            <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#f5f5f5] text-[10px] font-black text-[#474747] opacity-40 uppercase tracking-widest">
                               <span className="truncate max-w-[150px]">{c.course_name}</span>
                               <span>{new Date(c.submitted_at).toLocaleDateString()}</span>
                             </div>
