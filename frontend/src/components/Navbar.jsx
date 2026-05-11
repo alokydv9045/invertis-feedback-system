@@ -9,11 +9,13 @@ export default function Navbar() {
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="sticky top-0 z-50 flex items-center justify-between px-8 py-3 bg-white border-b border-[#e2e8f0] select-none shadow-sm"
+      className="sticky top-0 z-50 flex items-center justify-between px-8 py-3 bg-white border-b border-[#e2e8f0] select-none shadow-sm relative"
     >
+      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#f15a24]/30 to-transparent"></div>
+      
       <div className="flex items-center gap-6">
-        <div className="hidden md:flex items-center bg-[#f5f7fa] px-4 py-2 rounded border border-[#e2e8f0] group focus-within:border-[#2d3fe0] transition-all">
-          <Search size={16} className="text-gray-400 group-focus-within:text-[#2d3fe0]" />
+        <div className="hidden md:flex items-center bg-[#f5f7fa] px-4 py-2 rounded border border-[#e2e8f0] group focus-within:border-[#f15a24] transition-all">
+          <Search size={16} className="text-gray-400 group-focus-within:text-[#f15a24]" />
           <input 
             type="text" 
             placeholder="Search categories..." 

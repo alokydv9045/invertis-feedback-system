@@ -51,20 +51,20 @@ function AdminDashboard() {
           <h1 className="text-2xl font-bold text-[#1a2233]">System Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">Management overview for Invertis Feedback System</p>
         </div>
-        <button onClick={() => navigate('/admin/courses')} className="bg-[#2d3fe0] hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded transition-all shadow-sm active:scale-95 flex items-center gap-2">
-          <PlusCircle size={16} /> New Evaluation
+        <button onClick={() => navigate('/admin/courses')} className="bg-gradient-to-r from-[#f15a24] to-[#d94e1d] hover:shadow-lg hover:shadow-orange-500/30 text-white font-bold py-2.5 px-8 rounded transition-all active:scale-95 flex items-center gap-2 text-sm uppercase tracking-wider">
+          <PlusCircle size={18} /> New Evaluation
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Students', value: stats?.totalStudents, icon: Users, color: 'text-blue-500' },
-          { label: 'Total Courses', value: stats?.totalCourses, icon: BookOpen, color: 'text-[#f15a24]' },
+          { label: 'Total Students', value: stats?.totalStudents, icon: Users, color: 'text-[#1a2233]', bg: 'bg-blue-50' },
+          { label: 'Total Courses', value: stats?.totalCourses, icon: BookOpen, color: 'text-[#f15a24]', bg: 'bg-orange-50' },
           { label: 'Completion Rate', value: `${stats?.completionRate || 0}%`, icon: BarChart2, color: 'text-emerald-500' },
           { label: 'Active TLFQs', value: stats?.totalTlfqs, icon: ClipboardList, color: 'text-indigo-500' },
         ].map((s, i) => (
           <div key={i} className="bg-white border border-[#e2e8f0] rounded-lg shadow-sm p-6 flex items-center gap-4">
-            <div className={`h-12 w-12 rounded-lg bg-[#f5f7fa] flex items-center justify-center ${s.color}`}>
+            <div className={`h-12 w-12 rounded-lg ${s.bg || 'bg-[#f5f7fa]'} flex items-center justify-center ${s.color}`}>
               <s.icon size={24} />
             </div>
             <div>
@@ -94,7 +94,7 @@ function AdminDashboard() {
                 className="p-5 border border-[#e2e8f0] rounded-lg hover:border-[#2d3fe0] hover:bg-[#f5f7fa] transition-all cursor-pointer group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded bg-[#f5f7fa] flex items-center justify-center text-gray-400 group-hover:text-[#2d3fe0] transition-colors">
+                  <div className="h-10 w-10 rounded bg-[#f5f7fa] flex items-center justify-center text-gray-400 group-hover:text-[#f15a24] group-hover:bg-orange-50 transition-all">
                     <action.icon size={20} />
                   </div>
                   <div>
@@ -138,12 +138,12 @@ function HODOverview() {
         </div>
       </div>
       <div className="bg-white border border-[#e2e8f0] rounded-lg shadow-sm p-12 text-center flex flex-col items-center">
-        <div className="h-20 w-20 bg-[#f5f7fa] rounded-full flex items-center justify-center text-[#2d3fe0] mb-6">
+        <div className="h-20 w-20 bg-orange-50 rounded-full flex items-center justify-center text-[#f15a24] mb-6 shadow-inner">
           <BarChart2 size={40} />
         </div>
         <h2 className="text-xl font-bold text-[#1a2233]">Department Analytics</h2>
         <p className="text-sm text-gray-500 mt-2 max-w-md">View detailed performance reports of faculty members and courses in your department.</p>
-        <button onClick={() => navigate('/hod/analytics')} className="bg-[#2d3fe0] hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded transition-all shadow-sm active:scale-95 mt-8">
+        <button onClick={() => navigate('/hod/analytics')} className="bg-gradient-to-r from-[#1a2233] to-[#242f45] hover:from-[#f15a24] hover:to-[#d94e1d] text-white font-bold py-3 px-10 rounded-lg transition-all shadow-md active:scale-95 mt-8 uppercase tracking-widest text-xs">
           Launch Analytics Hub
         </button>
       </div>
@@ -181,13 +181,14 @@ function StudentDashboard() {
           { label: 'Curriculum Feedback', desc: 'Provide insights on syllabus relevance, study materials, and practical application.', icon: ClipboardList },
           { label: 'Infrastructure', desc: 'Report issues or suggest improvements for campus facilities, labs, and library.', icon: Building2 },
         ].map((card, i) => (
-          <div key={i} className="bg-white border border-[#e2e8f0] rounded-lg shadow-sm p-8 flex flex-col group hover:border-[#2d3fe0] transition-all cursor-pointer">
-            <div className="h-12 w-12 rounded bg-[#f5f7fa] flex items-center justify-center text-[#1a2233] group-hover:bg-[#2d3fe0] group-hover:text-white transition-all mb-6">
+          <div key={i} className="bg-white border border-[#e2e8f0] rounded-lg shadow-sm p-8 flex flex-col group hover:border-[#f15a24] transition-all cursor-pointer relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-orange-50/50 rounded-bl-full -mr-12 -mt-12 group-hover:bg-[#f15a24]/10 transition-colors"></div>
+            <div className="h-12 w-12 rounded bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#1a2233] group-hover:bg-[#f15a24] group-hover:text-white transition-all mb-6 relative z-10">
               <card.icon size={24} />
             </div>
             <h3 className="text-lg font-bold text-[#1a2233] mb-3">{card.label}</h3>
             <p className="text-xs text-gray-500 leading-relaxed font-medium">{card.desc}</p>
-            <div className="mt-8 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#2d3fe0]">
+            <div className="mt-8 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#f15a24]">
               Begin Evaluation <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
@@ -221,7 +222,7 @@ function StudentDashboard() {
                           className={`flex items-center justify-between px-4 py-2 rounded text-[11px] font-bold border transition-all ${
                             tlfq.completed
                               ? 'bg-gray-50 text-gray-400 border-gray-100'
-                              : 'bg-white text-[#2d3fe0] border-[#2d3fe0]/20 hover:border-[#2d3fe0] hover:bg-[#2d3fe0] hover:text-white'
+                              : 'bg-white text-[#f15a24] border-[#f15a24]/20 hover:border-[#f15a24] hover:bg-[#f15a24] hover:text-white'
                           }`}
                         >
                           <span>{tlfq.faculty_name}</span>

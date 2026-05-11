@@ -36,23 +36,37 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f7fa] flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] opacity-30"></div>
+      <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#f15a24]/5 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#1a2233]/5 rounded-full blur-3xl"></div>
+
       {/* Logo Area */}
       <div className="mb-8 flex flex-col items-center">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="h-10 w-10 bg-[#1a2233] rounded flex items-center justify-center text-white font-bold">I</div>
-          <span className="text-xl font-bold text-[#1a2233]">Invertis University Portal</span>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="h-12 w-12 bg-gradient-to-br from-[#1a2233] to-[#242f45] rounded-lg flex items-center justify-center text-white font-black shadow-xl shadow-slate-900/20 border border-white/10 text-xl">I</div>
+          <div className="flex flex-col">
+            <span className="text-xl font-black text-[#1a2233] leading-none tracking-tight"><span className="text-[#f15a24]">Invertis</span> University</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mt-1">Academic Portal</span>
+          </div>
         </div>
       </div>
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[420px] bg-white border border-[#e2e8f0] rounded-xl shadow-lg p-10"
+        className="w-full max-w-[420px] bg-white border border-[#e2e8f0] rounded-2xl shadow-2xl p-10 relative overflow-hidden"
       >
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#1a2233] via-[#f15a24] to-[#1a2233]"></div>
+        <div className="absolute bottom-0 left-0 w-full h-2 bg-gradient-to-r from-[#1a2233] via-[#f15a24] to-[#1a2233]"></div>
+        
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-slate-800">Student Login</h1>
-          <p className="text-sm text-gray-400 mt-2 font-medium">Access the Feedback System</p>
+          <div className="inline-block p-3 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl mb-4 shadow-sm border border-orange-200/50">
+            <GraduationCap size={28} className="text-[#f15a24]" />
+          </div>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Student Login</h1>
+          <p className="text-[13px] text-gray-500 mt-1 font-medium italic">Access the Feedback System</p>
         </div>
 
         {error && (
@@ -69,7 +83,7 @@ export default function Login() {
               <input 
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="Enter your ID"
-                className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded focus:outline-none focus:ring-2 focus:ring-[#2d3fe0]/20 focus:border-[#2d3fe0] transition-all pl-10 text-sm" required 
+                className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded focus:outline-none focus:ring-2 focus:ring-[#f15a24]/20 focus:border-[#f15a24] transition-all pl-10 text-sm" required 
               />
             </div>
           </div>
@@ -84,7 +98,7 @@ export default function Login() {
               <input 
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded focus:outline-none focus:ring-2 focus:ring-[#2d3fe0]/20 focus:border-[#2d3fe0] transition-all pl-10 text-sm" required 
+                className="w-full px-4 py-2.5 bg-white border border-[#e2e8f0] rounded focus:outline-none focus:ring-2 focus:ring-[#f15a24]/20 focus:border-[#f15a24] transition-all pl-10 text-sm" required 
               />
             </div>
           </div>
@@ -96,7 +110,7 @@ export default function Login() {
 
           <button 
             type="submit" disabled={loading}
-            className="w-full bg-[#1a2233] hover:bg-[#242f45] text-white font-bold py-3.5 rounded transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm uppercase tracking-widest"
+            className="w-full bg-[#f15a24] hover:bg-[#d94e1d] text-white font-bold py-3.5 rounded transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 text-sm uppercase tracking-widest"
           >
             {loading ? 'Logging in...' : 'Sign In'} <ArrowRight size={18} />
           </button>
@@ -132,7 +146,7 @@ export default function Login() {
         </div>
 
         <div className="mt-8 pt-6 border-t border-[#e2e8f0] text-center">
-          <p className="text-[11px] text-gray-500 font-medium">By signing in, you agree to our <a href="#" className="text-[#2d3fe0] hover:underline">Terms of Service</a></p>
+          <p className="text-[11px] text-gray-500 font-medium">By signing in, you agree to our <a href="#" className="text-[#f15a24] hover:underline">Terms of Service</a></p>
         </div>
       </motion.div>
 

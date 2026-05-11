@@ -29,9 +29,12 @@ export default function Sidebar() {
   return (
     <div className="w-full md:w-64 bg-[#1a2233] text-gray-400 flex flex-col min-h-screen select-none overflow-y-auto">
       {/* Brand area */}
-      <div className="p-6 flex flex-col gap-1 border-b border-white/5">
-        <h1 className="text-white font-bold text-lg tracking-tight">Feedback System</h1>
-        <p className="text-[10px] uppercase tracking-widest text-gray-500 font-black">Invertis University</p>
+      <div className="p-8 flex flex-col gap-1 border-b border-white/5 bg-gradient-to-br from-[#1a2233] to-[#242f45] relative overflow-hidden">
+        <div className="absolute -top-4 -right-4 w-16 h-16 bg-[#f15a24]/10 rounded-full blur-2xl"></div>
+        <h1 className="text-white font-black text-xl tracking-tight leading-none">
+          <span className="text-[#f15a24]">Invertis</span> Feedback
+        </h1>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-black mt-2">University Portal</p>
       </div>
 
       <div className="flex-1 py-6 flex flex-col gap-1">
@@ -40,14 +43,13 @@ export default function Sidebar() {
           const isActive = location.pathname === link.to;
           return (
             <Link to={link.to} key={link.to}>
-              <div className={`relative flex items-center gap-3 px-6 py-3.5 text-[13px] font-medium transition-all hover:bg-white/5 hover:text-white group ${
-                isActive ? 'bg-white/5 text-white' : ''
-              }`}>
+              <div className={`relative flex items-center gap-3 px-6 py-3.5 text-[13px] font-medium transition-all hover:bg-white/5 hover:text-white group ${isActive ? 'bg-white/5 text-white' : ''
+                }`}>
                 {/* Active indicator (Orange) */}
                 {isActive && (
-                  <motion.div 
+                  <motion.div
                     layoutId="active-nav"
-                    className="absolute left-0 top-0 bottom-0 w-1 bg-[#f15a24]" 
+                    className="absolute left-0 top-0 bottom-0 w-1 bg-[#f15a24]"
                   />
                 )}
                 <Icon size={18} className={`${isActive ? 'text-[#f15a24]' : 'text-gray-500 group-hover:text-[#f15a24]'} transition-colors`} />
@@ -70,7 +72,7 @@ export default function Sidebar() {
           </div>
         </div>
 
-        <button 
+        <button
           onClick={logout}
           className="flex items-center gap-3 px-4 py-2 text-[12px] font-bold text-gray-500 hover:text-white hover:bg-white/5 rounded transition-all w-full text-left"
         >

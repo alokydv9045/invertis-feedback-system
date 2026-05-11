@@ -5,7 +5,7 @@ import api from '../services/api';
 import { motion } from 'framer-motion';
 import { BookOpen, Users, Plus, Trash2, Settings, Building2, Download, Upload, RefreshCw } from 'lucide-react';
 
-const inputCls = 'bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full transition';
+const inputCls = 'bg-gray-50 border border-[#e2e8f0] rounded-xl px-4 py-3 text-sm text-[#1a2233] font-bold placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#f15a24]/20 focus:border-[#f15a24] w-full transition-all shadow-sm';
 
 export default function ManageDirectory() {
   const [activeTab, setActiveTab] = useState('departments');
@@ -115,198 +115,220 @@ export default function ManageDirectory() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+    <div className="min-h-screen bg-[#f5f7fa] flex flex-col font-sans">
+      <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 p-6 md:p-8">
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6 max-w-5xl">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Settings size={20} className="text-indigo-400" />
-                <h1 className="text-2xl font-black">Directory Management</h1>
+        <div className="flex-1 flex flex-col">
+          <Navbar />
+          <main className="p-8">
+            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-6xl mx-auto">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-orange-50 rounded-lg">
+                    <Settings size={24} className="text-[#f15a24]" />
+                  </div>
+                  <h1 className="text-2xl font-black text-[#1a2233]">Directory Management</h1>
+                </div>
+                <p className="text-sm text-gray-500 font-medium ml-12">Manage departments, courses, and faculty data records.</p>
               </div>
-              <p className="text-sm text-slate-400">Manage departments, courses, and faculty data records.</p>
-            </div>
 
-            {msg.text && (
-              <div className={`p-4 rounded-xl text-sm font-semibold border ${
-                msg.type === 'error'
-                  ? 'bg-rose-950/40 text-rose-400 border-rose-900/50'
-                  : 'bg-emerald-950/40 text-emerald-300 border-emerald-800/50'
-              }`}>{msg.text}</div>
-            )}
+              {msg.text && (
+                <div className={`p-4 rounded-xl text-sm font-bold border shadow-sm ${
+                  msg.type === 'error'
+                    ? 'bg-rose-50 text-rose-700 border-rose-100'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                }`}>{msg.text}</div>
+              )}
 
-            {/* Tabs */}
-            <div className="flex gap-2 border-b border-slate-800 flex-wrap">
-              {TABS.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold border-b-2 transition -mb-px cursor-pointer ${
-                    activeTab === id
-                      ? 'border-indigo-500 text-indigo-400'
-                      : 'border-transparent text-slate-500 hover:text-slate-300'
-                  }`}
-                >
-                  <Icon size={14} /> {label}
-                </button>
-              ))}
-            </div>
-
-            {loading ? (
-              <div className="bg-slate-800 border border-slate-700 rounded-2xl p-12 flex justify-center">
-                <div className="h-10 w-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+              {/* Tabs */}
+              <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#e2e8f0] shadow-sm self-start">
+                {TABS.map(({ id, label, icon: Icon }) => (
+                  <button
+                    key={id}
+                    onClick={() => setActiveTab(id)}
+                    className={`flex items-center gap-2 px-6 py-2.5 text-[11px] font-black uppercase tracking-widest transition-all cursor-pointer rounded-lg ${
+                      activeTab === id
+                        ? 'bg-[#1a2233] text-white shadow-md'
+                        : 'text-gray-400 hover:text-[#1a2233] hover:bg-gray-50'
+                    }`}
+                  >
+                    <Icon size={14} className={activeTab === id ? 'text-[#f15a24]' : ''} /> {label}
+                  </button>
+                ))}
               </div>
-            ) : (
-              <div className="flex flex-col gap-6">
-                {/* DEPARTMENTS */}
-                {activeTab === 'departments' && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex flex-col gap-4 h-fit">
-                      <h3 className="font-bold text-slate-200 flex items-center gap-2 text-sm"><Plus size={15} className="text-indigo-400" /> Add Department</h3>
-                      <form onSubmit={handleCreateDept} className="flex flex-col gap-3">
-                        <input type="text" placeholder="E.g. Computer Science & Engineering" value={deptName} onChange={e => setDeptName(e.target.value)} className={inputCls} />
-                        <input type="text" placeholder="Code (e.g. CSE)" value={deptCode} onChange={e => setDeptCode(e.target.value)} className={inputCls} />
-                        <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 font-bold rounded-xl text-xs cursor-pointer">Add Department</button>
-                      </form>
-                    </div>
-                    <div className="lg:col-span-2 bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
-                      <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-                        <h3 className="font-bold text-slate-200 text-sm flex items-center gap-2"><Building2 size={15} className="text-indigo-400" /> All Departments</h3>
-                        <span className="text-xs bg-indigo-900/40 text-indigo-300 border border-indigo-800/40 px-2.5 py-1 rounded-full font-bold">{departments.length}</span>
-                      </div>
-                      <table className="w-full text-sm">
-                        <thead className="bg-slate-900 text-xs text-slate-500 uppercase">
-                          <tr><th className="p-4 text-left">Name</th><th className="p-4 text-left">Code</th><th className="p-4"></th></tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-700/60">
-                          {departments.map(d => (
-                            <tr key={d.id} className="hover:bg-slate-700/30 text-xs text-slate-300">
-                              <td className="p-4 font-semibold">{d.name}</td>
-                              <td className="p-4 font-mono text-slate-400">{d.code}</td>
-                              <td className="p-4 text-right">
-                                <button onClick={() => handleDelete('departments', d.id)} className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition cursor-pointer"><Trash2 size={14} /></button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
 
-                {/* COURSES */}
-                {activeTab === 'courses' && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex flex-col gap-4 h-fit">
-                      <h3 className="font-bold text-slate-200 flex items-center gap-2 text-sm"><Plus size={15} className="text-indigo-400" /> Add Course</h3>
-                      <form onSubmit={handleCreateCourse} className="flex flex-col gap-3">
-                        <input type="text" placeholder="Course Code (e.g. CS401)" value={courseCode} onChange={e => setCourseCode(e.target.value)} className={inputCls} />
-                        <input type="text" placeholder="Course Name" value={courseName} onChange={e => setCourseName(e.target.value)} className={inputCls} />
-                        <select value={courseDept} onChange={e => setCourseDept(e.target.value)} className={inputCls + ' cursor-pointer'}>
-                          <option value="">Select Department…</option>
-                          {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                        </select>
-                        <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 font-bold rounded-xl text-xs cursor-pointer">Add Course</button>
-                      </form>
-                    </div>
-                    <div className="lg:col-span-2 bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
-                      <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-                        <h3 className="font-bold text-slate-200 text-sm flex items-center gap-2"><BookOpen size={15} className="text-indigo-400" /> All Courses</h3>
-                        <span className="text-xs bg-indigo-900/40 text-indigo-300 border border-indigo-800/40 px-2.5 py-1 rounded-full font-bold">{courses.length}</span>
+              {loading ? (
+                <div className="bg-white border border-[#e2e8f0] rounded-2xl p-20 flex flex-col items-center justify-center gap-4 shadow-sm">
+                  <div className="h-12 w-12 border-4 border-[#f15a24] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Loading Records...</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-8">
+                  {/* DEPARTMENTS */}
+                  {activeTab === 'departments' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      <div className="bg-white border border-[#e2e8f0] rounded-2xl p-8 flex flex-col gap-6 h-fit shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-[#f15a24]"></div>
+                        <h3 className="font-black text-[#1a2233] flex items-center gap-2 text-xs uppercase tracking-widest"><Plus size={16} className="text-[#f15a24]" /> Add Department</h3>
+                        <form onSubmit={handleCreateDept} className="flex flex-col gap-4">
+                          <input type="text" placeholder="E.g. Computer Science & Engineering" value={deptName} onChange={e => setDeptName(e.target.value)} className={inputCls} />
+                          <input type="text" placeholder="Code (e.g. CSE)" value={deptCode} onChange={e => setDeptCode(e.target.value)} className={inputCls} />
+                          <button type="submit" className="w-full bg-[#1a2233] hover:bg-[#242f45] text-white py-3.5 font-black uppercase tracking-widest text-[10px] rounded-xl cursor-pointer transition-all active:scale-95 shadow-lg shadow-slate-900/10">Add Department</button>
+                        </form>
                       </div>
-                      <table className="w-full text-sm">
-                        <thead className="bg-slate-900 text-xs text-slate-500 uppercase">
-                          <tr><th className="p-4 text-left">Code</th><th className="p-4 text-left">Name</th><th className="p-4 text-left">Dept.</th><th className="p-4"></th></tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-700/60">
-                          {courses.map(c => (
-                            <tr key={c.id} className="hover:bg-slate-700/30 text-xs text-slate-300">
-                              <td className="p-4 font-mono text-indigo-300">{c.code}</td>
-                              <td className="p-4 font-semibold">{c.name}</td>
-                              <td className="p-4 text-slate-500">{c.department_name}</td>
-                              <td className="p-4 text-right">
-                                <button onClick={() => handleDelete('courses', c.id)} className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition cursor-pointer"><Trash2 size={14} /></button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                      <div className="lg:col-span-2 bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-sm">
+                        <div className="p-6 border-b border-[#e2e8f0] flex items-center justify-between bg-gray-50/50">
+                          <h3 className="font-black text-[#1a2233] text-xs uppercase tracking-widest flex items-center gap-2"><Building2 size={16} className="text-[#f15a24]" /> All Departments</h3>
+                          <span className="text-[10px] bg-[#f15a24] text-white px-3 py-1 rounded-full font-black uppercase tracking-widest shadow-sm shadow-orange-500/20">{departments.length} Units</span>
+                        </div>
+                        <table className="w-full text-sm">
+                          <thead className="bg-gray-50 text-[10px] text-gray-400 uppercase tracking-[0.2em] font-black border-b border-[#e2e8f0]">
+                            <tr><th className="px-6 py-4 text-left">Department Name</th><th className="px-6 py-4 text-left">Code</th><th className="px-6 py-4"></th></tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#e2e8f0]">
+                            {departments.map(d => (
+                              <tr key={d.id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4 font-bold text-[#1a2233]">{d.name}</td>
+                                <td className="px-6 py-4"><span className="text-[10px] font-black bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">{d.code}</span></td>
+                                <td className="px-6 py-4 text-right">
+                                  <button onClick={() => handleDelete('departments', d.id)} className="p-2.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition cursor-pointer"><Trash2 size={16} /></button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* FACULTY */}
-                {activeTab === 'faculty' && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex flex-col gap-4 h-fit">
-                      <h3 className="font-bold text-slate-200 flex items-center gap-2 text-sm"><Plus size={15} className="text-indigo-400" /> Add Faculty Record</h3>
-                      <p className="text-xs text-slate-500">Faculty are data records only — they do not have login access.</p>
-                      <form onSubmit={handleCreateFaculty} className="flex flex-col gap-3">
-                        <input type="text" placeholder="Full Name (e.g. Dr. Alan Turing)" value={facultyName} onChange={e => setFacultyName(e.target.value)} className={inputCls} />
-                        <select value={facultyDept} onChange={e => setFacultyDept(e.target.value)} className={inputCls + ' cursor-pointer'}>
-                          <option value="">Select Department…</option>
-                          {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                        </select>
-                        <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 font-bold rounded-xl text-xs cursor-pointer">Add Faculty</button>
-                      </form>
-                    </div>
-                    <div className="lg:col-span-2 bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
-                      <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-                        <h3 className="font-bold text-slate-200 text-sm flex items-center gap-2"><Users size={15} className="text-indigo-400" /> Faculty Records</h3>
-                        <span className="text-xs bg-indigo-900/40 text-indigo-300 border border-indigo-800/40 px-2.5 py-1 rounded-full font-bold">{faculty.length}</span>
+                  {/* COURSES */}
+                  {activeTab === 'courses' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      <div className="bg-white border border-[#e2e8f0] rounded-2xl p-8 flex flex-col gap-6 h-fit shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-[#f15a24]"></div>
+                        <h3 className="font-black text-[#1a2233] flex items-center gap-2 text-xs uppercase tracking-widest"><Plus size={16} className="text-[#f15a24]" /> Add Course</h3>
+                        <form onSubmit={handleCreateCourse} className="flex flex-col gap-4">
+                          <input type="text" placeholder="Course Code (e.g. CS401)" value={courseCode} onChange={e => setCourseCode(e.target.value)} className={inputCls} />
+                          <input type="text" placeholder="Course Name" value={courseName} onChange={e => setCourseName(e.target.value)} className={inputCls} />
+                          <select value={courseDept} onChange={e => setCourseDept(e.target.value)} className={inputCls + ' cursor-pointer'}>
+                            <option value="">Select Department…</option>
+                            {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                          </select>
+                          <button type="submit" className="w-full bg-[#1a2233] hover:bg-[#242f45] text-white py-3.5 font-black uppercase tracking-widest text-[10px] rounded-xl cursor-pointer transition-all active:scale-95 shadow-lg shadow-slate-900/10">Add Course</button>
+                        </form>
                       </div>
-                      <table className="w-full text-sm">
-                        <thead className="bg-slate-900 text-xs text-slate-500 uppercase">
-                          <tr><th className="p-4 text-left">Name</th><th className="p-4 text-left">Department</th><th className="p-4"></th></tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-700/60">
-                          {faculty.map(f => (
-                            <tr key={f.id} className="hover:bg-slate-700/30 text-xs text-slate-300">
-                              <td className="p-4 font-semibold">{f.name}</td>
-                              <td className="p-4 text-slate-400">{f.department_name}</td>
-                              <td className="p-4 text-right">
-                                <button onClick={() => handleDelete('faculty', f.id)} className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition cursor-pointer"><Trash2 size={14} /></button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                      <div className="lg:col-span-2 bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-sm">
+                        <div className="p-6 border-b border-[#e2e8f0] flex items-center justify-between bg-gray-50/50">
+                          <h3 className="font-black text-[#1a2233] text-xs uppercase tracking-widest flex items-center gap-2"><BookOpen size={16} className="text-[#f15a24]" /> All Courses</h3>
+                          <span className="text-[10px] bg-[#f15a24] text-white px-3 py-1 rounded-full font-black uppercase tracking-widest shadow-sm shadow-orange-500/20">{courses.length} Active</span>
+                        </div>
+                        <table className="w-full text-sm">
+                          <thead className="bg-gray-50 text-[10px] text-gray-400 uppercase tracking-[0.2em] font-black border-b border-[#e2e8f0]">
+                            <tr><th className="px-6 py-4 text-left">Code</th><th className="px-6 py-4 text-left">Course Name</th><th className="px-6 py-4 text-left">Dept.</th><th className="px-6 py-4"></th></tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#e2e8f0]">
+                            {courses.map(c => (
+                              <tr key={c.id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4 font-black text-[#f15a24]">{c.code}</td>
+                                <td className="px-6 py-4 font-bold text-[#1a2233]">{c.name}</td>
+                                <td className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">{c.department_name}</td>
+                                <td className="px-6 py-4 text-right">
+                                  <button onClick={() => handleDelete('courses', c.id)} className="p-2.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition cursor-pointer"><Trash2 size={16} /></button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* SYNC */}
-                {activeTab === 'sync' && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 flex flex-col gap-4">
-                      <h3 className="font-bold text-slate-200 flex items-center gap-2"><Download size={16} className="text-indigo-400" /> Export System Data</h3>
-                      <p className="text-xs text-slate-400">Export all records as a JSON backup file.</p>
-                      <button onClick={handleExportData} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer">
-                        <Download size={15} /> Download Backup JSON
-                      </button>
-                    </div>
-                    <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 flex flex-col gap-4">
-                      <h3 className="font-bold text-slate-200 flex items-center gap-2"><Upload size={16} className="text-indigo-400" /> Import / Synchronize</h3>
-                      <input type="file" accept="application/json" onChange={e => setImportFile(e.target.files[0])} className="text-xs bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-400 cursor-pointer focus:outline-none" />
-                      <div className="grid grid-cols-2 gap-2">
-                        {['merge', 'overwrite'].map(m => (
-                          <button key={m} onClick={() => setSyncMode(m)} className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${syncMode === m ? 'bg-indigo-900/40 border-indigo-600 text-indigo-300' : 'bg-slate-900 border-slate-700 text-slate-500'}`}>
-                            {m === 'merge' ? 'Merge (Safe)' : 'Full Overwrite'}
-                          </button>
-                        ))}
+                  {/* FACULTY */}
+                  {activeTab === 'faculty' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      <div className="bg-white border border-[#e2e8f0] rounded-2xl p-8 flex flex-col gap-6 h-fit shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-[#f15a24]"></div>
+                        <h3 className="font-black text-[#1a2233] flex items-center gap-2 text-xs uppercase tracking-widest"><Plus size={16} className="text-[#f15a24]" /> Add Faculty Record</h3>
+                        <p className="text-[11px] text-gray-400 font-medium italic">Faculty are data records only — they do not have portal login access.</p>
+                        <form onSubmit={handleCreateFaculty} className="flex flex-col gap-4">
+                          <input type="text" placeholder="Full Name (e.g. Dr. Alan Turing)" value={facultyName} onChange={e => setFacultyName(e.target.value)} className={inputCls} />
+                          <select value={facultyDept} onChange={e => setFacultyDept(e.target.value)} className={inputCls + ' cursor-pointer'}>
+                            <option value="">Select Department…</option>
+                            {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                          </select>
+                          <button type="submit" className="w-full bg-[#1a2233] hover:bg-[#242f45] text-white py-3.5 font-black uppercase tracking-widest text-[10px] rounded-xl cursor-pointer transition-all active:scale-95 shadow-lg shadow-slate-900/10">Add Faculty</button>
+                        </form>
                       </div>
-                      <button onClick={handleImportData} disabled={!importFile} className={`w-full font-bold py-3.5 rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer ${importFile ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}>
-                        <RefreshCw size={14} /> {syncMode === 'merge' ? 'Merge & Sync' : 'Overwrite & Sync'}
-                      </button>
+                      <div className="lg:col-span-2 bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-sm">
+                        <div className="p-6 border-b border-[#e2e8f0] flex items-center justify-between bg-gray-50/50">
+                          <h3 className="font-black text-[#1a2233] text-xs uppercase tracking-widest flex items-center gap-2"><Users size={16} className="text-[#f15a24]" /> Faculty Records</h3>
+                          <span className="text-[10px] bg-[#f15a24] text-white px-3 py-1 rounded-full font-black uppercase tracking-widest shadow-sm shadow-orange-500/20">{faculty.length} Faculty</span>
+                        </div>
+                        <table className="w-full text-sm">
+                          <thead className="bg-gray-50 text-[10px] text-gray-400 uppercase tracking-[0.2em] font-black border-b border-[#e2e8f0]">
+                            <tr><th className="px-6 py-4 text-left">Faculty Name</th><th className="px-6 py-4 text-left">Department</th><th className="px-6 py-4"></th></tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#e2e8f0]">
+                            {faculty.map(f => (
+                              <tr key={f.id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4 font-bold text-[#1a2233]">{f.name}</td>
+                                <td className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">{f.department_name}</td>
+                                <td className="px-6 py-4 text-right">
+                                  <button onClick={() => handleDelete('faculty', f.id)} className="p-2.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition cursor-pointer"><Trash2 size={16} /></button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </motion.div>
-        </main>
+                  )}
+
+                  {/* SYNC */}
+                  {activeTab === 'sync' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="bg-white border border-[#e2e8f0] rounded-2xl p-10 flex flex-col gap-6 shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-[#1a2233]"></div>
+                        <div className="h-12 w-12 bg-orange-50 rounded-xl flex items-center justify-center text-[#f15a24]">
+                          <Download size={24} />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-[#1a2233] uppercase tracking-widest text-sm">Export System Data</h3>
+                          <p className="text-xs text-gray-400 font-medium mt-1">Export all current records as a JSON backup file for external storage or migration.</p>
+                        </div>
+                        <button onClick={handleExportData} className="w-full bg-[#1a2233] hover:bg-[#242f45] text-white font-black py-4 rounded-xl text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 cursor-pointer transition-all shadow-lg shadow-slate-900/10">
+                          <Download size={16} /> Download Backup JSON
+                        </button>
+                      </div>
+                      
+                      <div className="bg-white border border-[#e2e8f0] rounded-2xl p-10 flex flex-col gap-6 shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-[#f15a24]"></div>
+                        <div className="h-12 w-12 bg-[#1a2233]/5 rounded-xl flex items-center justify-center text-[#1a2233]">
+                          <Upload size={24} />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-[#1a2233] uppercase tracking-widest text-sm">Import / Synchronize</h3>
+                          <p className="text-xs text-gray-400 font-medium mt-1">Import records from a JSON file. Overwrite will erase current records.</p>
+                        </div>
+                        <input type="file" accept="application/json" onChange={e => setImportFile(e.target.files[0])} className="text-[10px] uppercase font-black tracking-widest bg-gray-50 border border-[#e2e8f0] rounded-xl p-4 text-gray-400 cursor-pointer focus:outline-none file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-[#1a2233] file:text-white file:cursor-pointer shadow-inner" />
+                        <div className="grid grid-cols-2 gap-3">
+                          {['merge', 'overwrite'].map(m => (
+                            <button key={m} onClick={() => setSyncMode(m)} className={`py-3 px-4 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${syncMode === m ? 'bg-[#1a2233] border-[#1a2233] text-white shadow-md' : 'bg-white border-[#e2e8f0] text-gray-400 hover:text-[#1a2233]'}`}>
+                              {m === 'merge' ? 'Merge (Safe)' : 'Overwrite'}
+                            </button>
+                          ))}
+                        </div>
+                        <button onClick={handleImportData} disabled={!importFile} className={`w-full font-black py-4 rounded-xl text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 transition-all ${importFile ? 'bg-[#f15a24] hover:bg-[#d94e1d] text-white shadow-lg shadow-orange-500/20' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}`}>
+                          <RefreshCw size={16} className={importFile ? 'animate-spin-slow' : ''} /> {syncMode === 'merge' ? 'Merge & Sync' : 'Overwrite & Sync'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </main>
+        </div>
       </div>
     </div>
   );
