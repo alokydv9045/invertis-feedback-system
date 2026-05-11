@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Analytics - Invertis Feedback System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#fd8955",
+                      "on-secondary-fixed-variant": "#7d2d00",
+                      "tertiary-fixed-dim": "#b0c6ff",
+                      "error": "#ba1a1a",
+                      "secondary": "#9f4212",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0",
+                      "primary-container": "#266fe6",
+                      "surface-variant": "#e0e3e5",
+                      "surface": "#f7f9fb",
+                      "on-primary-fixed-variant": "#004299",
+                      "tertiary-container": "#336fe1",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#0059c7",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#6e2600",
+                      "surface-container-high": "#e6e8ea",
+                      "outline": "#727785",
+                      "on-error": "#ffffff",
+                      "tertiary": "#0155c6",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#ffb597",
+                      "on-primary-fixed": "#001943",
+                      "outline-variant": "#c2c6d6",
+                      "secondary-fixed": "#ffdbcd",
+                      "inverse-surface": "#2d3133",
+                      "on-tertiary-fixed": "#001945",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-fixed": "#d9e2ff",
+                      "primary": "#0057c2",
+                      "background": "#f7f9fb",
+                      "on-background": "#191c1e",
+                      "surface-bright": "#f7f9fb",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#00429c",
+                      "inverse-primary": "#afc6ff",
+                      "on-secondary-fixed": "#360f00",
+                      "on-tertiary-container": "#fefcff",
+                      "on-surface": "#191c1e",
+                      "surface-dim": "#d8dadc",
+                      "on-primary-container": "#fefcff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface-variant": "#424754",
+                      "primary-fixed": "#d9e2ff",
+                      "primary-fixed-dim": "#afc6ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "8px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "sm": "16px",
+                      "lg": "40px",
+                      "xl": "64px",
+                      "gutter": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-sm": [
+                              "Montserrat"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Montserrat"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Montserrat"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar (Hidden on Mobile, Flex on LG) -->
+<nav class="hidden lg:flex flex-col h-screen p-sm gap-xs bg-surface-container-low dark:bg-surface-container docked full-height left-0 w-64 border-r border-surface-variant flex-shrink-0 sticky top-0 z-40">
+<!-- Header -->
+<div class="px-sm py-md flex items-center gap-sm">
+<div class="shrink-0">
+<img alt="Invertis University Logo" class="h-12 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0ujtZe0-qrM8ge2gwK3ZSfxpJt1OW4ZvAPuAda34nX5ysArT-TJAz-bg149vVk6DHTXe3EpYxqfVob2XKvjHrcbQdaLcNWR0QA1u2gkp_4rWm5d2KgH0aho48zzVjovYReVo-HhKkbMrtWvTe3o1h6_HjxzJJ5sthacZXKK1LedchJm-0bv7AdDGWnIiiPRCuPrNJNPZlG08mLM2bBD_bIHLI35_Ugexedo0lj0osvmMj08zq4rEqZC4AzzIVkG4Qlu0HKnfYE4rnw"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary truncate">Invertis Feedback</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Centralized Portal</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-xs flex-1 mt-md">
+<!-- Inactive -->
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Home</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">rate_review</span>
+<span>Course Feedback</span>
+</a>
+<!-- Active: Faculty Analytics (Closest match to Global Analytics) -->
+<a class="flex items-center gap-sm px-md py-sm bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-lg font-bold font-label-md text-label-md opacity-80 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
+<span>Faculty Analytics</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>User Management</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">history</span>
+<span>System Logs</span>
+</a>
+</div>
+<!-- CTA & Footer -->
+<div class="mt-auto flex flex-col gap-sm">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-sm px-md rounded-lg flex items-center justify-center gap-xs hover:bg-surface-tint transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Export Data</span>
+</button>
+<div class="border-t border-surface-variant pt-sm">
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- TopNavBar (Web) -->
+<header class="hidden md:flex justify-between items-center w-full px-margin-desktop py-xs sticky top-0 z-50 bg-surface-container-lowest dark:bg-surface-container-high shadow-sm dark:shadow-none docked full-width top-0">
+<!-- Brand / Mobile Fallback (Hidden on Desktop since SideNav is present, but kept for structural compliance if SideNav is hidden) -->
+<div class="lg:hidden font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">
+                IFS v2.0
+            </div>
+<!-- Global Search -->
+<div class="flex-1 max-w-md ml-lg lg:ml-0 relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container text-on-surface font-body-md pl-xl pr-md py-sm rounded-full border-none focus:ring-2 focus:ring-primary outline-none transition-all" placeholder="Search departments, courses, or faculty..." type="text"/>
+</div>
+<!-- Right Actions -->
+<div class="flex items-center gap-md ml-auto">
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded-full hover:bg-surface-tint transition-colors">
+                    New Feedback
+                </button>
+<div class="flex items-center gap-xs">
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-variant/50">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-variant/50">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border-2 border-surface-container-lowest">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a corporate administrator in a modern, well-lit office setting. The lighting is soft and neutral, emphasizing a light-mode aesthetic. The individual is wearing a crisp white shirt, exuding trust and competence. The background is slightly blurred to keep focus on the subject." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNIwalUPlK9cQLk0y6bud6icErgJciS5XqhKrLHM4AgIl1FmoWqdgWtdt6KPSBkGboYU2JvUmI9sSOC9yduSqNPmerAA8IQ3A00iJLUriwm_79XV8xcNIZkWBjtilvDp7QT1iW12mpzFycGCUWr21D_QORi5ARH8SaO8njctkS7OwJxtNF7Nb3g_7chArtl9uPiBVtMyN4YTJeO6MeUZ4KXN2ZbYdd6MI9I2DC0_CRKW5voijH9vkuJUWDryQV0FMAXTu3F7uNqa17"/>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop overflow-y-auto">
+<!-- Page Header -->
+<div class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-background mb-xs">Global Analytics Overview</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">University-wide performance metrics, department comparisons, and engagement trends for Fall Semester 2024.</p>
+</div>
+<div class="flex items-center gap-sm">
+<select class="bg-surface-container-lowest border border-outline-variant text-on-surface rounded-lg px-md py-sm font-label-md text-label-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+<option>Fall 2024</option>
+<option>Spring 2024</option>
+<option>Fall 2023</option>
+</select>
+<button class="bg-surface-container text-on-surface border border-outline-variant hover:bg-surface-variant px-md py-sm rounded-lg font-label-md text-label-md transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filters
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-gutter">
+<!-- KPI Cards (Top Row) -->
+<div class="md:col-span-2 lg:col-span-3 bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant flex flex-col justify-between">
+<div class="flex items-start justify-between mb-lg">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<span class="bg-primary-container/20 text-primary-container px-xs py-base rounded font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 12%
+                        </span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Total Responses</p>
+<h2 class="font-headline-lg text-headline-lg text-on-background">45,231</h2>
+</div>
+</div>
+<div class="md:col-span-2 lg:col-span-3 bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant flex flex-col justify-between">
+<div class="flex items-start justify-between mb-lg">
+<div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">star_rate</span>
+</div>
+<span class="bg-primary-container/20 text-primary-container px-xs py-base rounded font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 0.2
+                        </span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Avg. Satisfaction Score</p>
+<h2 class="font-headline-lg text-headline-lg text-on-background">4.6<span class="text-on-surface-variant font-headline-sm text-headline-sm">/5.0</span></h2>
+</div>
+</div>
+<div class="md:col-span-2 lg:col-span-3 bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant flex flex-col justify-between">
+<div class="flex items-start justify-between mb-lg">
+<div class="w-10 h-10 rounded-lg bg-secondary-container/20 flex items-center justify-center text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<span class="bg-secondary-container/20 text-on-secondary-fixed-variant px-xs py-base rounded font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span> 3%
+                        </span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Flagged Reviews (Negative)</p>
+<h2 class="font-headline-lg text-headline-lg text-on-background">842</h2>
+</div>
+</div>
+<div class="md:col-span-2 lg:col-span-3 bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant flex flex-col justify-between">
+<div class="flex items-start justify-between mb-lg">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">timer</span>
+</div>
+<span class="text-on-surface-variant px-xs py-base rounded font-label-sm text-label-sm flex items-center gap-1">
+                            Neutral
+                        </span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Avg. Completion Time</p>
+<h2 class="font-headline-lg text-headline-lg text-on-background">4m 12s</h2>
+</div>
+</div>
+<!-- Main Chart Area (Spans 8 columns) -->
+<div class="md:col-span-4 lg:col-span-8 bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant flex flex-col min-h-[400px]">
+<div class="flex items-center justify-between mb-lg border-b border-surface-variant pb-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-background">Department Performance Comparison</h3>
+<div class="flex gap-sm">
+<button class="text-primary font-label-md text-label-md bg-primary-container/10 px-sm py-xs rounded hover:bg-primary-container/20 transition-colors">Bar</button>
+<button class="text-on-surface-variant font-label-md text-label-md hover:bg-surface-variant/50 px-sm py-xs rounded transition-colors">Line</button>
+</div>
+</div>
+<!-- Faux Chart Visualization -->
+<div class="flex-1 flex items-end gap-md pt-lg relative">
+<!-- Y-Axis Labels -->
+<div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-on-surface-variant font-label-sm text-label-sm pb-xl">
+<span>5.0</span>
+<span>4.0</span>
+<span>3.0</span>
+<span>2.0</span>
+<span>1.0</span>
+</div>
+<!-- Chart Bars -->
+<div class="flex-1 flex items-end justify-around pl-xl h-full pb-xl relative">
+<!-- Grid Lines -->
+<div class="absolute inset-0 pl-xl flex flex-col justify-between pb-xl pointer-events-none opacity-20">
+<div class="w-full border-t border-outline"></div>
+<div class="w-full border-t border-outline"></div>
+<div class="w-full border-t border-outline"></div>
+<div class="w-full border-t border-outline"></div>
+<div class="w-full border-t border-outline"></div>
+</div>
+<!-- Columns -->
+<div class="w-full max-w-[48px] h-[92%] bg-primary rounded-t-sm group relative">
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm text-on-surface-variant -rotate-45 whitespace-nowrap">Engineering</div>
+<div class="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-sm py-xs rounded font-label-sm text-label-sm whitespace-nowrap transition-opacity z-10 shadow-lg">4.8 (Eng)</div>
+</div>
+<div class="w-full max-w-[48px] h-[85%] bg-primary/80 rounded-t-sm group relative">
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm text-on-surface-variant -rotate-45 whitespace-nowrap">Business</div>
+<div class="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-sm py-xs rounded font-label-sm text-label-sm whitespace-nowrap transition-opacity z-10 shadow-lg">4.5 (Bus)</div>
+</div>
+<div class="w-full max-w-[48px] h-[75%] bg-primary/60 rounded-t-sm group relative">
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm text-on-surface-variant -rotate-45 whitespace-nowrap">Arts</div>
+<div class="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-sm py-xs rounded font-label-sm text-label-sm whitespace-nowrap transition-opacity z-10 shadow-lg">4.1 (Arts)</div>
+</div>
+<div class="w-full max-w-[48px] h-[88%] bg-primary/90 rounded-t-sm group relative">
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm text-on-surface-variant -rotate-45 whitespace-nowrap">Science</div>
+<div class="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-sm py-xs rounded font-label-sm text-label-sm whitespace-nowrap transition-opacity z-10 shadow-lg">4.6 (Sci)</div>
+</div>
+<div class="w-full max-w-[48px] h-[60%] bg-secondary-container rounded-t-sm group relative">
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 font-label-sm text-label-sm text-on-surface-variant -rotate-45 whitespace-nowrap">Law</div>
+<div class="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-sm py-xs rounded font-label-sm text-label-sm whitespace-nowrap transition-opacity z-10 shadow-lg">3.4 (Law) - Needs Review</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Top Performing Courses List (Spans 4 columns) -->
+<div class="md:col-span-2 lg:col-span-4 bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-background mb-md border-b border-surface-variant pb-sm">Highest Rated Courses</h3>
+<div class="flex flex-col gap-sm overflow-y-auto pr-xs">
+<!-- Course Item 1 -->
+<div class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container transition-colors group cursor-pointer border border-transparent hover:border-surface-variant">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded bg-primary-container flex items-center justify-center text-on-primary-container font-headline-sm text-headline-sm">CS</div>
+<div>
+<p class="font-label-md text-label-md text-on-background font-bold group-hover:text-primary transition-colors">Advanced Algorithms</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Prof. Alan Turing</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-headline-sm text-on-background">4.9</p>
+<p class="font-label-sm text-label-sm text-primary">340 reviews</p>
+</div>
+</div>
+<!-- Course Item 2 -->
+<div class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container transition-colors group cursor-pointer border border-transparent hover:border-surface-variant">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded bg-tertiary-container flex items-center justify-center text-on-tertiary-container font-headline-sm text-headline-sm">DS</div>
+<div>
+<p class="font-label-md text-label-md text-on-background font-bold group-hover:text-primary transition-colors">Data Mining</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Prof. Grace Hopper</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-headline-sm text-on-background">4.8</p>
+<p class="font-label-sm text-label-sm text-primary">280 reviews</p>
+</div>
+</div>
+<!-- Course Item 3 -->
+<div class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container transition-colors group cursor-pointer border border-transparent hover:border-surface-variant">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline-sm text-headline-sm">MG</div>
+<div>
+<p class="font-label-md text-label-md text-on-background font-bold group-hover:text-primary transition-colors">Strategic Mgt.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Prof. Peter Drucker</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-headline-sm text-on-background">4.7</p>
+<p class="font-label-sm text-label-sm text-primary">412 reviews</p>
+</div>
+</div>
+<!-- Course Item 4 -->
+<div class="flex items-center justify-between p-sm rounded-lg hover:bg-surface-container transition-colors group cursor-pointer border border-transparent hover:border-surface-variant">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline-sm text-headline-sm">PH</div>
+<div>
+<p class="font-label-md text-label-md text-on-background font-bold group-hover:text-primary transition-colors">Quantum Physics</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Prof. Marie Curie</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline-sm text-headline-sm text-on-background">4.7</p>
+<p class="font-label-sm text-label-sm text-primary">195 reviews</p>
+</div>
+</div>
+</div>
+<button class="mt-auto pt-md text-primary font-label-md text-label-md text-center hover:underline w-full">View Full Report</button>
+</div>
+<!-- Engagement Trend (Spans full width) -->
+<div class="md:col-span-4 lg:col-span-12 bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant">
+<h3 class="font-headline-sm text-headline-sm text-on-background mb-md">Response Engagement Over Semester</h3>
+<div class="h-[200px] w-full relative flex items-end">
+<!-- Simple visual representation of an area chart -->
+<div class="absolute inset-0 bg-gradient-to-t from-primary-container/20 to-transparent pointer-events-none rounded-b-lg"></div>
+<!-- SVG Line (Faux) -->
+<svg class="w-full h-full absolute top-0 left-0 preserve-aspect-ratio-none" preserveaspectratio="none" viewbox="0 0 100 100">
+<path class="text-primary" d="M0,80 Q10,70 20,75 T40,50 T60,60 T80,30 T100,20 L100,100 L0,100 Z" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+</svg>
+<!-- Plot Points -->
+<div class="absolute left-[20%] bottom-[25%] w-3 h-3 bg-surface-container-lowest border-2 border-primary rounded-full shadow cursor-pointer hover:scale-150 transition-transform" title="Week 3: Mid-terms"></div>
+<div class="absolute left-[40%] bottom-[50%] w-3 h-3 bg-surface-container-lowest border-2 border-primary rounded-full shadow cursor-pointer hover:scale-150 transition-transform" title="Week 6"></div>
+<div class="absolute left-[80%] bottom-[70%] w-3 h-3 bg-surface-container-lowest border-2 border-primary rounded-full shadow cursor-pointer hover:scale-150 transition-transform" title="Week 12: Finals Prep"></div>
+<!-- X-Axis Labels -->
+<div class="absolute -bottom-8 left-0 right-0 flex justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Week 1</span>
+<span>Week 4</span>
+<span>Week 8</span>
+<span>Week 12</span>
+<span>Finals</span>
+</div>
+</div>
+</div>
+</div>
+<div class="h-16"></div> <!-- Bottom Padding for scrolling -->
+</main>
+</div>
+</body></html>

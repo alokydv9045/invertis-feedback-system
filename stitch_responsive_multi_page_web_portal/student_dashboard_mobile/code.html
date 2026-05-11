@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Invertis Feedback - Student Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#fd8955",
+                        "on-secondary-fixed-variant": "#7d2d00",
+                        "tertiary-fixed-dim": "#b0c6ff",
+                        "error": "#ba1a1a",
+                        "secondary": "#9f4212",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container": "#eceef0",
+                        "primary-container": "#266fe6",
+                        "surface-variant": "#e0e3e5",
+                        "surface": "#f7f9fb",
+                        "on-primary-fixed-variant": "#004299",
+                        "tertiary-container": "#336fe1",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#0059c7",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#6e2600",
+                        "surface-container-high": "#e6e8ea",
+                        "outline": "#727785",
+                        "on-error": "#ffffff",
+                        "tertiary": "#0155c6",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#ffb597",
+                        "on-primary-fixed": "#001943",
+                        "outline-variant": "#c2c6d6",
+                        "secondary-fixed": "#ffdbcd",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed": "#001945",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed": "#d9e2ff",
+                        "primary": "#0057c2",
+                        "background": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "surface-bright": "#f7f9fb",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#00429c",
+                        "inverse-primary": "#afc6ff",
+                        "on-secondary-fixed": "#360f00",
+                        "on-tertiary-container": "#fefcff",
+                        "on-surface": "#191c1e",
+                        "surface-dim": "#d8dadc",
+                        "on-primary-container": "#fefcff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#424754",
+                        "primary-fixed": "#d9e2ff",
+                        "primary-fixed-dim": "#afc6ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "margin-desktop": "48px",
+                        "margin-mobile": "16px",
+                        "md": "24px",
+                        "sm": "16px",
+                        "lg": "40px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Montserrat"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row">
+<!-- Mobile Top App Bar (Replaces Desktop TopNavBar/SideNavBar on small screens) -->
+<header class="md:hidden flex justify-between items-center w-full px-margin-mobile py-sm bg-surface-container-lowest sticky top-0 z-50 shadow-sm">
+<div class="flex items-center gap-sm">
+<button aria-label="Menu" class="text-on-surface-variant p-base rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<span class="font-headline-md text-headline-md font-bold text-primary">IFS v2.0</span>
+</div>
+<div class="flex items-center gap-sm">
+<button aria-label="Notifications" class="text-on-surface-variant p-base rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A close up, professional headshot of a young male university student with short dark hair, wearing a casual grey sweater. The background is a soft, blurred bright library setting, conveying an academic environment. The lighting is soft and natural, creating a clean and approachable mood suitable for a modern educational application profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDShihHPGJnIwP_VCsl7nuYHQdc-SziDcF1evbJ1CuVTWgbgiWarGLPaASX7sxspa62B8hLE0zdpAFl3VxLhWBUDd3FwZzIBIopEtvaBgYNO2kzek0BJy_aW5hVtgff2AW-A9bwlFwRfz6AxGnLoomA6KUJRGwJFJlg_sU8704yPbe_55AdnX5PjQn244SLTQu3LZyggTU7MAx4sv1ZyZ4PXnU-G1WN-x60qiu5MbC0NQoDmnF7FK3Li5IvPEF2gHuGxY92YLAq7wgx"/>
+</div>
+</header>
+<!-- Desktop SideNavBar (Hidden on Mobile) -->
+<nav class="hidden md:flex flex-col h-screen p-sm gap-xs bg-surface-container-low w-64 docked full-height left-0 sticky top-0 flex-shrink-0 border-r border-surface-variant">
+<div class="flex items-center gap-sm px-sm py-md mb-md border-b border-surface-variant">
+<img alt="Invertis University Logo" class="w-10 h-10 rounded-lg object-cover w-auto h-8 object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0ujtZe0-qrM8ge2gwK3ZSfxpJt1OW4ZvAPuAda34nX5ysArT-TJAz-bg149vVk6DHTXe3EpYxqfVob2XKvjHrcbQdaLcNWR0QA1u2gkp_4rWm5d2KgH0aho48zzVjovYReVo-HhKkbMrtWvTe3o1h6_HjxzJJ5sthacZXKK1LedchJm-0bv7AdDGWnIiiPRCuPrNJNPZlG08mLM2bBD_bIHLI35_Ugexedo0lj0osvmMj08zq4rEqZC4AzzIVkG4Qlu0HKnfYE4rnw"/>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Invertis Feedback</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Centralized Portal</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto flex flex-col gap-xs">
+<a class="flex items-center gap-sm px-sm py-xs bg-primary-container text-on-primary-container rounded-lg font-bold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">rate_review</span>
+<span class="font-label-md text-label-md">Course Feedback</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">bar_chart</span>
+<span class="font-label-md text-label-md">Faculty Analytics</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label-md text-label-md">User Management</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">history</span>
+<span class="font-label-md text-label-md">System Logs</span>
+</a>
+</div>
+<div class="mt-auto pt-md border-t border-surface-variant flex flex-col gap-xs">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-xs rounded-lg hover:bg-tertiary transition-colors mb-sm shadow-sm">
+                Export Data
+            </button>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-[1280px] mx-auto pb-xl md:pb-0">
+<!-- Desktop TopNavBar (Hidden on Mobile, as per layout rules) -->
+<header class="hidden md:flex justify-between items-center w-full px-margin-desktop py-xs sticky top-0 z-50 bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-lg">
+<!-- Search Bar -->
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-xs pl-xl pr-sm text-body-md focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="Search..." type="text"/>
+</div>
+<nav class="flex gap-md">
+<a class="font-label-md text-label-md py-xs text-primary border-b-2 border-primary font-bold" href="#">Dashboard</a>
+<a class="font-label-md text-label-md py-xs text-on-surface-variant hover:text-primary transition-colors" href="#">Feedback</a>
+<a class="font-label-md text-label-md py-xs text-on-surface-variant hover:text-primary transition-colors" href="#">Analytics</a>
+<a class="font-label-md text-label-md py-xs text-on-surface-variant hover:text-primary transition-colors" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-primary text-on-primary px-md py-xs rounded-full font-label-md text-label-md hover:bg-tertiary transition-colors shadow-sm">
+                    New Feedback
+                </button>
+<div class="flex items-center gap-xs">
+<button aria-label="Notifications" class="text-on-surface-variant p-base rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<button aria-label="Settings" class="text-on-surface-variant p-base rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+</div>
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A close up, professional headshot of a young male university student with short dark hair, wearing a casual grey sweater. The background is a soft, blurred bright library setting, conveying an academic environment. The lighting is soft and natural, creating a clean and approachable mood suitable for a modern educational application profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJyTiyHgFNgkYTiV7-CbmE5iIWE4JeN5X9W9mbcPg45KWom5J2wNBFnl1V3IVoQ6yeVtALXwYgBVcYp-bYUsZXyk8SkqihFtcqVYYG3Z51JI4Gc9A7y3NQ3dZlsOJpLTLt7Ddszu9Xx7rwRd1T3EIPEnP4Nm6fN3IVA7tPXT80GJ4BxR01FH6oZNP2OeHmJaStQz0ujGR-8Tjv5omlaR_yb5gRFzi-Sr7IM-vgaAQhNVd9mEJMHiC-M3NupNqjv105MGaPxgemYeTC"/>
+</div>
+</header>
+<div class="p-margin-mobile md:p-margin-desktop flex flex-col gap-md">
+<!-- Welcome Banner -->
+<section class="bg-gradient-to-r from-primary to-tertiary-container rounded-xl p-md text-on-primary shadow-sm relative overflow-hidden">
+<div class="relative z-10">
+<h2 class="font-headline-lg text-headline-lg mb-xs">Welcome back, Alex!</h2>
+<p class="font-body-lg text-body-lg opacity-90 mb-md">You have 3 pending course feedback forms to complete this week.</p>
+<button class="bg-surface-container-lowest text-primary font-label-md text-label-md px-sm py-xs rounded-lg hover:bg-surface-container-low transition-colors inline-flex items-center gap-xs">
+<span>Start Now</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<!-- Decorative Abstract Shape -->
+<div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white opacity-10 rounded-full blur-2xl"></div>
+<div class="absolute -right-4 top-4 w-24 h-24 bg-secondary-container opacity-20 rounded-full blur-xl"></div>
+</section>
+<!-- Progress Widgets (Horizontal Scroll on Mobile) -->
+<section>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm">Your Progress</h3>
+<div class="flex overflow-x-auto gap-sm pb-sm no-scrollbar snap-x">
+<!-- Widget 1: Overall Completion -->
+<div class="min-w-[240px] md:min-w-[280px] bg-surface-container-lowest p-md rounded-xl shadow-sm snap-start flex-shrink-0 border border-surface-variant flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Overall Completion</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex items-end gap-xs">
+<span class="font-headline-lg text-headline-lg text-on-surface">65%</span>
+<span class="font-body-md text-body-md text-on-surface-variant pb-1">Semester 1</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden mt-auto">
+<div class="bg-primary h-full rounded-full" style="width: 65%;"></div>
+</div>
+</div>
+<!-- Widget 2: Pending Forms -->
+<div class="min-w-[240px] md:min-w-[280px] bg-surface-container-lowest p-md rounded-xl shadow-sm snap-start flex-shrink-0 border border-surface-variant flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Pending Forms</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">pending_actions</span>
+</div>
+<div class="flex items-end gap-xs">
+<span class="font-headline-lg text-headline-lg text-on-surface">3</span>
+<span class="font-body-md text-body-md text-on-surface-variant pb-1">courses left</span>
+</div>
+<p class="font-label-sm text-label-sm text-secondary mt-auto">Due in 4 days</p>
+</div>
+<!-- Widget 3: Feedback Impact -->
+<div class="min-w-[240px] md:min-w-[280px] bg-surface-container-lowest p-md rounded-xl shadow-sm snap-start flex-shrink-0 border border-surface-variant flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Your Impact</span>
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+</div>
+<div class="flex items-end gap-xs">
+<span class="font-headline-lg text-headline-lg text-on-surface">12</span>
+<span class="font-body-md text-body-md text-on-surface-variant pb-1">forms submitted</span>
+</div>
+<p class="font-label-sm text-label-sm text-tertiary mt-auto">+2 from last semester</p>
+</div>
+</div>
+</section>
+<!-- Content Grid: Assigned Feedback & Mini Leaderboard -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<!-- Assigned Feedback (Takes 2/3 width on large screens) -->
+<section class="lg:col-span-2">
+<div class="flex justify-between items-end mb-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Assigned Feedback</h3>
+<a class="font-label-sm text-label-sm text-primary hover:underline" href="#">View All</a>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Feedback Card 1 -->
+<div class="bg-surface-container-lowest p-sm md:p-md rounded-xl shadow-sm border border-surface-variant flex flex-col sm:flex-row gap-md items-start sm:items-center hover:shadow-md transition-shadow">
+<div class="w-12 h-12 rounded-lg bg-primary-container text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">science</span>
+</div>
+<div class="flex-1">
+<h4 class="font-headline-md text-[18px] text-on-surface">Advanced Physics 301</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Prof. Sarah Jenkins • Mid-term Review</p>
+</div>
+<div class="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-sm sm:gap-xs mt-sm sm:mt-0 border-t border-surface-variant sm:border-t-0 pt-sm sm:pt-0">
+<span class="font-label-sm text-label-sm px-2 py-1 bg-error-container text-on-error-container rounded-md">Urgent</span>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-sm py-1.5 rounded-lg hover:bg-tertiary transition-colors whitespace-nowrap">
+                                    Start
+                                </button>
+</div>
+</div>
+<!-- Feedback Card 2 -->
+<div class="bg-surface-container-lowest p-sm md:p-md rounded-xl shadow-sm border border-surface-variant flex flex-col sm:flex-row gap-md items-start sm:items-center hover:shadow-md transition-shadow">
+<div class="w-12 h-12 rounded-lg bg-tertiary-fixed-dim text-on-tertiary-fixed-variant flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</div>
+<div class="flex-1">
+<h4 class="font-headline-md text-[18px] text-on-surface">Modern Literature</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Dr. Emily Thorne • Course Evaluation</p>
+</div>
+<div class="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-sm sm:gap-xs mt-sm sm:mt-0 border-t border-surface-variant sm:border-t-0 pt-sm sm:pt-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Due in 2 days</span>
+<button class="bg-surface-container-high text-on-surface font-label-md text-label-md px-sm py-1.5 rounded-lg hover:bg-surface-variant transition-colors whitespace-nowrap border border-outline-variant">
+                                    Continue
+                                </button>
+</div>
+</div>
+<!-- Feedback Card 3 -->
+<div class="bg-surface-container-lowest p-sm md:p-md rounded-xl shadow-sm border border-surface-variant flex flex-col sm:flex-row gap-md items-start sm:items-center hover:shadow-md transition-shadow opacity-70">
+<div class="w-12 h-12 rounded-lg bg-surface-variant text-on-surface-variant flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">calculate</span>
+</div>
+<div class="flex-1">
+<h4 class="font-headline-md text-[18px] text-on-surface line-through">Calculus II</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Prof. Alan Turing • Final Review</p>
+</div>
+<div class="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-sm sm:gap-xs mt-sm sm:mt-0 border-t border-surface-variant sm:border-t-0 pt-sm sm:pt-0">
+<span class="font-label-sm text-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check</span>
+                                     Completed
+                                 </span>
+</div>
+</div>
+</div>
+</section>
+<!-- Mini Leaderboard -->
+<aside class="lg:col-span-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm">Top Contributors</h3>
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-sm border border-surface-variant flex flex-col gap-sm">
+<p class="font-body-md text-body-md text-on-surface-variant mb-xs text-sm">Students with the most helpful feedback this month.</p>
+<!-- Leaderboard Item 1 -->
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold font-label-sm">1</div>
+<img alt="Student Profile" class="w-10 h-10 rounded-full object-cover border border-surface-variant" data-alt="A bright, cheerful headshot of a female university student with long brown hair, smiling warmly. The background is a crisp, out-of-focus modern campus building. The lighting is sunny and optimistic, fitting the aesthetic of a successful top contributor on a modern educational platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4X_e0nV9s0wPcF0YRWPUhvURTGrmBxWccrI_gpaSyiCmPYdSQHMQ2t4OjEYRCIO9AGJsZP0F9HMOwUHHJZYAtelfhQtxbigQyRyEeco_uOjhU_xLyy38LXut_8LvulgUntMrvfp8LyHhgDZc0b6HSBdbJz-2kqdPZkGwMtEUuWsU_yOJo8jpcs8C0EXT3BiTHda-pF72oBwcHVvrm7wzcsBnaMRVDObL1NMQ7_E3UX3b44RXoykC3HHpvAf_6WfVDzkneC-__Z1cB"/>
+<div class="flex-1">
+<h5 class="font-label-md text-label-md text-on-surface">Sarah Connor</h5>
+<p class="font-label-sm text-label-sm text-on-surface-variant">42 pts</p>
+</div>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<div class="h-px bg-surface-variant w-full"></div>
+<!-- Leaderboard Item 2 -->
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-bold font-label-sm">2</div>
+<img alt="Student Profile" class="w-10 h-10 rounded-full object-cover border border-surface-variant" data-alt="A professional headshot of a young male student with short hair and glasses, looking directly at the camera with a confident expression. The background is a clean, minimalist white wall. The lighting is studio-quality and even, matching a modern, clean user interface design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqX0O5RNG2nbBnu8J2ZaFcnEE3RZTxtJFhBRMQ8zHJjvOUreyrRY4w8MWpKQu0XOh31TSz6ApHj0qV41JM9QnoMC7sPXSjdshUVkHeWnIqxOkb-or9x0xwEnTDHiEb0JnGytNxAK2HajvdCrFz5ip-TQYJUsoSLf0W_gHXiU54wxqdJPB3N_dna920ydztX8G16C1rVJBR2s59hK6FjF7FWePcutc6U7V0bmUFge0K5OzoSa_CnOE9cPQmvPZDAolpEz2OLY6VGXjv"/>
+<div class="flex-1">
+<h5 class="font-label-md text-label-md text-on-surface">John Smith</h5>
+<p class="font-label-sm text-label-sm text-on-surface-variant">38 pts</p>
+</div>
+</div>
+<div class="h-px bg-surface-variant w-full"></div>
+<!-- Leaderboard Item 3 -->
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-bold font-label-sm">3</div>
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-headline-sm font-bold border border-surface-variant">
+                                A
+                            </div>
+<div class="flex-1">
+<h5 class="font-label-md text-label-md text-on-surface font-bold text-primary">You</h5>
+<p class="font-label-sm text-label-sm text-on-surface-variant">35 pts</p>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Navigation Shell -->
+<nav class="md:hidden fixed bottom-0 w-full bg-surface-container-lowest flex justify-around items-center py-xs pb-4 border-t border-surface-variant z-50">
+<a class="flex flex-col items-center gap-1 p-2 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-sm text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">rate_review</span>
+<span class="font-label-sm text-[10px]">Feedback</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">bar_chart</span>
+<span class="font-label-sm text-[10px]">Analytics</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-sm text-[10px]">Profile</span>
+</a>
+</nav>
+</body></html>

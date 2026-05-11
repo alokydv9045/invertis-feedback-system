@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Forgot Password - Invertis Feedback System</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#fd8955",
+                      "on-secondary-fixed-variant": "#7d2d00",
+                      "tertiary-fixed-dim": "#b0c6ff",
+                      "error": "#ba1a1a",
+                      "secondary": "#9f4212",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0",
+                      "primary-container": "#266fe6",
+                      "surface-variant": "#e0e3e5",
+                      "surface": "#f7f9fb",
+                      "on-primary-fixed-variant": "#004299",
+                      "tertiary-container": "#336fe1",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#0059c7",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#6e2600",
+                      "surface-container-high": "#e6e8ea",
+                      "outline": "#727785",
+                      "on-error": "#ffffff",
+                      "tertiary": "#0155c6",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#ffb597",
+                      "on-primary-fixed": "#001943",
+                      "outline-variant": "#c2c6d6",
+                      "secondary-fixed": "#ffdbcd",
+                      "inverse-surface": "#2d3133",
+                      "on-tertiary-fixed": "#001945",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-fixed": "#d9e2ff",
+                      "primary": "#0057c2",
+                      "background": "#f7f9fb",
+                      "on-background": "#191c1e",
+                      "surface-bright": "#f7f9fb",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#00429c",
+                      "inverse-primary": "#afc6ff",
+                      "on-secondary-fixed": "#360f00",
+                      "on-tertiary-container": "#fefcff",
+                      "on-surface": "#191c1e",
+                      "surface-dim": "#d8dadc",
+                      "on-primary-container": "#fefcff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface-variant": "#424754",
+                      "primary-fixed": "#d9e2ff",
+                      "primary-fixed-dim": "#afc6ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "8px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "sm": "16px",
+                      "lg": "40px",
+                      "xl": "64px",
+                      "gutter": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-sm": [
+                              "Montserrat"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Montserrat"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Montserrat"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop font-body-md text-body-md text-on-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- Card Container -->
+<main class="w-full max-w-[480px] bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant p-lg flex flex-col gap-lg relative overflow-hidden">
+<!-- Decorative Top Bar -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-primary"></div>
+<!-- Header Section -->
+<div class="flex flex-col items-center text-center gap-sm">
+<!-- Logo Image -->
+<img alt="Invertis University Logo" class="h-16 w-auto object-contain mb-xs rounded-DEFAULT" src="https://lh3.googleusercontent.com/aida/ADBb0ujtZe0-qrM8ge2gwK3ZSfxpJt1OW4ZvAPuAda34nX5ysArT-TJAz-bg149vVk6DHTXe3EpYxqfVob2XKvjHrcbQdaLcNWR0QA1u2gkp_4rWm5d2KgH0aho48zzVjovYReVo-HhKkbMrtWvTe3o1h6_HjxzJJ5sthacZXKK1LedchJm-0bv7AdDGWnIiiPRCuPrNJNPZlG08mLM2bBD_bIHLI35_Ugexedo0lj0osvmMj08zq4rEqZC4AzzIVkG4Qlu0HKnfYE4rnw"/>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Forgot Password?</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[85%]">
+                Enter the email address associated with your account and we'll send you a link to reset your password.
+            </p>
+</div>
+<!-- Form Section -->
+<form action="#" class="flex flex-col gap-md" method="POST">
+<!-- Email Input Group -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="email">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">
+                        mail
+                    </span>
+<input class="w-full bg-surface border border-outline rounded-DEFAULT pl-xl pr-sm py-[10px] font-body-md text-body-md text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200" id="email" name="email" placeholder="name@invertis.edu" required="" type="email"/>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-[12px] px-md rounded-DEFAULT hover:bg-on-primary-fixed-variant focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none transition-all duration-200 flex justify-center items-center gap-xs mt-xs shadow-sm hover:shadow-md" type="submit">
+<span>Send Reset Link</span>
+<span class="material-symbols-outlined text-[18px]">
+                    send
+                </span>
+</button>
+</form>
+<!-- Footer Links -->
+<div class="flex flex-col items-center pt-sm border-t border-surface-variant mt-xs">
+<a class="inline-flex items-center gap-base font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform duration-200">
+                    arrow_back
+                </span>
+                Back to Login
+            </a>
+</div>
+</main>
+</body></html>

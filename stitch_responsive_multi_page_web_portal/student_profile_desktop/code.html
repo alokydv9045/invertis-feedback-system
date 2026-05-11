@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Profile - IFS v2.0</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#fd8955",
+                      "on-secondary-fixed-variant": "#7d2d00",
+                      "tertiary-fixed-dim": "#b0c6ff",
+                      "error": "#ba1a1a",
+                      "secondary": "#9f4212",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0",
+                      "primary-container": "#266fe6",
+                      "surface-variant": "#e0e3e5",
+                      "surface": "#f7f9fb",
+                      "on-primary-fixed-variant": "#004299",
+                      "tertiary-container": "#336fe1",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#0059c7",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#6e2600",
+                      "surface-container-high": "#e6e8ea",
+                      "outline": "#727785",
+                      "on-error": "#ffffff",
+                      "tertiary": "#0155c6",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#ffb597",
+                      "on-primary-fixed": "#001943",
+                      "outline-variant": "#c2c6d6",
+                      "secondary-fixed": "#ffdbcd",
+                      "inverse-surface": "#2d3133",
+                      "on-tertiary-fixed": "#001945",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-fixed": "#d9e2ff",
+                      "primary": "#0057c2",
+                      "background": "#f7f9fb",
+                      "on-background": "#191c1e",
+                      "surface-bright": "#f7f9fb",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#00429c",
+                      "inverse-primary": "#afc6ff",
+                      "on-secondary-fixed": "#360f00",
+                      "on-tertiary-container": "#fefcff",
+                      "on-surface": "#191c1e",
+                      "surface-dim": "#d8dadc",
+                      "on-primary-container": "#fefcff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface-variant": "#424754",
+                      "primary-fixed": "#d9e2ff",
+                      "primary-fixed-dim": "#afc6ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "8px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "sm": "16px",
+                      "lg": "40px",
+                      "xl": "64px",
+                      "gutter": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-sm": [
+                              "Montserrat"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Montserrat"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Montserrat"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- SideNavBar -->
+<nav class="hidden lg:flex flex-col h-screen p-sm gap-xs bg-surface-container-low w-64 border-r border-outline-variant flex-shrink-0 z-40">
+<!-- Header -->
+<div class="flex items-center gap-sm p-sm mb-md">
+<img alt="Invertis University Logo" class="w-32" data-alt="A clean, professional circular logo or avatar placeholder for a university system, featuring crisp white typography on a vibrant, corporate blue background. The lighting is flat and uniform, conveying a highly polished, modern institutional aesthetic." src="https://lh3.googleusercontent.com/aida/ADBb0ujtZe0-qrM8ge2gwK3ZSfxpJt1OW4ZvAPuAda34nX5ysArT-TJAz-bg149vVk6DHTXe3EpYxqfVob2XKvjHrcbQdaLcNWR0QA1u2gkp_4rWm5d2KgH0aho48zzVjovYReVo-HhKkbMrtWvTe3o1h6_HjxzJJ5sthacZXKK1LedchJm-0bv7AdDGWnIiiPRCuPrNJNPZlG08mLM2bBD_bIHLI35_Ugexedo0lj0osvmMj08zq4rEqZC4AzzIVkG4Qlu0HKnfYE4rnw"/>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary">Invertis Feedback</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Centralized Portal</p>
+</div>
+</div>
+<!-- Tabs -->
+<div class="flex flex-col gap-base flex-1">
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="rate_review">rate_review</span>
+<span class="font-label-md text-label-md">Course Feedback</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-label-md text-label-md">Faculty Analytics</span>
+</a>
+<!-- Active Tab (User Management maps closest to Profile context in admin shell) -->
+<a class="flex items-center gap-md p-sm bg-primary-container text-on-primary-container rounded-lg font-bold opacity-80 duration-200" href="#">
+<span class="material-symbols-outlined icon-fill" data-icon="group">group</span>
+<span class="font-label-md text-label-md">User Management</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-md text-label-md">System Logs</span>
+</a>
+</div>
+<!-- CTA -->
+<div class="px-sm py-md border-t border-outline-variant/30">
+<button class="w-full bg-secondary text-on-secondary font-label-md text-label-md py-xs rounded-DEFAULT hover:opacity-90 transition-opacity">
+                    Export Data
+                 </button>
+</div>
+<!-- Footer Tabs -->
+<div class="flex flex-col gap-base mt-auto">
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all rounded-DEFAULT text-error" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex flex-col flex-1 h-screen overflow-hidden bg-background">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-xs sticky top-0 z-50 bg-surface-container-lowest shadow-sm flex-shrink-0">
+<!-- Left: Brand / Search -->
+<div class="flex items-center gap-lg">
+<div class="lg:hidden">
+<span class="font-headline-md text-headline-md font-bold text-primary">IFS v2.0</span>
+</div>
+<div class="hidden lg:block relative w-64">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-xl pr-sm py-xs bg-surface-container-low border border-transparent rounded-full focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none font-body-md text-body-md text-on-surface transition-all" placeholder="Search..." type="text"/>
+</div>
+</div>
+<!-- Center: Navigation Links -->
+<nav class="hidden md:flex items-center gap-md">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-xs" href="#">Dashboard</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-xs" href="#">Feedback</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-xs" href="#">Analytics</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-xs" href="#">Reports</a>
+</nav>
+<!-- Right: Trailing Actions -->
+<div class="flex items-center gap-sm">
+<button class="hidden md:flex items-center gap-xs bg-primary text-on-primary px-sm py-xs rounded-DEFAULT font-label-md text-label-md hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        New Feedback
+                    </button>
+<button class="p-xs text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:text-primary hover:bg-surface-variant rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden ml-xs border-2 border-transparent hover:border-primary cursor-pointer transition-colors">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A close-up, professional portrait of a young adult looking forward with a neutral, pleasant expression. The background is a clean, softly lit studio gray, ensuring focus remains on the individual. The lighting is bright and even, typical of high-quality corporate or academic profile photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA91NmM3DqRR1TNjZYVv0GTtwvbOMw17sFqLP0sxoKWgIMrpsGl-xQAl8cz6FzpeKg3eMSES9V2mn_WEDLlvp_SMR2d--KQzAqSmdmCVzE3gvUHrY7c0gzA7FB5KPAQ08-Z2EluEEnsr2_A3boxdijZGUt-MzXiDxgczAqyYVa42-3OYK7OWbT_a-Rk79O8XUw3PmycAaaOWHfGN_Au14AdazSBlWMiV6bM2CWkR6R2dZoIfJKzo_weiniCoN7QOTHKDBpm-Uc-UtoA"/>
+</div>
+</div>
+</header>
+<!-- Scrollable Canvas -->
+<div class="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop">
+<div class="max-w-6xl mx-auto">
+<!-- Page Header -->
+<div class="mb-md">
+<h1 class="font-headline-lg text-headline-lg text-on-background">Student Profile</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-base">Manage your personal information and security settings.</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-md items-start">
+<!-- Left Column: ID Card Preview -->
+<div class="lg:col-span-4 flex flex-col gap-md">
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container-highest">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm">Digital ID Card</h3>
+<!-- ID Card Visual Representation -->
+<div class="relative w-full aspect-[1.58/1] rounded-xl overflow-hidden shadow-sm border border-outline-variant bg-gradient-to-br from-primary to-surface-tint">
+<!-- Background Pattern -->
+<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 20px 20px;"></div>
+<div class="relative h-full flex flex-col justify-between p-sm text-on-primary">
+<!-- Card Header -->
+<div class="flex justify-between items-start">
+<div class="font-headline-sm text-headline-sm font-bold tracking-tight">INVERTIS</div>
+<span class="font-label-sm text-label-sm bg-on-primary/20 px-xs py-base rounded-sm backdrop-blur-sm">STUDENT</span>
+</div>
+<!-- Card Body -->
+<div class="flex items-center gap-sm mt-auto">
+<div class="w-16 h-16 rounded-md border-2 border-on-primary/50 overflow-hidden bg-surface-container-lowest">
+<img alt="Student Photo" class="w-full h-full object-cover" data-alt="A clean, professional headshot of a young adult, framed tightly as an ID photo. The subject has a clear, neutral expression suitable for official identification. The background is a stark, high-key white, creating maximum contrast with the subject and aligning with institutional photo standards." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsUnOjxzse78mHybe6dSPf7tkyZyG2emgVOmbTlMqayA-ca68F5-DmE3_qhkO_Xi7WPEbcRs-UzmPvMUl9be-26rYY-oB9wqMSEjEvKMRXs0mrRutgAsrdkgfUyCGkFaHcGxUFU8SW8N1J2LdKjS-V4eXw7NKKZ-pWYpd_4dJ5bSoiOOhbG68z7_Kft77PM4LwkqEF8d7nwfJ9vp6VF6vahZLPnQBeZSLlCntKiADw5aVm4o-GYSgYhNzh1G8grxZI0UKptxDHe86y"/>
+</div>
+<div class="flex-1">
+<div class="font-headline-md text-headline-md font-bold leading-tight">Alex Carter</div>
+<div class="font-label-sm text-label-sm opacity-80 mt-base">B.Tech Computer Science</div>
+<div class="font-label-sm text-label-sm opacity-80 font-mono mt-base">ID: INV-2023-0842</div>
+</div>
+</div>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center mt-sm">Virtual ID is valid for campus access.</p>
+</div>
+</div>
+<!-- Right Column: Form Sections -->
+<div class="lg:col-span-8 flex flex-col gap-md">
+<!-- Personal Information Section -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container-highest">
+<div class="flex items-center justify-between mb-md border-b border-surface-variant pb-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface">Personal Information</h2>
+<span class="material-symbols-outlined text-outline">person</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+<!-- Editable Field -->
+<div class="col-span-1 md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Full Name</label>
+<input class="w-full px-sm py-xs bg-surface-container-lowest border border-outline-variant rounded-DEFAULT font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" type="text" value="Alex Carter"/>
+<p class="font-label-sm text-label-sm text-outline mt-base">As it appears on your official documents.</p>
+</div>
+<!-- Read-only Fields -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center gap-base">
+                                            Course <span class="material-symbols-outlined text-[14px] text-outline">lock</span>
+</label>
+<input class="w-full px-sm py-xs bg-surface-container-low border border-outline-variant/50 rounded-DEFAULT font-body-md text-body-md text-on-surface-variant cursor-not-allowed outline-none" readonly="" type="text" value="B.Tech Computer Science"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center gap-base">
+                                            Batch Years <span class="material-symbols-outlined text-[14px] text-outline">lock</span>
+</label>
+<input class="w-full px-sm py-xs bg-surface-container-low border border-outline-variant/50 rounded-DEFAULT font-body-md text-body-md text-on-surface-variant cursor-not-allowed outline-none" readonly="" type="text" value="2023 - 2027"/>
+</div>
+<div class="col-span-1 md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center gap-base">
+                                            University Email <span class="material-symbols-outlined text-[14px] text-outline">lock</span>
+</label>
+<input class="w-full px-sm py-xs bg-surface-container-low border border-outline-variant/50 rounded-DEFAULT font-body-md text-body-md text-on-surface-variant cursor-not-allowed outline-none" readonly="" type="email" value="alex.c23@invertis.edu"/>
+</div>
+</div>
+<div class="mt-md pt-sm flex justify-end">
+<button class="bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md px-md py-xs rounded-DEFAULT transition-colors shadow-sm">
+                                        Save Changes
+                                    </button>
+</div>
+</div>
+<!-- Security Section -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container-highest">
+<div class="flex items-center justify-between mb-md border-b border-surface-variant pb-sm">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Security Settings</h2>
+<p class="font-body-md text-body-md text-on-surface-variant text-[14px] mt-base">Update your password to keep your account secure.</p>
+</div>
+<span class="material-symbols-outlined text-outline">shield</span>
+</div>
+<div class="flex flex-col gap-sm max-w-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Current Password</label>
+<div class="relative">
+<input class="w-full pl-sm pr-xl py-xs bg-surface-container-lowest border border-outline-variant rounded-DEFAULT font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="••••••••" type="password"/>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline cursor-pointer hover:text-on-surface">visibility_off</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">New Password</label>
+<div class="relative">
+<input class="w-full pl-sm pr-xl py-xs bg-surface-container-lowest border border-outline-variant rounded-DEFAULT font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="Enter new password" type="password"/>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-outline cursor-pointer hover:text-on-surface">visibility_off</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Confirm New Password</label>
+<input class="w-full px-sm py-xs bg-surface-container-lowest border border-outline-variant rounded-DEFAULT font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" placeholder="Confirm new password" type="password"/>
+</div>
+</div>
+<div class="mt-md pt-sm flex justify-start">
+<button class="border border-outline text-on-surface font-label-md text-label-md px-md py-xs rounded-DEFAULT hover:bg-surface-container-low hover:text-primary hover:border-primary transition-all">
+                                        Update Password
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

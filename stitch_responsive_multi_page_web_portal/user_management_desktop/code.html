@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Management - Admin Portal</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#fd8955",
+                        "on-secondary-fixed-variant": "#7d2d00",
+                        "tertiary-fixed-dim": "#b0c6ff",
+                        "error": "#ba1a1a",
+                        "secondary": "#9f4212",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container": "#eceef0",
+                        "primary-container": "#266fe6",
+                        "surface-variant": "#e0e3e5",
+                        "surface": "#f7f9fb",
+                        "on-primary-fixed-variant": "#004299",
+                        "tertiary-container": "#336fe1",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#0059c7",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#6e2600",
+                        "surface-container-high": "#e6e8ea",
+                        "outline": "#727785",
+                        "on-error": "#ffffff",
+                        "tertiary": "#0155c6",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#ffb597",
+                        "on-primary-fixed": "#001943",
+                        "outline-variant": "#c2c6d6",
+                        "secondary-fixed": "#ffdbcd",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed": "#001945",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed": "#d9e2ff",
+                        "primary": "#0057c2",
+                        "background": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "surface-bright": "#f7f9fb",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#00429c",
+                        "inverse-primary": "#afc6ff",
+                        "on-secondary-fixed": "#360f00",
+                        "on-tertiary-container": "#fefcff",
+                        "on-surface": "#191c1e",
+                        "surface-dim": "#d8dadc",
+                        "on-primary-container": "#fefcff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#424754",
+                        "primary-fixed": "#d9e2ff",
+                        "primary-fixed-dim": "#afc6ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "margin-desktop": "48px",
+                        "margin-mobile": "16px",
+                        "md": "24px",
+                        "sm": "16px",
+                        "lg": "40px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Montserrat"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- SideNavBar (Shared Component JSON) -->
+<nav class="hidden lg:flex flex-col h-screen p-sm gap-xs bg-surface-container-low dark:bg-surface-container w-64 flex-shrink-0 z-40 border-r border-outline-variant/30">
+<!-- Header -->
+<div class="flex items-center gap-sm px-sm py-md mb-md">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden shrink-0">
+<img alt="Invertis University Logo" class="w-full h-full object-cover" data-alt="A clean, minimalist abstract corporate logo featuring geometric interlocking shapes in deep institutional blue and vibrant energetic orange. The logo is set against a pure white background in a well-lit, professional studio environment, emphasizing trust, academic excellence, and modern design principles. High resolution and sharp focus." src="https://lh3.googleusercontent.com/aida/ADBb0ujtZe0-qrM8ge2gwK3ZSfxpJt1OW4ZvAPuAda34nX5ysArT-TJAz-bg149vVk6DHTXe3EpYxqfVob2XKvjHrcbQdaLcNWR0QA1u2gkp_4rWm5d2KgH0aho48zzVjovYReVo-HhKkbMrtWvTe3o1h6_HjxzJJ5sthacZXKK1LedchJm-0bv7AdDGWnIiiPRCuPrNJNPZlG08mLM2bBD_bIHLI35_Ugexedo0lj0osvmMj08zq4rEqZC4AzzIVkG4Qlu0HKnfYE4rnw"/>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary">Invertis Feedback</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Centralized Portal</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 flex flex-col gap-xs overflow-y-auto">
+<!-- Inactive Tab -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Home
+            </a>
+<!-- Inactive Tab -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined">rate_review</span>
+                Course Feedback
+            </a>
+<!-- Inactive Tab -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+                Faculty Analytics
+            </a>
+<!-- Active Tab -->
+<a class="flex items-center gap-md px-md py-sm font-label-md text-label-md bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-lg font-bold opacity-80 duration-200 shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+                User Management
+            </a>
+<!-- Inactive Tab -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+                System Logs
+            </a>
+</div>
+<!-- CTA & Footer -->
+<div class="mt-auto flex flex-col gap-sm pt-md border-t border-outline-variant/30">
+<button class="w-full flex items-center justify-center gap-xs bg-surface-container-highest text-on-surface font-label-md text-label-md py-sm rounded-lg hover:bg-surface-dim transition-colors border border-outline-variant">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                Export Data
+            </button>
+<div class="flex flex-col gap-xs mt-sm">
+<a class="flex items-center gap-md px-md py-sm rounded-lg font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+                    Support
+                </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg font-label-md text-label-md text-error hover:bg-error-container/50 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                    Logout
+                </a>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-y-auto bg-background">
+<!-- Header Section -->
+<header class="px-margin-mobile md:px-margin-desktop py-lg flex flex-col sm:flex-row sm:items-end justify-between gap-md shrink-0">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">User Management</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Manage system access, roles, and administrative privileges.</p>
+</div>
+<button class="bg-primary text-on-primary hover:bg-surface-tint font-label-md text-label-md px-lg py-[12px] rounded-full flex items-center justify-center gap-xs shadow-sm hover:shadow-md transition-all whitespace-nowrap">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                Create New User
+            </button>
+</header>
+<!-- Content Canvas -->
+<div class="px-margin-mobile md:px-margin-desktop pb-xl flex-1 flex flex-col gap-md">
+<!-- Controls Bar (Bento-inspired Segmented Layout) -->
+<div class="bg-surface-container-lowest rounded-xl p-xs shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/20 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-sm">
+<!-- Segmented Tabs -->
+<div class="flex items-center p-base bg-surface-container rounded-lg w-full lg:w-auto overflow-x-auto">
+<button class="flex-1 lg:flex-none px-md py-[8px] bg-surface-container-lowest shadow-sm rounded-md font-label-md text-label-md text-primary font-semibold whitespace-nowrap">
+                        Students
+                    </button>
+<button class="flex-1 lg:flex-none px-md py-[8px] rounded-md font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap">
+                        HODs
+                    </button>
+<button class="flex-1 lg:flex-none px-md py-[8px] rounded-md font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap">
+                        Admins
+                    </button>
+</div>
+<!-- Search & Filter Actions -->
+<div class="flex items-center gap-sm w-full lg:w-auto pr-xs">
+<div class="relative flex-1 lg:w-64">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface py-[10px] pl-[40px] pr-sm rounded-lg border border-outline-variant/50 focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md text-on-surface placeholder:text-outline outline-none transition-all" placeholder="Search users by name or ID..." type="text"/>
+</div>
+<button class="flex items-center gap-xs px-sm py-[10px] bg-surface border border-outline-variant/50 rounded-lg font-label-md text-label-md text-on-surface hover:bg-surface-container transition-colors shrink-0">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+<span class="hidden sm:inline">Department</span>
+</button>
+</div>
+</div>
+<!-- Data Table Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-outline-variant/20 overflow-hidden flex-1 flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant border-b border-outline-variant/50">
+<th class="py-sm px-md font-label-sm text-label-sm uppercase tracking-wider">User Details</th>
+<th class="py-sm px-md font-label-sm text-label-sm uppercase tracking-wider">Enrollment ID</th>
+<th class="py-sm px-md font-label-sm text-label-sm uppercase tracking-wider">Department</th>
+<th class="py-sm px-md font-label-sm text-label-sm uppercase tracking-wider">Status</th>
+<th class="py-sm px-md font-label-sm text-label-sm uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- Row 1 -->
+<tr class="hover:bg-surface/50 transition-colors group">
+<td class="py-sm px-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-headline-sm text-headline-sm shrink-0">
+                                            AS
+                                        </div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Ananya Sharma</div>
+<div class="font-body-md text-body-md text-on-surface-variant text-[13px]">ananya.s@invertis.edu</div>
+</div>
+</div>
+</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface">INV2023CS012</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface">Computer Science</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-primary-fixed-dim/20 text-primary font-label-sm text-label-sm">
+                                        Active
+                                    </span>
+</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-md hover:bg-surface-container text-outline hover:text-primary transition-colors" title="Reset Password">
+<span class="material-symbols-outlined text-[20px]">key</span>
+</button>
+<button class="p-2 rounded-md hover:bg-secondary-fixed text-outline hover:text-secondary transition-colors" title="Suspend User">
+<span class="material-symbols-outlined text-[20px]">block</span>
+</button>
+<button class="p-2 rounded-md hover:bg-error-container/50 text-outline hover:text-error transition-colors" title="Delete User">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface/50 transition-colors group">
+<td class="py-sm px-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-headline-sm text-headline-sm shrink-0">
+                                            RV
+                                        </div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Rahul Verma</div>
+<div class="font-body-md text-body-md text-on-surface-variant text-[13px]">rahul.v@invertis.edu</div>
+</div>
+</div>
+</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface">INV2022ME045</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface">Mechanical Engineering</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-secondary-fixed/50 text-secondary font-label-sm text-label-sm">
+                                        Suspended
+                                    </span>
+</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-md hover:bg-surface-container text-outline hover:text-primary transition-colors" title="Reset Password">
+<span class="material-symbols-outlined text-[20px]">key</span>
+</button>
+<button class="p-2 rounded-md hover:bg-surface-container text-outline hover:text-on-surface transition-colors" title="Reactivate User">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</button>
+<button class="p-2 rounded-md hover:bg-error-container/50 text-outline hover:text-error transition-colors" title="Delete User">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface/50 transition-colors group">
+<td class="py-sm px-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-headline-sm text-headline-sm shrink-0">
+                                            PK
+                                        </div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Priya Kapoor</div>
+<div class="font-body-md text-body-md text-on-surface-variant text-[13px]">priya.k@invertis.edu</div>
+</div>
+</div>
+</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface">INV2024BA089</td>
+<td class="py-sm px-md font-body-md text-body-md text-on-surface">Business Administration</td>
+<td class="py-sm px-md">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-primary-fixed-dim/20 text-primary font-label-sm text-label-sm">
+                                        Active
+                                    </span>
+</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-md hover:bg-surface-container text-outline hover:text-primary transition-colors" title="Reset Password">
+<span class="material-symbols-outlined text-[20px]">key</span>
+</button>
+<button class="p-2 rounded-md hover:bg-secondary-fixed text-outline hover:text-secondary transition-colors" title="Suspend User">
+<span class="material-symbols-outlined text-[20px]">block</span>
+</button>
+<button class="p-2 rounded-md hover:bg-error-container/50 text-outline hover:text-error transition-colors" title="Delete User">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="mt-auto border-t border-outline-variant/30 p-sm flex items-center justify-between bg-surface-container-lowest">
+<span class="font-body-md text-body-md text-on-surface-variant text-[13px]">Showing 1 to 3 of 1,245 students</span>
+<div class="flex items-center gap-xs">
+<button class="p-1 rounded-md border border-outline-variant/50 text-outline hover:bg-surface-container transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="p-1 rounded-md border border-outline-variant/50 text-on-surface hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
