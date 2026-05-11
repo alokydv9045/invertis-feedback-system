@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Leaderboard</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#fd8955",
+                      "on-secondary-fixed-variant": "#7d2d00",
+                      "tertiary-fixed-dim": "#b0c6ff",
+                      "error": "#ba1a1a",
+                      "secondary": "#9f4212",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0",
+                      "primary-container": "#266fe6",
+                      "surface-variant": "#e0e3e5",
+                      "surface": "#f7f9fb",
+                      "on-primary-fixed-variant": "#004299",
+                      "tertiary-container": "#336fe1",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#0059c7",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#6e2600",
+                      "surface-container-high": "#e6e8ea",
+                      "outline": "#727785",
+                      "on-error": "#ffffff",
+                      "tertiary": "#0155c6",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#ffb597",
+                      "on-primary-fixed": "#001943",
+                      "outline-variant": "#c2c6d6",
+                      "secondary-fixed": "#ffdbcd",
+                      "inverse-surface": "#2d3133",
+                      "on-tertiary-fixed": "#001945",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-fixed": "#d9e2ff",
+                      "primary": "#0057c2",
+                      "background": "#f7f9fb",
+                      "on-background": "#191c1e",
+                      "surface-bright": "#f7f9fb",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#00429c",
+                      "inverse-primary": "#afc6ff",
+                      "on-secondary-fixed": "#360f00",
+                      "on-tertiary-container": "#fefcff",
+                      "on-surface": "#191c1e",
+                      "surface-dim": "#d8dadc",
+                      "on-primary-container": "#fefcff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface-variant": "#424754",
+                      "primary-fixed": "#d9e2ff",
+                      "primary-fixed-dim": "#afc6ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "8px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "sm": "16px",
+                      "lg": "40px",
+                      "xl": "64px",
+                      "gutter": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-sm": ["Montserrat"],
+                      "label-sm": ["Inter"],
+                      "headline-md": ["Montserrat"],
+                      "label-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-lg": ["Montserrat"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                      "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                      "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                      "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                      "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for clean UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #d8dadc;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen w-full overflow-hidden flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- Web SideNavBar (Hidden on Mobile) -->
+<nav class="hidden lg:flex flex-col h-screen w-64 p-sm gap-xs bg-surface-container-low text-primary flex-shrink-0">
+<!-- Header -->
+<div class="flex items-center gap-sm px-sm py-md mb-xs">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center shrink-0">
+<img alt="Invertis University Logo" class="w-full h-full object-cover rounded-xl" src="https://lh3.googleusercontent.com/aida/ADBb0ujtZe0-qrM8ge2gwK3ZSfxpJt1OW4ZvAPuAda34nX5ysArT-TJAz-bg149vVk6DHTXe3EpYxqfVob2XKvjHrcbQdaLcNWR0QA1u2gkp_4rWm5d2KgH0aho48zzVjovYReVo-HhKkbMrtWvTe3o1h6_HjxzJJ5sthacZXKK1LedchJm-0bv7AdDGWnIiiPRCuPrNJNPZlG08mLM2bBD_bIHLI35_Ugexedo0lj0osvmMj08zq4rEqZC4AzzIVkG4Qlu0HKnfYE4rnw"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">Invertis Feedback</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Centralized Portal</span>
+</div>
+</div>
+<!-- Links -->
+<div class="flex-1 flex flex-col gap-base">
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-on-surface-variant hover:bg-surface-variant transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Home
+            </a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-on-surface-variant hover:bg-surface-variant transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">rate_review</span>
+                Course Feedback
+            </a>
+<!-- Active State -->
+<a class="flex items-center gap-sm px-sm py-xs bg-primary-container text-on-primary-container rounded-lg font-bold transition-all font-label-md text-label-md opacity-80 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
+                Faculty Analytics
+            </a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-on-surface-variant hover:bg-surface-variant transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">group</span>
+                User Management
+            </a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-on-surface-variant hover:bg-surface-variant transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">history</span>
+                System Logs
+            </a>
+</div>
+<!-- CTA & Footer Links -->
+<div class="flex flex-col gap-xs mt-auto">
+<button class="w-full py-xs px-sm bg-primary text-on-primary rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-xs shadow-sm">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                Export Data
+            </button>
+<div class="w-full h-[1px] bg-outline-variant/30 my-xs"></div>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-on-surface-variant hover:bg-surface-variant transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-error hover:bg-error-container transition-all font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-full overflow-hidden bg-surface-bright relative">
+<!-- Web TopNavBar (Hidden on Mobile, adapts SideNav logic for layout consistency per JSON) -->
+<header class="hidden md:flex justify-between items-center w-full px-margin-desktop py-xs sticky top-0 z-50 bg-surface-container-lowest shadow-sm">
+<!-- Brand/Logo (Left) -->
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">IFS v2.0</span>
+<!-- Search Bar (on_left) -->
+<div class="relative w-64 ml-sm">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-xl pr-sm py-xs rounded-full bg-surface border-none focus:ring-2 focus:ring-primary text-body-md font-body-md text-on-surface placeholder:text-outline" placeholder="Search..." type="text"/>
+</div>
+</div>
+<!-- Navigation Links (Center) -->
+<nav class="flex items-center gap-lg h-full pt-xs">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-sm" href="#">Dashboard</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-sm" href="#">Feedback</a>
+<!-- Active Link -->
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary font-bold hover:text-primary transition-colors pb-sm scale-95 transition-transform duration-150" href="#">Analytics</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors pb-sm" href="#">Reports</a>
+</nav>
+<!-- Trailing Actions (Right) -->
+<div class="flex items-center gap-sm">
+<button class="bg-primary text-on-primary px-md py-xs rounded-full font-label-md text-label-md hover:bg-primary/90 transition-colors shadow-sm">New Feedback</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden ml-xs border-2 border-surface-variant cursor-pointer">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A clean, professional headshot of a young male student wearing a crisp white shirt. The lighting is soft and flattering, creating a trustworthy and approachable mood. The background is a solid, light institutional blue that matches the overall application UI theme, emphasizing clarity and modern academic aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmOo-NCPj_Xl5pSpcobvZ2jSr1XjNjhLizPvo0XjYXy_U8oKvElz_j_BIYiLj4p0uAtqr6PC7ToWz_cLgEJ3vcK1yVRMrynhgIcTtZL1wbhQVre3fl_M9mgRnQqLb7dcOsTx5Aw48eh-xw-5g4LU0-caANH9VkSh2FwBFIanbNHuU3-42lwZyfYPRh7IWG-eAcvVp7MTnKPsKt5pjlcXS25BH79d9VlHZqzuAFSRDHJbyBXXRO35g_pAhFprJDQoVg2DFYfN4ul4Rw"/>
+</div>
+</div>
+</header>
+<!-- Mobile Header (Simplified Top Bar) -->
+<header class="md:hidden flex justify-between items-center w-full px-margin-mobile py-sm bg-surface-container-lowest shadow-sm z-40 relative">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">Student Leaderboard</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-surface-variant">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A clean, professional headshot of a young male student wearing a crisp white shirt. The lighting is soft and flattering, creating a trustworthy and approachable mood. The background is a solid, light institutional blue that matches the overall application UI theme, emphasizing clarity and modern academic aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7NtUc32w6VCWlHeVKH5JwtOkY27PCDNbLnHQ2_wb71oELkXI_j5DXn-S29WiaePVwQamQ9rA3Rykk3LU7775SrLcPFmeddmWEHVZgcStPP_n7nRpR36A2LOFfSXQeKJWEsbe3fLyh-O4FD93KrSGO2zPbRVAHfH3HsdzfEp_dGgyUNVhvtNZV-u-AI_mPA8_TcCrXYgC3NEvvOLDQ9ObCtim8pxmOPivRdYbTj2VXyR437xHomP6MgXKwKek7OuR9cfKoKVG1DMwD"/>
+</div>
+</header>
+<!-- Scrollable Leaderboard Content -->
+<main class="flex-1 overflow-y-auto w-full relative pb-24 md:pb-xl">
+<div class="px-margin-mobile md:px-margin-desktop py-md max-w-4xl mx-auto w-full flex flex-col gap-lg">
+<!-- Page Title Area (Web) -->
+<div class="hidden md:flex flex-col gap-xs mb-sm">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Student Leaderboard</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Top contributors by feedback submission count.</p>
+</div>
+<!-- Top 3 Podium (Bento Style) -->
+<div class="grid grid-cols-3 gap-xs md:gap-md items-end max-w-2xl mx-auto w-full mt-sm md:mt-0">
+<!-- Rank 2 -->
+<div class="flex flex-col items-center gap-sm pb-4">
+<div class="relative">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-4 border-surface-container-lowest shadow-sm z-10 relative">
+<img alt="Student" class="w-full h-full object-cover" data-alt="A professional headshot of a young female university student smiling warmly. The lighting is bright and soft, creating an optimistic and friendly mood. The background is a clean, minimal light gray setting that integrates seamlessly with a modern digital interface design featuring institutional blues and crisp whites." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5j7QJpDCsnazzhWT_8938ubf0uVtrQ8ytYFGGTIrXOK_BlS18raIoTI03K8K3_ADGepqks0SooamAuV7TSOAAgxHeZqder_askvzSKdx2lwGRmVnhDcKM9GYmI2esrn04BP7cR8ZcVPi5e-11AsNRbjUZavRNiIrvv88PP-fb1bbR9tvJtxQS_niB7TRvUYYLRqgufQxCC7Wcr4GX5KuBCHRv6B-fjfJOb_bSuUOwoG_ZaOK5sh0sicWrpouLbqepKAmNUJWNyCJM"/>
+</div>
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center font-label-sm text-label-sm font-bold shadow-sm z-20">2</div>
+</div>
+<div class="text-center">
+<h3 class="font-label-md text-label-md font-bold text-on-surface truncate w-20 md:w-full">Sarah J.</h3>
+<p class="font-label-sm text-label-sm text-primary font-bold">142<span class="text-on-surface-variant font-normal ml-1">subs</span></p>
+</div>
+<div class="w-full h-24 md:h-32 bg-surface-container rounded-t-xl mt-xs relative overflow-hidden flex items-start justify-center pt-xs">
+<div class="w-8 h-1 rounded-full bg-surface-variant"></div>
+</div>
+</div>
+<!-- Rank 1 -->
+<div class="flex flex-col items-center gap-sm">
+<div class="relative">
+<div class="absolute -inset-1 bg-gradient-to-tr from-primary to-tertiary rounded-full blur-[2px] opacity-70"></div>
+<div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-surface-container-lowest shadow-[0_10px_30px_rgba(0,0,0,0.12)] z-10 relative">
+<img alt="Student" class="w-full h-full object-cover" data-alt="A striking portrait of a diverse male student looking directly at the camera with a confident, proud expression. The high-key lighting emphasizes clarity and professionalism. The background features subtle, abstract geometric shapes in Invertis blue and white, evoking a sense of achievement and modern academic excellence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0D3L1dXSOWciMzH7xP_QLlOSNDEwU65QuO-VsjTTjCxRzH6P4yHUyJfF_9yDphgXdl0VeMNr140BHtq6ge2OXsGP0bvoj0WpbJ05hC6lZCYm-qJMDdVFhEigxYs6U-9CTaB9mY-PwD7hx9d1Z_MItDjTV-Pg44uagKa0H5e6DzlbHOTVYIIqTTDgh_hah9pKOD5KuILT-XhZeI61EWs_1a_lNe8Cbb3z3540kNO60HaMvccnEMdrDAMyTZaW_qlq_2TCy7Jc98uD1"/>
+</div>
+<div class="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-headline-sm text-headline-sm font-bold shadow-sm z-20">1</div>
+</div>
+<div class="text-center">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate w-24 md:w-full">David M.</h3>
+<p class="font-label-md text-label-md text-primary font-bold">158<span class="text-on-surface-variant font-normal ml-1">subs</span></p>
+</div>
+<div class="w-full h-32 md:h-40 bg-primary-container rounded-t-xl mt-xs shadow-sm relative overflow-hidden flex items-start justify-center pt-xs">
+<span class="material-symbols-outlined text-primary/30 text-[40px] mt-sm">emoji_events</span>
+</div>
+</div>
+<!-- Rank 3 -->
+<div class="flex flex-col items-center gap-sm pb-8">
+<div class="relative">
+<div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-4 border-surface-container-lowest shadow-sm z-10 relative">
+<img alt="Student" class="w-full h-full object-cover" data-alt="A bright, cheerful headshot of a young female student with glasses, smiling genuinely. The lighting is natural and clear, communicating intelligence and approachability. The background is a soft, solid off-white, allowing the subject to stand out perfectly within a structured, data-driven academic leaderboard interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA1pVFFFBWt9wdB3GWmzR4mEzp_Il80caWddiA-OKSdRBIiXqWl-pmbE_qqlI3tp4iVtFgQkWjZjyJvXerXYq9fHAfRqn5xFInaYaB1QlZYCdYSUK2wUnaap6Vzv2oaBn0P05bTZsusuZno0wGvD6U70BGEM71qfVoEuik6P_KjKxe_4hU_gMclCfSs61qnlxUrJDKIEkayzuEZjpO_dLtXzsqNwgHBSu4Fjwa5UQP4rkUAQJryUK1TbCZTfYlicO7X1QnC9vsxC7z"/>
+</div>
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center font-label-sm text-label-sm font-bold shadow-sm z-20">3</div>
+</div>
+<div class="text-center">
+<h3 class="font-label-md text-label-md font-bold text-on-surface truncate w-20 md:w-full">Emily R.</h3>
+<p class="font-label-sm text-label-sm text-primary font-bold">129<span class="text-on-surface-variant font-normal ml-1">subs</span></p>
+</div>
+<div class="w-full h-20 md:h-24 bg-surface-container rounded-t-xl mt-xs relative overflow-hidden flex items-start justify-center pt-xs">
+<div class="w-8 h-1 rounded-full bg-surface-variant"></div>
+</div>
+</div>
+</div>
+<!-- List View (Ranks 4+) -->
+<div class="flex flex-col gap-base w-full max-w-2xl mx-auto">
+<!-- List Item -->
+<div class="flex items-center justify-between p-sm rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-md">
+<span class="w-6 text-center font-headline-sm text-headline-sm text-outline font-bold">4</span>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="A clean, simple avatar placeholder showing a generic human silhouette against a neutral gray background. Suitable for a modern UI layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpbWTCQb935mmp4V1zZaiSFDzQlcm7rl4BII76f22DhWVU8JuMXH_Z6oDZxLeFuyri6_XHyTm_YBXH6S1rKO3DRcI4Ca8FwOknCk9vzoijJEHwqSga9ZbvZJqU1SflbUzjFyin6dL4cxievq6sHv4P7Nl-TYwlbiZTzyF3z5dYUbmegqCxs2Z0Jm5LWAIe3vBLylCGhWbZvpOKIEf9l328tioBiRLHm8qZkXZWK44RpeJJdddqMfmwj6Kh3xrD2v5E6xgH5p0rs9Cu"/>
+</div>
+<span class="font-body-md text-body-md font-medium text-on-surface">Michael K.</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">115</span>
+</div>
+<!-- List Item -->
+<div class="flex items-center justify-between p-sm rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-md">
+<span class="w-6 text-center font-headline-sm text-headline-sm text-outline font-bold">5</span>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="A clean, simple avatar placeholder showing a generic human silhouette against a neutral gray background. Suitable for a modern UI layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQMi2l5rUIbS86ZEo_y2kYtkBESP20g_qPX74WdgGFlzkxtoIBKIUzFvUR1uOxYKSWBJkikyN_C4AlP6WydTVbC03LKgwKpu51UWo9eKUyyZETDvxI4JE4WBsZVmjUNarY_68NhROXwbTEdEp68C3G0XwDlumEdtTR0kC3LTSRSuXkY2Rg8CI7siXEiWzVrUPHM0p4Wh7416LYzZQf_IfjbPQzC8sXHIrARZTRqFDsUfOKsSUizas3FLgLcSo7M93XlLhxkbJ2fRPC"/>
+</div>
+<span class="font-body-md text-body-md font-medium text-on-surface">Jessica L.</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">98</span>
+</div>
+<!-- List Item -->
+<div class="flex items-center justify-between p-sm rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-md">
+<span class="w-6 text-center font-headline-sm text-headline-sm text-outline font-bold">6</span>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant">
+<img alt="Avatar" class="w-full h-full object-cover" data-alt="A clean, simple avatar placeholder showing a generic human silhouette against a neutral gray background. Suitable for a modern UI layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMROjR94P_9UsO8aKrFbkDgaKAmclNVlQxvmxaJOEF0_wsCPGUDlLeJIElB0PxC8XaG3Y3gssbXl1O_HDEwC7tvgn9rpq-K-rZKhvQbUowWSE-Gk2NKPsgKOxeTtk0GqOqIL4r51F57Ij7MZRD4ohYf-thaL7qSsBv8XOH5GJuMjsFT1r85BgtMT2lYF_d7DaH21mLWcMzzzKxx2cqj6TSfLybpWEI_dHUPKCRvHRaqnURqAQqs3rdeXEKzpvTK3U_P19sjF67ZuC5"/>
+</div>
+<span class="font-body-md text-body-md font-medium text-on-surface">Robert T.</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">87</span>
+</div>
+<!-- Ellipsis/More indicator -->
+<div class="flex justify-center py-xs">
+<span class="material-symbols-outlined text-outline-variant">more_vert</span>
+</div>
+</div>
+</div>
+<!-- Spacer to ensure content isn't hidden behind the sticky current user bar -->
+<div class="h-24"></div>
+</main>
+<!-- Current Logged-in User Highlight (Sticky at bottom of scrollable area, above mobile nav) -->
+<div class="absolute bottom-0 md:bottom-md left-0 w-full px-margin-mobile md:px-margin-desktop z-30 pb-[72px] md:pb-0 pointer-events-none">
+<div class="max-w-2xl mx-auto pointer-events-auto">
+<div class="flex items-center justify-between p-sm rounded-xl bg-primary-container shadow-[0_10px_30px_rgba(0,0,0,0.12)] border border-primary/20">
+<div class="flex items-center gap-md">
+<div class="w-8 flex flex-col items-center">
+<span class="font-label-sm text-label-sm text-on-primary-container/80 uppercase">Rank</span>
+<span class="font-headline-sm text-headline-sm text-on-primary-container font-bold">12</span>
+</div>
+<div class="w-[1px] h-8 bg-on-primary-container/20"></div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-lowest">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A clean, professional headshot of a young male student wearing a crisp white shirt. The lighting is soft and flattering, creating a trustworthy and approachable mood. The background is a solid, light institutional blue that matches the overall application UI theme, emphasizing clarity and modern academic aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-vSQ3guFsFT2kGKIkKsjForiF2CJtDbx3Fa7uIqNKxnQUEO42FEj270rT4mTLdSOZdtlFbEYtcynAJh-zV8Bj_no_XrsamRSMbfHsrTqAl0RXOJjfuJG2UX5y0C8qac8tdyGzeX0Log4fpXe1XshZPSnFO5wjb73kR2rGikzq_H-VhFHSj2rA7hVJ0MQjuv9Z543kRjEspmJ-JrXwLmSdSJScx_y2wKthG670ls1Sg27kmYWI-521mX3wW-xgfyakZymxXhlYR3Al"/>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-bold text-on-primary-container">You</span>
+<span class="font-label-sm text-label-sm text-on-primary-container/80">Keep it up!</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-headline-sm text-headline-sm text-on-primary-container font-bold">42</span>
+<span class="font-label-sm text-label-sm text-on-primary-container/80">Submissions</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Mobile Bottom Nav (Synthesized from JSON SideNav logic, Hidden on Web) -->
+<!-- Note: Shell Border Ban dictates NO border-t, relying on shadow -->
+<nav class="md:hidden fixed bottom-0 w-full bg-surface-container-lowest flex justify-around items-center h-[72px] z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] px-sm">
+<a class="flex flex-col items-center justify-center w-16 h-full gap-1 text-on-surface-variant" href="#">
+<div class="w-16 h-8 rounded-full flex items-center justify-center group-hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+</div>
+<span class="font-label-sm text-label-sm text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center w-16 h-full gap-1 text-on-surface-variant" href="#">
+<div class="w-16 h-8 rounded-full flex items-center justify-center group-hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[24px]">rate_review</span>
+</div>
+<span class="font-label-sm text-label-sm text-[10px]">Feedback</span>
+</a>
+<!-- Active Mobile Tab -->
+<a class="flex flex-col items-center justify-center w-16 h-full gap-1 text-on-primary-container" href="#">
+<div class="w-16 h-8 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
+</div>
+<span class="font-label-sm text-label-sm text-[10px] font-bold">Analytics</span>
+</a>
+<a class="flex flex-col items-center justify-center w-16 h-full gap-1 text-on-surface-variant" href="#">
+<div class="w-16 h-8 rounded-full flex items-center justify-center group-hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[24px]">group</span>
+</div>
+<span class="font-label-sm text-label-sm text-[10px]">Profile</span>
+</a>
+</nav>
+</div>
+</body></html>

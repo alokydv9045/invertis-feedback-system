@@ -1,0 +1,62 @@
+[
+  {
+    "id": "q1",
+    "question_text": "How clearly did the trainer/faculty explain the concepts and topics?",
+    "question_type": "rating",
+    "sort_order": 1
+  },
+  {
+    "id": "q2",
+    "question_text": "How well was the faculty prepared for the classes and lectures?",
+    "question_type": "rating",
+    "sort_order": 2
+  },
+  {
+    "id": "q3",
+    "question_text": "How effectively did the faculty engage students during the class?",
+    "question_type": "rating",
+    "sort_order": 3
+  },
+  {
+    "id": "q4",
+    "question_text": "How satisfied are you with the faculty’s teaching methodology?",
+    "question_type": "rating",
+    "sort_order": 4
+  },
+  {
+    "id": "q5",
+    "question_text": "How approachable and supportive was the faculty for doubt solving?",
+    "question_type": "rating",
+    "sort_order": 5
+  },
+  {
+    "id": "q6",
+    "question_text": "How well did the faculty maintain discipline and professionalism in class?",
+    "question_type": "rating",
+    "sort_order": 6
+  },
+  {
+    "id": "q7",
+    "question_text": "How relevant and useful were the assignments, practicals, or activities provided?",
+    "question_type": "rating",
+    "sort_order": 7
+  },
+  {
+    "id": "q8",
+    "question_text": "How effectively did the faculty connect theoretical concepts with real-world applications?",
+    "question_type": "rating",
+    "sort_order": 8
+  },
+  {
+    "id": "q9",
+    "question_text": "How satisfied are you with the pace and overall management of the course?",
+    "question_type": "rating",
+    "sort_order": 9
+  },
+  {
+    "id": "q10",
+    "question_text": "Overall, how would you rate the performance of this faculty/trainer?",
+    "question_type": "rating",
+    "sort_order": 10
+  }
+]

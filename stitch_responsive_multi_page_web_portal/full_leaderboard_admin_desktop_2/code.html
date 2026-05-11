@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Full Leaderboard - Invertis Feedback</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for high density data table */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #c2c6d6; /* outline-variant */
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#fd8955",
+                        "on-secondary-fixed-variant": "#7d2d00",
+                        "tertiary-fixed-dim": "#b0c6ff",
+                        "error": "#ba1a1a",
+                        "secondary": "#9f4212",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container": "#eceef0",
+                        "primary-container": "#266fe6",
+                        "surface-variant": "#e0e3e5",
+                        "surface": "#f7f9fb",
+                        "on-primary-fixed-variant": "#004299",
+                        "tertiary-container": "#336fe1",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#0059c7",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#6e2600",
+                        "surface-container-high": "#e6e8ea",
+                        "outline": "#727785",
+                        "on-error": "#ffffff",
+                        "tertiary": "#0155c6",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#ffb597",
+                        "on-primary-fixed": "#001943",
+                        "outline-variant": "#c2c6d6",
+                        "secondary-fixed": "#ffdbcd",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed": "#001945",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed": "#d9e2ff",
+                        "primary": "#0057c2",
+                        "background": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "surface-bright": "#f7f9fb",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#00429c",
+                        "inverse-primary": "#afc6ff",
+                        "on-secondary-fixed": "#360f00",
+                        "on-tertiary-container": "#fefcff",
+                        "on-surface": "#191c1e",
+                        "surface-dim": "#d8dadc",
+                        "on-primary-container": "#fefcff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#424754",
+                        "primary-fixed": "#d9e2ff",
+                        "primary-fixed-dim": "#afc6ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "margin-desktop": "48px",
+                        "margin-mobile": "16px",
+                        "md": "24px",
+                        "sm": "16px",
+                        "lg": "40px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Montserrat"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md h-screen overflow-hidden flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="bg-surface-container-low dark:bg-surface-container docked full-height left-0 w-64 hidden lg:flex flex-col h-screen p-sm gap-xs flex-shrink-0 z-40 border-r border-surface-variant">
+<!-- Header -->
+<div class="flex items-center gap-sm p-sm mb-md">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container overflow-hidden">
+<img alt="Invertis University Logo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/ADBb0ujtZe0-qrM8ge2gwK3ZSfxpJt1OW4ZvAPuAda34nX5ysArT-TJAz-bg149vVk6DHTXe3EpYxqfVob2XKvjHrcbQdaLcNWR0QA1u2gkp_4rWm5d2KgH0aho48zzVjovYReVo-HhKkbMrtWvTe3o1h6_HjxzJJ5sthacZXKK1LedchJm-0bv7AdDGWnIiiPRCuPrNJNPZlG08mLM2bBD_bIHLI35_Ugexedo0lj0osvmMj08zq4rEqZC4AzzIVkG4Qlu0HKnfYE4rnw"/>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary">Invertis Feedback</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Centralized Portal</p>
+</div>
+</div>
+<!-- Main Navigation -->
+<div class="flex-1 flex flex-col gap-xs">
+<!-- Inactive Tab: Home -->
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<!-- Inactive Tab: Course Feedback -->
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="rate_review">rate_review</span>
+<span class="font-label-md text-label-md">Course Feedback</span>
+</a>
+<!-- Inactive Tab: Faculty Analytics -->
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="bar_chart">bar_chart</span>
+<span class="font-label-md text-label-md">Faculty Analytics</span>
+</a>
+<!-- ACTIVE TAB: User Management (Semantic Match for Leaderboard/Students) -->
+<a class="flex items-center gap-sm px-md py-sm bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-lg font-bold hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-all opacity-80 duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="group" data-weight="fill" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-md text-label-md">User Management</span>
+</a>
+<!-- Inactive Tab: System Logs -->
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:bg-surface-variant dark:hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="history">history</span>
+<span class="font-label-md text-label-md">System Logs</span>
+</a>
+</div>
+<!-- Spacer -->
+<div class="mt-auto"></div>
+<!-- CTA & Footer Tabs -->
+<div class="flex flex-col gap-xs mt-md border-t border-surface-variant pt-sm">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-sm px-md rounded-xl hover:opacity-90 transition-opacity flex justify-center items-center gap-xs shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                Export Data
+            </button>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- Mobile Top Nav (Fallback since SideNav is hidden on mobile) -->
+<div class="lg:hidden flex items-center justify-between p-margin-mobile bg-surface-container-lowest border-b border-surface-variant sticky top-0 z-30">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[28px]">menu</span>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">Invertis Feedback</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden">
+<img alt="Admin Profile" class="w-full h-full object-cover" data-alt="A close-up portrait of a professional individual looking directly at the camera with a confident, neutral expression. The lighting is soft and flattering, typical of a modern corporate headshot. The background is slightly blurred, focusing entirely on the subject. The overall tone is approachable yet authoritative, suited for an institutional setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDE5uAWyc-3TCAhHvdeWazzzyaZV9IwLO14D0ijw5kaIYY7B5N7fgdV-97KqdhL16cmCyL17tn6ZSjWRqK-JWmeiucHwPxHMY1WfYm7VxKYqKlmA7hcmWszHfhVOcUzIOKn2xkqSHcA1HoTVAwo87aceAszkRY8gQTQKALJDdnDJkpEjfaFXtYMbxRUzScdAt2fOLu46RsN8QOJVCWmISRdgNtxlqlCpSFeXJ0qHL0ZGGuHn7MRKXQnLpAuDH4qx0ZMSKTv7t8ajelE"/>
+</div>
+</div>
+<!-- Scrollable Content Area -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-margin-mobile md:p-margin-desktop w-full max-w-[1280px] mx-auto">
+<!-- Page Header -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-base">Student Leaderboard</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                        Comprehensive overview of student engagement across all academic programs. Ranked by total verified feedback submissions.
+                    </p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface-container-lowest border border-outline text-on-surface font-label-md text-label-md py-xs px-md rounded-lg hover:bg-surface-container transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Advanced Filters
+                    </button>
+<button class="bg-primary text-on-primary font-label-md text-label-md py-xs px-md rounded-lg hover:opacity-90 transition-opacity flex items-center gap-xs shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+                        Refresh Data
+                    </button>
+</div>
+</header>
+<!-- Quick Filters (Bento-style row) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-lg">
+<!-- Search -->
+<div class="md:col-span-2 bg-surface-container-lowest rounded-xl p-xs border border-surface-variant flex items-center gap-sm shadow-[0_4px_20px_rgba(0,0,0,0.02)] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<span class="material-symbols-outlined text-outline ml-sm">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-outline-variant py-sm px-0" placeholder="Search by Student ID or Name..." type="text"/>
+</div>
+<!-- Department Filter -->
+<div class="relative bg-surface-container-lowest rounded-xl border border-surface-variant shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<select class="w-full h-full bg-transparent border-none focus:ring-0 font-label-md text-label-md text-on-surface py-sm px-md appearance-none cursor-pointer">
+<option disabled="" selected="" value="">All Departments</option>
+<option value="cs">Computer Science</option>
+<option value="bus">Business Administration</option>
+<option value="eng">Engineering</option>
+<option value="arts">Arts &amp; Humanities</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+</div>
+<!-- Course Filter -->
+<div class="relative bg-surface-container-lowest rounded-xl border border-surface-variant shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+<select class="w-full h-full bg-transparent border-none focus:ring-0 font-label-md text-label-md text-on-surface py-sm px-md appearance-none cursor-pointer">
+<option disabled="" selected="" value="">All Courses</option>
+<option value="cs101">Intro to Programming (CS101)</option>
+<option value="mgt201">Organizational Behavior (MGT201)</option>
+<option value="phy301">Applied Physics (PHY301)</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- High-Density Data Table Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-surface-variant shadow-[0_4px_20px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+<!-- Table Controls Header -->
+<div class="flex items-center justify-between p-md border-b border-surface-variant bg-surface-bright">
+<div class="font-headline-sm text-headline-sm text-on-surface">Top Contributors</div>
+<div class="flex items-center gap-md">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Showing 1-10 of 2,451</span>
+<div class="flex items-center border border-outline-variant rounded-lg overflow-hidden">
+<button aria-label="Previous Page" class="p-xs hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<div class="px-sm font-label-md text-label-md text-on-surface border-x border-outline-variant">Page 1 of 246</div>
+<button aria-label="Next Page" class="p-xs hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Scrollable Table Wrapper -->
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left whitespace-nowrap border-collapse">
+<thead class="bg-surface-container border-b border-surface-variant">
+<tr>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider w-16 text-center">Rank</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Student Details</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Department</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Submissions</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Completion Rate</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Last Active</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider w-12"></th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-surface-variant">
+<!-- Row 1 (Rank 1 - Gold) -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="py-sm px-md text-center">
+<div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#FFF3E0] text-[#E65100] font-headline-sm text-headline-sm font-bold">1</div>
+</td>
+<td class="py-sm px-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden flex-shrink-0">
+<img alt="Student Avatar" class="w-full h-full object-cover" data-alt="A profile picture of a young female student with a bright, engaged smile. She has dark hair and is wearing a casual blue shirt. The background is a softly out-of-focus academic building environment with natural daylight illuminating her face. The image communicates enthusiasm and approachability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtaJwlmbeYJlAm4cKo9OM2C9rmkJ1vlFIJ6nqzd6XYO3orGXZHaVnEhd_e4FBDeKv0zOlhANcAOn7XJ9uRvrYGPHgQrc7XWgWypsjPoxNp4iY6hZVZUx13HMIwrSXBzpJqUBzzCH4npT5YF9S9Zd0TrEdpsEE7UyBR3q9UO42mgksQ5Og2-sP7hLaEe-ds_1WfwFpypYlKq3wdrRUurvJ3tdxY_yjyEng46q96xzphpwtBgGhctu2fiHiiloXi4GHQS3MRTmNhOTVn"/>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-bold">Aanya Sharma</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">ID: INV20210045</div>
+</div>
+</div>
+</td>
+<td class="py-sm px-md text-on-surface">Computer Science</td>
+<td class="py-sm px-md text-right font-headline-md text-headline-md text-primary">142</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container rounded-full" style="width: 98%;"></div>
+</div>
+<span class="text-on-surface font-label-md text-label-md">98%</span>
+</div>
+</td>
+<td class="py-sm px-md text-right text-on-surface-variant font-label-md text-label-md">2 hrs ago</td>
+<td class="py-sm px-md">
+<button aria-label="View Details" class="p-xs text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 (Rank 2 - Silver) -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="py-sm px-md text-center">
+<div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant font-headline-sm text-headline-sm font-bold">2</div>
+</td>
+<td class="py-sm px-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden flex-shrink-0">
+<img alt="Student Avatar" class="w-full h-full object-cover" data-alt="A profile shot of a male university student looking slightly off-camera thoughtfully. He has short hair and is wearing a modern, neutral-toned sweater. The lighting is soft studio lighting against a clean, light grey backdrop, giving it a polished, professional yet academic look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLa68HFJVrc5aWmDnL7DGB1Gh3w61bqcIo6Tf-WtHNuWr990wcCkck81uoJeQr-du1AXylWNVePPwc317kjnUOytdo-Z3at7bN7itVm-2MLwEu_SMd3IfHaBXGb4hGDNNIiNpLIV59j-XZDSwCQmM3ql15CgZety9CTdKK95tQnQtZhUeUw7uxEYrXz6GQnqmuZb2YmgQST6E67XIiih4CPqvFg2RpYW56ZqHb1nR0lmUjQCXvsMCr0bmdAwo7PvKgzxja7aAcZmX6"/>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-bold">Rohan Gupta</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">ID: INV20211022</div>
+</div>
+</div>
+</td>
+<td class="py-sm px-md text-on-surface">Business Administration</td>
+<td class="py-sm px-md text-right font-headline-md text-headline-md text-primary">138</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 95%;"></div>
+</div>
+<span class="text-on-surface font-label-md text-label-md">95%</span>
+</div>
+</td>
+<td class="py-sm px-md text-right text-on-surface-variant font-label-md text-label-md">5 hrs ago</td>
+<td class="py-sm px-md">
+<button aria-label="View Details" class="p-xs text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 (Rank 3 - Bronze) -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="py-sm px-md text-center">
+<div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#EFEBE9] text-[#5D4037] font-headline-sm text-headline-sm font-bold">3</div>
+</td>
+<td class="py-sm px-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden flex-shrink-0 flex items-center justify-center text-on-surface-variant font-headline-sm">
+<span>PK</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-bold">Priya Kapoor</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">ID: INV20220311</div>
+</div>
+</div>
+</td>
+<td class="py-sm px-md text-on-surface">Engineering</td>
+<td class="py-sm px-md text-right font-headline-md text-headline-md text-primary">129</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 92%;"></div>
+</div>
+<span class="text-on-surface font-label-md text-label-md">92%</span>
+</div>
+</td>
+<td class="py-sm px-md text-right text-on-surface-variant font-label-md text-label-md">Yesterday</td>
+<td class="py-sm px-md">
+<button aria-label="View Details" class="p-xs text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Standard Row 4 -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="py-sm px-md text-center text-on-surface-variant font-label-md text-label-md">4</td>
+<td class="py-sm px-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden flex-shrink-0 flex items-center justify-center text-on-surface-variant font-headline-sm">
+<span>AS</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-bold">Aditya Singh</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">ID: INV20210899</div>
+</div>
+</div>
+</td>
+<td class="py-sm px-md text-on-surface">Computer Science</td>
+<td class="py-sm px-md text-right font-headline-sm text-headline-sm text-on-surface">115</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 88%;"></div>
+</div>
+<span class="text-on-surface font-label-md text-label-md">88%</span>
+</div>
+</td>
+<td class="py-sm px-md text-right text-on-surface-variant font-label-md text-label-md">Yesterday</td>
+<td class="py-sm px-md">
+<button aria-label="View Details" class="p-xs text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Standard Row 5 -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="py-sm px-md text-center text-on-surface-variant font-label-md text-label-md">5</td>
+<td class="py-sm px-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden flex-shrink-0">
+<img alt="Student Avatar" class="w-full h-full object-cover" data-alt="A portrait of a female student with curly hair, looking directly at the viewer with a gentle expression. The lighting is warm and bright, suggesting a sunny day on campus. The background is a soft, indiscernible wash of natural colors, keeping the focus entirely on her features." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWMbUiVkaMJmTtSJK2ONHJ6te_Dg17uKX8q7nQDBg3ieB4oOoZCmbnneEMD2rRH5nISb0Wvgy8VpS0S19PTu6KeW8Lcm9TaDZnH-cXbIt2BJPkx9QCMSSI7kJDv50k82F_tAJRfHVwpLAsWGS6ydZmBHTWWzy3zOyVBTLI_QXEk7uirMjlxxQr216F4cI4hBxYZfQ8lUD3JKZe2h2g15ZJeRpQlmGZ0OynPRhA09IYjybE5hbQO73fb0Dvq0GpxbTCHDBENQVRYdgu"/>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-bold">Meera Patel</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">ID: INV20230102</div>
+</div>
+</div>
+</td>
+<td class="py-sm px-md text-on-surface">Arts &amp; Humanities</td>
+<td class="py-sm px-md text-right font-headline-sm text-headline-sm text-on-surface">112</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 85%;"></div>
+</div>
+<span class="text-on-surface font-label-md text-label-md">85%</span>
+</div>
+</td>
+<td class="py-sm px-md text-right text-on-surface-variant font-label-md text-label-md">2 days ago</td>
+<td class="py-sm px-md">
+<button aria-label="View Details" class="p-xs text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Standard Row 6 -->
+<tr class="hover:bg-surface transition-colors group">
+<td class="py-sm px-md text-center text-on-surface-variant font-label-md text-label-md">6</td>
+<td class="py-sm px-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden flex-shrink-0 flex items-center justify-center text-on-surface-variant font-headline-sm">
+<span>NV</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-bold">Nikhil Verma</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">ID: INV20210554</div>
+</div>
+</div>
+</td>
+<td class="py-sm px-md text-on-surface">Business Administration</td>
+<td class="py-sm px-md text-right font-headline-sm text-headline-sm text-on-surface">108</td>
+<td class="py-sm px-md text-right">
+<div class="flex items-center justify-end gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 82%;"></div>
+</div>
+<span class="text-on-surface font-label-md text-label-md">82%</span>
+</div>
+</td>
+<td class="py-sm px-md text-right text-on-surface-variant font-label-md text-label-md">3 days ago</td>
+<td class="py-sm px-md">
+<button aria-label="View Details" class="p-xs text-outline hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Minimal Pagination info -->
+<div class="p-sm bg-surface-bright border-t border-surface-variant flex justify-center">
+<button class="text-primary font-label-md text-label-md hover:underline flex items-center gap-xs">
+                         Load More Records
+                         <span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard - Global Platform Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#fd8955",
+                      "on-secondary-fixed-variant": "#7d2d00",
+                      "tertiary-fixed-dim": "#b0c6ff",
+                      "error": "#ba1a1a",
+                      "secondary": "#9f4212",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0",
+                      "primary-container": "#266fe6",
+                      "surface-variant": "#e0e3e5",
+                      "surface": "#f7f9fb",
+                      "on-primary-fixed-variant": "#004299",
+                      "tertiary-container": "#336fe1",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#0059c7",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#6e2600",
+                      "surface-container-high": "#e6e8ea",
+                      "outline": "#727785",
+                      "on-error": "#ffffff",
+                      "tertiary": "#0155c6",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#ffb597",
+                      "on-primary-fixed": "#001943",
+                      "outline-variant": "#c2c6d6",
+                      "secondary-fixed": "#ffdbcd",
+                      "inverse-surface": "#2d3133",
+                      "on-tertiary-fixed": "#001945",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-fixed": "#d9e2ff",
+                      "primary": "#0057c2",
+                      "background": "#f7f9fb",
+                      "on-background": "#191c1e",
+                      "surface-bright": "#f7f9fb",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#00429c",
+                      "inverse-primary": "#afc6ff",
+                      "on-secondary-fixed": "#360f00",
+                      "on-tertiary-container": "#fefcff",
+                      "on-surface": "#191c1e",
+                      "surface-dim": "#d8dadc",
+                      "on-primary-container": "#fefcff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface-variant": "#424754",
+                      "primary-fixed": "#d9e2ff",
+                      "primary-fixed-dim": "#afc6ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "8px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "sm": "16px",
+                      "lg": "40px",
+                      "xl": "64px",
+                      "gutter": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-sm": [
+                              "Montserrat"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Montserrat"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Montserrat"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .shadow-diffuse {
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        .shadow-floating {
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.12);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<!-- TopNavBar -->
+<nav class="bg-surface-container-lowest dark:bg-surface-container-high w-full top-0 shadow-sm dark:shadow-none flex justify-between items-center px-margin-desktop py-xs sticky z-50">
+<div class="flex items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">IFS v2.0</span>
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-xl pr-sm py-xs bg-surface-container-low border-none rounded-lg text-label-md font-label-md w-64 focus:ring-2 focus:ring-primary" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="text-primary dark:text-inverse-primary border-b-2 border-primary font-bold font-label-md text-label-md py-xs" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors font-label-md text-label-md py-xs" href="#">Feedback</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors font-label-md text-label-md py-xs" href="#">Analytics</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors font-label-md text-label-md py-xs" href="#">Reports</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-primary text-on-primary px-sm py-xs rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity hidden md:block">New Feedback</button>
+<div class="flex items-center gap-xs">
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full ml-xs" data-alt="A professional headshot of a business person in a light, modern studio setting. The lighting is soft and high-key, aligning with a corporate, trustworthy aesthetic. The background is a clean, neutral white to ensure the face is the focal point." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGf8vxY5roa82dLXcYplRQ7mbtIdgNJ75gO1BKW0HBtaGPmRLUM8EvNzibgMrbfWraTSz29Eui8GwBCiKqyN_bG4Nq1WY842KkVqy1HOMhI42k8LCrxemb20N3Ddl-N9cvYVwl8dBFZwn6eLCRJwfTmtzexMGoWk8pjKidLsXNkjfb8Xcf45dou82jKeiPKkHnj2BRNR9aWKP5unG2riZ1hJWIbBvXdDwvdCeV9q_EFQkFUmmO--J8V7whPjbRTGH96g9D_1tYJloV"/>
+</div>
+</div>
+</nav>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col h-[calc(100vh-64px)] p-sm gap-xs bg-surface-container-low dark:bg-surface-container w-64 flex-shrink-0 sticky top-[64px]">
+<div class="flex items-center gap-sm p-sm mb-md">
+<img alt="Invertis University Bareilly Logo" class="h-10 w-auto object-contain" data-alt="Official logo of Invertis University Bareilly featuring blue and orange text with a circular graphic element." src="https://lh3.googleusercontent.com/aida/ADBb0ujtZe0-qrM8ge2gwK3ZSfxpJt1OW4ZvAPuAda34nX5ysArT-TJAz-bg149vVk6DHTXe3EpYxqfVob2XKvjHrcbQdaLcNWR0QA1u2gkp_4rWm5d2KgH0aho48zzVjovYReVo-HhKkbMrtWvTe3o1h6_HjxzJJ5sthacZXKK1LedchJm-0bv7AdDGWnIiiPRCuPrNJNPZlG08mLM2bBD_bIHLI35_Ugexedo0lj0osvmMj08zq4rEqZC4AzzIVkG4Qlu0HKnfYE4rnw"/>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary">Invertis Feedback</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Centralized Portal</p>
+</div>
+</div>
+<nav class="flex flex-col gap-xs flex-1">
+<a class="flex items-center gap-sm px-sm py-xs bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-lg font-bold font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                    Home
+                </a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 rounded-lg font-label-md text-label-md transition-all" href="#">
+<span class="material-symbols-outlined">rate_review</span>
+                    Course Feedback
+                </a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 rounded-lg font-label-md text-label-md transition-all" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+                    Faculty Analytics
+                </a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 rounded-lg font-label-md text-label-md transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+                    User Management
+                </a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 rounded-lg font-label-md text-label-md transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+                    System Logs
+                </a>
+</nav>
+<div class="mt-auto pt-md flex flex-col gap-xs border-t border-surface-variant">
+<button class="w-full bg-surface-container-high text-on-surface px-sm py-xs rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors mb-sm flex justify-center items-center gap-xs">
+<span class="material-symbols-outlined">download</span>
+                    Export Data
+                </button>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 rounded-lg font-label-md text-label-md transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+                    Support
+                </a>
+<a class="flex items-center gap-sm px-sm py-xs text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 rounded-lg font-label-md text-label-md transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+                    Logout
+                </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop bg-background">
+<header class="mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-on-background">Global Platform Overview</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Real-time metrics and structural engagement analytics.</p>
+</header>
+<!-- Global Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-xl">
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-diffuse border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-xs bg-primary-container rounded-lg">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<span class="text-primary font-label-sm text-label-sm bg-primary-fixed py-1 px-2 rounded-full">+4.2%</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-base">Total Students</p>
+<h3 class="font-headline-md text-headline-md text-on-background">12,450</h3>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-diffuse border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-xs bg-tertiary-container rounded-lg">
+<span class="material-symbols-outlined text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">local_library</span>
+</div>
+<span class="text-primary font-label-sm text-label-sm bg-primary-fixed py-1 px-2 rounded-full">+1.1%</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-base">Active Faculty</p>
+<h3 class="font-headline-md text-headline-md text-on-background">842</h3>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-diffuse border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-xs bg-surface-container-high rounded-lg">
+<span class="material-symbols-outlined text-on-surface" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</div>
+<span class="text-on-surface-variant font-label-sm text-label-sm bg-surface-variant py-1 px-2 rounded-full">Active</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-base">Total Courses</p>
+<h3 class="font-headline-md text-headline-md text-on-background">1,120</h3>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-diffuse border border-surface-variant flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-xs bg-surface-container-high rounded-lg">
+<span class="material-symbols-outlined text-on-surface" style="font-variation-settings: 'FILL' 1;">domain</span>
+</div>
+<span class="text-on-surface-variant font-label-sm text-label-sm bg-surface-variant py-1 px-2 rounded-full">Total</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-base">Departments</p>
+<h3 class="font-headline-md text-headline-md text-on-background">24</h3>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-xl">
+<!-- Completion Rate Gauge -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-diffuse border border-surface-variant flex flex-col items-center justify-center lg:col-span-1">
+<h2 class="font-headline-sm text-headline-sm text-on-background w-full text-left mb-md">Feedback Completion</h2>
+<div class="relative w-48 h-48 flex items-center justify-center">
+<!-- Simulated Gauge using SVG -->
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle class="stroke-surface-container-highest" cx="50" cy="50" fill="none" r="40" stroke-width="8"></circle>
+<circle class="stroke-primary" cx="50" cy="50" fill="none" r="40" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-headline-lg text-headline-lg text-primary">75%</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Global Rate</span>
+</div>
+</div>
+<div class="w-full mt-md bg-surface-container-low p-sm rounded-lg flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Target: 80%</span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed py-1 px-2 rounded-full">-5% Shortfall</span>
+</div>
+</div>
+<!-- Department Overview Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-diffuse border border-surface-variant lg:col-span-2 overflow-hidden flex flex-col">
+<div class="p-md border-b border-surface-variant flex justify-between items-center">
+<h2 class="font-headline-sm text-headline-sm text-on-background">Department Performance</h2>
+<button class="text-primary font-label-md text-label-md hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-surface-variant">
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant font-semibold">Department</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant font-semibold">Engagement</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant font-semibold">Avg Rating</th>
+<th class="p-sm font-label-sm text-label-sm text-on-surface-variant font-semibold">Trend</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-variant">
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-sm font-label-md text-label-md text-on-background font-medium">Computer Science</td>
+<td class="p-sm">
+<div class="flex items-center gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="w-[85%] h-full bg-primary"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">85%</span>
+</div>
+</td>
+<td class="p-sm font-label-md text-label-md text-on-background">4.6 / 5</td>
+<td class="p-sm">
+<span class="material-symbols-outlined text-primary text-lg">trending_up</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-sm font-label-md text-label-md text-on-background font-medium">Business Admin</td>
+<td class="p-sm">
+<div class="flex items-center gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="w-[72%] h-full bg-tertiary"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">72%</span>
+</div>
+</td>
+<td class="p-sm font-label-md text-label-md text-on-background">4.2 / 5</td>
+<td class="p-sm">
+<span class="material-symbols-outlined text-surface-tint text-lg">trending_flat</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-sm font-label-md text-label-md text-on-background font-medium">Engineering</td>
+<td class="p-sm">
+<div class="flex items-center gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="w-[91%] h-full bg-primary"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">91%</span>
+</div>
+</td>
+<td class="p-sm font-label-md text-label-md text-on-background">4.8 / 5</td>
+<td class="p-sm">
+<span class="material-symbols-outlined text-primary text-lg">trending_up</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-sm font-label-md text-label-md text-on-background font-medium">Liberal Arts</td>
+<td class="p-sm">
+<div class="flex items-center gap-xs">
+<div class="w-16 h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="w-[58%] h-full bg-secondary"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">58%</span>
+</div>
+</td>
+<td class="p-sm font-label-md text-label-md text-on-background">3.9 / 5</td>
+<td class="p-sm">
+<span class="material-symbols-outlined text-secondary text-lg">trending_down</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

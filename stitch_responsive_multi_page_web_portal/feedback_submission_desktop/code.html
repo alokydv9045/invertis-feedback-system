@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Course Feedback Submission - Invertis Feedback</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#fd8955",
+                      "on-secondary-fixed-variant": "#7d2d00",
+                      "tertiary-fixed-dim": "#b0c6ff",
+                      "error": "#ba1a1a",
+                      "secondary": "#9f4212",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container": "#eceef0",
+                      "primary-container": "#266fe6",
+                      "surface-variant": "#e0e3e5",
+                      "surface": "#f7f9fb",
+                      "on-primary-fixed-variant": "#004299",
+                      "tertiary-container": "#336fe1",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#0059c7",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#6e2600",
+                      "surface-container-high": "#e6e8ea",
+                      "outline": "#727785",
+                      "on-error": "#ffffff",
+                      "tertiary": "#0155c6",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#ffb597",
+                      "on-primary-fixed": "#001943",
+                      "outline-variant": "#c2c6d6",
+                      "secondary-fixed": "#ffdbcd",
+                      "inverse-surface": "#2d3133",
+                      "on-tertiary-fixed": "#001945",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-fixed": "#d9e2ff",
+                      "primary": "#0057c2",
+                      "background": "#f7f9fb",
+                      "on-background": "#191c1e",
+                      "surface-bright": "#f7f9fb",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#00429c",
+                      "inverse-primary": "#afc6ff",
+                      "on-secondary-fixed": "#360f00",
+                      "on-tertiary-container": "#fefcff",
+                      "on-surface": "#191c1e",
+                      "surface-dim": "#d8dadc",
+                      "on-primary-container": "#fefcff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface-variant": "#424754",
+                      "primary-fixed": "#d9e2ff",
+                      "primary-fixed-dim": "#afc6ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "8px",
+                      "margin-desktop": "48px",
+                      "margin-mobile": "16px",
+                      "md": "24px",
+                      "sm": "16px",
+                      "lg": "40px",
+                      "xl": "64px",
+                      "gutter": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-sm": ["Montserrat"],
+                      "label-sm": ["Inter"],
+                      "headline-md": ["Montserrat"],
+                      "label-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-lg": ["Montserrat"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                      "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                      "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                      "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                      "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="bg-surface-container-low dark:bg-surface-container hidden lg:flex flex-col h-screen p-sm gap-xs fixed inset-y-0 left-0 w-64 z-40 border-r border-outline-variant/30">
+<!-- Header -->
+<div class="flex items-center gap-sm p-sm mb-md">
+<img alt="Invertis Logo" class="h-12 w-auto shrink-0" src="https://lh3.googleusercontent.com/aida/ADBb0ujtZe0-qrM8ge2gwK3ZSfxpJt1OW4ZvAPuAda34nX5ysArT-TJAz-bg149vVk6DHTXe3EpYxqfVob2XKvjHrcbQdaLcNWR0QA1u2gkp_4rWm5d2KgH0aho48zzVjovYReVo-HhKkbMrtWvTe3o1h6_HjxzJJ5sthacZXKK1LedchJm-0bv7AdDGWnIiiPRCuPrNJNPZlG08mLM2bBD_bIHLI35_Ugexedo0lj0osvmMj08zq4rEqZC4AzzIVkG4Qlu0HKnfYE4rnw"/>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary">Invertis Feedback</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Centralized Portal</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-xs flex-1">
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:text-primary transition-all rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Home
+            </a>
+<!-- Active Tab -->
+<a class="flex items-center gap-sm p-sm bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-lg font-bold font-label-md text-label-md opacity-80 duration-200" href="#">
+<span class="material-symbols-outlined">rate_review</span>
+                Course Feedback
+            </a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:text-primary transition-all rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+                Faculty Analytics
+            </a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:text-primary transition-all rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">group</span>
+                User Management
+            </a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:text-primary transition-all rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">history</span>
+                System Logs
+            </a>
+</div>
+<!-- CTA -->
+<button class="w-full py-2 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md font-bold mb-sm hover:opacity-90 transition-opacity">
+            Export Data
+        </button>
+<!-- Footer Links -->
+<div class="flex flex-col gap-xs mt-auto border-t border-outline-variant/30 pt-sm">
+<a class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 hover:text-primary transition-all rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">help</span>
+                Support
+            </a>
+<a class="flex items-center gap-sm p-sm text-error hover:bg-error-container/50 transition-all rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Logout
+            </a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 lg:ml-64 min-h-screen flex flex-col">
+<!-- Mandatory Progress Indicator -->
+<div class="w-full h-1 bg-surface-variant sticky top-0 z-30">
+<div class="h-full bg-primary w-2/3 rounded-r-full transition-all duration-500"></div>
+</div>
+<div class="flex-1 p-margin-mobile md:p-margin-desktop max-w-6xl mx-auto w-full">
+<!-- Page Title -->
+<div class="mb-lg mt-md">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Submit Course Feedback</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Your detailed feedback is essential for maintaining the high standards of our curriculum and supporting our faculty's continuous improvement.</p>
+</div>
+<!-- Subject/Trainer Banner Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md mb-lg border border-outline-variant/20 flex flex-col md:flex-row md:items-center justify-between gap-md relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-2 bg-primary"></div>
+<div class="flex items-center gap-md pl-2">
+<div class="w-16 h-16 rounded-full bg-surface-variant overflow-hidden shrink-0 border-2 border-surface">
+<img alt="Trainer Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of an approachable academic trainer or professor. The setting is bright and modern, suggesting an institutional environment. Soft, flattering high-key lighting illuminates the subject. The color palette is neutral with subtle corporate blue tones, aligning with a trustworthy and educational aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHnZxRLqigWCH54pEU_kxM_alHHA92bUTXvKEjsFEZsQan0MOHjUSK2lAutsSFIjJrmO3V_RuJIIWjCKkIKJ_xlg6JVT1dGIlSahyTceJrDsP8rpq0PzoQH77ZXEU_aIbMZ_tg_6HoF3l5bNbiTyuCccy3xIr-Y7sDIFfnHGa5hOrjXfq51GrzGc87yc6HcgVJfkcmBBQ45LC76BxUawklkcoT3VEAElHT6iwycMpscBCNUhsPP62yUPGvXu1qR0BNYQ8Ol-RmIGEb"/>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Data Structures &amp; Algorithms</h3>
+<p class="font-label-md text-label-md text-primary font-bold mt-1">CS-301 • Prof. Elena Rodriguez</p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1 rounded-lg bg-tertiary-container/20 text-tertiary-container font-label-sm text-label-sm">Fall Semester</span>
+<span class="px-3 py-1 rounded-lg bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">Mid-Term Evaluation</span>
+</div>
+</div>
+<!-- Structured Feedback Form -->
+<form class="space-y-lg">
+<!-- Bento Grid for Ratings & Short Answers -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Trainer Evaluation Card -->
+<fieldset class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md border border-outline-variant/20 flex flex-col">
+<legend class="font-headline-sm text-headline-sm text-on-surface font-bold mb-md w-full border-b border-outline-variant/30 pb-xs">Trainer Evaluation</legend>
+<div class="space-y-lg flex-1">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-sm">Clarity of Instruction &amp; Concept Delivery</label>
+<div class="flex items-center gap-2 text-surface-dim">
+<span class="material-symbols-outlined text-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-container transition-colors text-2xl">star</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-sm">Responsiveness to Student Queries</label>
+<div class="flex items-center gap-2 text-surface-dim">
+<span class="material-symbols-outlined text-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-container transition-colors text-2xl">star</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-container transition-colors text-2xl">star</span>
+</div>
+</div>
+</div>
+</fieldset>
+<!-- Course Content Card -->
+<fieldset class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md border border-outline-variant/20 flex flex-col">
+<legend class="font-headline-sm text-headline-sm text-on-surface font-bold mb-md w-full border-b border-outline-variant/30 pb-xs">Course Material</legend>
+<div class="space-y-lg flex-1">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-sm">Relevance of Syllabus to Industry Standards</label>
+<div class="flex items-center gap-2 text-surface-dim">
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors text-2xl">star</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs" for="difficult_topic">What was the most challenging topic covered?</label>
+<input class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" id="difficult_topic" placeholder="e.g., Red-Black Trees or Graph Traversals" type="text"/>
+</div>
+</div>
+</fieldset>
+</div>
+<!-- Written Review Section -->
+<fieldset class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-md border border-outline-variant/20">
+<legend class="font-headline-sm text-headline-sm text-on-surface font-bold mb-md w-full border-b border-outline-variant/30 pb-xs">Detailed Written Review</legend>
+<div class="space-y-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs" for="strengths">What did you like most about this course?</label>
+<input class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" id="strengths" placeholder="Briefly describe key strengths or memorable moments..." type="text"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs" for="detailed_feedback">Areas for Improvement &amp; Additional Comments</label>
+<textarea class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-y" id="detailed_feedback" placeholder="Please provide any detailed feedback, constructive criticism, or suggestions for the trainer and curriculum development team..." rows="6"></textarea>
+</div>
+</div>
+</fieldset>
+<!-- Action Buttons -->
+<div class="flex items-center justify-end gap-md pt-sm pb-xl">
+<button class="px-6 py-3 rounded-lg font-label-md text-label-md font-bold text-outline border border-outline hover:bg-surface-variant/50 transition-colors" type="button">
+                        Cancel
+                    </button>
+<button class="px-8 py-3 rounded-lg font-label-md text-label-md font-bold bg-primary text-on-primary hover:bg-primary/90 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-[1px]" type="submit">
+                        Submit Feedback
+                    </button>
+</div>
+</form>
+</div>
+</main>
+</body></html>
