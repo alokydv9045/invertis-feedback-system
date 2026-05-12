@@ -2,10 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Invertis University Feedback System - Empowering academic excellence through structured feedback." />
-    <title>IFS v2.0 | Invertis Feedback System</title>
+    <title>Invertis Feedback System</title>
+    <!-- Theme init: apply dark class synchronously before React renders to prevent flash -->
+    <script>
+      (function() {
+        var saved = localStorage.getItem('tlfq_theme');
+        var theme = saved === 'light' ? 'light' : 'dark';
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

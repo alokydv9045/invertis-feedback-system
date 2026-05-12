@@ -1,306 +1,275 @@
-/**
- * IFS v2.0 — Master Seed Script
- * Creates 50 students, 2 HODs, 1 admin (Indian names), 
- * feedback forms, reviews, and review answers
- * 
- * Usage: node seed.js
- * Requires: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in backend/.env
- */
+import 'dotenv/config';
+import { createClient } from '@supabase/supabase-js';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
-import 'dotenv/config'
-import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false }
+});
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-)
-
-// ============================================
-// Indian Student Names (50)
-// ============================================
-const studentNames = [
-  'Aarav Sharma', 'Aditi Patel', 'Aditya Gupta', 'Ananya Verma', 'Arjun Singh',
-  'Avni Mehta', 'Chirag Thakur', 'Deepa Iyer', 'Dhruv Agarwal', 'Diya Nair',
-  'Gaurav Mishra', 'Harini Reddy', 'Harsh Tiwari', 'Ishita Saxena', 'Jai Prakash Yadav',
-  'Kavya Bhatt', 'Krish Joshi', 'Lavanya Das', 'Manav Chauhan', 'Megha Srivastava',
-  'Naman Dubey', 'Neha Pandey', 'Nikhil Rathore', 'Pallavi Jha', 'Pranav Kumar',
-  'Priyanka Kumari', 'Rahul Dixit', 'Riya Chopra', 'Rohan Malhotra', 'Sakshi Bhatia',
-  'Samar Kapoor', 'Shreya Kulkarni', 'Shubham Ojha', 'Simran Kaur', 'Sneha Goyal',
-  'Sohail Khan', 'Swati Rawat', 'Tanvi Deshmukh', 'Tushar Bansal', 'Urvashi Rajput',
-  'Varun Sethi', 'Vidya Mohan', 'Vikas Chaudhary', 'Yash Trivedi', 'Zara Sheikh',
-  'Ankit Dwivedi', 'Bhavna Pillai', 'Chetan Hegde', 'Divya Menon', 'Esha Khanna',
-]
-
-// Distribute students across courses
-const courseDistribution = [
-  { courseName: 'B.Tech CSE', count: 15 },
-  { courseName: 'B.Pharma', count: 6 },
-  { courseName: 'BA LLB', count: 5 },
-  { courseName: 'BSc PCM', count: 4 },
-  { courseName: 'BA Psychology Hons', count: 4 },
-  { courseName: 'B.Tech Biotechnology', count: 3 },
-  { courseName: 'BBA LLB', count: 3 },
-  { courseName: 'BA Economics Hons', count: 3 },
-  { courseName: 'BA English Hons', count: 2 },
-  { courseName: 'BSc Hons Chemistry', count: 2 },
-  { courseName: 'BSc ZBC', count: 2 },
-  { courseName: 'B.Com LLB', count: 1 },
-]
-
-const hodProfiles = [
-  { name: 'Dr. Rajendra Prasad Mishra', email: 'rajendra.mishra@invertis.org', dept: 'Computer Science & Engineering', password: 'hod@cse2024' },
-  { name: 'Dr. Sunanda Kumari Joshi', email: 'sunanda.joshi@invertis.org', dept: 'Pharmacy', password: 'hod@pharma2024' },
-]
-
-const adminProfile = {
-  name: 'Prof. Hari Mohan Saxena', email: 'admin@invertis.org', password: 'admin@ifs2024',
+function generateFeedbackId() {
+  return 'ANO-' + crypto.randomBytes(3).toString('hex').toUpperCase();
 }
 
-const batchYears = ['2022', '2023', '2024', '2025']
-
-const feedbackTexts = [
-  'The teaching methodology was excellent. The trainer explained every concept with real-world examples that made it easy to understand.',
-  'Very knowledgeable faculty. However, the pace of teaching could be slightly slower for complex topics.',
-  'The practical sessions were well-organized and helped reinforce theoretical concepts effectively.',
-  'Good communication skills and approachable nature. Always available for doubt-clearing sessions after class.',
-  'The course content was well-structured. Assignments were relevant and helped in deeper understanding.',
-  'Faculty needs to use more visual aids and interactive teaching methods to keep students engaged.',
-  'Outstanding dedication towards student welfare. The trainer goes above and beyond to help struggling students.',
-  'The lab sessions were highly productive. Equipment availability and guidance were commendable.',
-  'Would appreciate more industry-relevant case studies and guest lectures from professionals.',
-  'The examination pattern was fair and covered all important topics discussed during lectures.',
-  'Excellent use of technology in teaching. The digital resources shared were very helpful for self-study.',
-  'The trainer maintained perfect discipline while keeping the classroom environment friendly and open.',
-  'More emphasis needed on practical applications. Theory-heavy sessions can become monotonous.',
-  'Very inspiring faculty member. Motivates students to think critically and explore beyond textbooks.',
-  'The group activities and presentations organized by the trainer enhanced our communication skills.',
-]
-
-// ============================================
-// Main Seed Function
-// ============================================
 async function seed() {
-  console.log('🌱 Starting IFS v2.0 seed process...\n')
+  console.log('🌱 Seeding Supabase database...');
 
-  // 1. Fetch existing courses
-  console.log('📚 Fetching courses...')
-  const { data: courses, error: courseErr } = await supabase.from('courses').select('*')
-  if (courseErr) { console.error('❌ Failed to fetch courses:', courseErr.message); return }
-  console.log(`   Found ${courses.length} courses`)
-
-  const courseMap = {}
-  courses.forEach(c => { courseMap[c.course_name] = c.id })
-
-  // 2. Fetch existing trainers
-  console.log('👩‍🏫 Fetching trainers...')
-  const { data: trainers, error: trainerErr } = await supabase.from('trainers').select('*')
-  if (trainerErr) { console.error('❌ Failed to fetch trainers:', trainerErr.message); return }
-  console.log(`   Found ${trainers.length} trainers`)
-
-  if (trainers.length === 0) {
-    console.error('❌ No trainers found! Run seed_trainers.sql first.')
-    return
+  // ── Check if already seeded ─────────────────────────────────────────────
+  const { count } = await supabase.from('users').select('id', { count: 'exact', head: true });
+  if (count > 0) {
+    console.log(`ℹ️  Database already has ${count} users. Skipping seed.`);
+    console.log('   To force re-seed, delete all data first.');
+    process.exit(0);
   }
 
-  // 3. Fetch subjects for feedback forms
-  console.log('📖 Fetching subjects...')
-  const { data: subjects, error: subErr } = await supabase.from('subjects').select('*')
-  if (subErr) { console.error('❌ Failed to fetch subjects:', subErr.message); return }
-  console.log(`   Found ${subjects.length} subjects`)
+  // ── Departments ────────────────────────────────────────────────────────
+  const deptRows = [
+    { name: 'B.Tech Artificial Intelligence', code: 'BTAI', portal_open: true },
+    { name: 'B.Tech Computer Science', code: 'BCS', portal_open: true },
+    { name: 'B.Tech Electronics & Communication', code: 'BTEC', portal_open: true },
+    { name: 'B.Tech Mechanical Engineering', code: 'BTME', portal_open: true },
+    { name: 'B.Tech Civil Engineering', code: 'BTCE', portal_open: true },
+  ];
+  const { data: depts } = await supabase.from('departments').insert(deptRows).select();
+  const [deptBTAI, deptBCS, deptBTEC, deptBTME, deptBTCE] = depts;
+  console.log('✅ Departments created');
 
-  // 4. Create Admin user
-  console.log('\n🔐 Creating Admin...')
-  const adminId = await createUser(adminProfile.email, adminProfile.password, {
-    role: 'admin', full_name: adminProfile.name, email: adminProfile.email,
-  })
-  if (adminId) console.log(`   ✅ Admin: ${adminProfile.name} (${adminProfile.email})`)
+  // ── Supreme Authority ──────────────────────────────────────────────────
+  const supPassword = await bcrypt.hash('Super@123', 10);
+  await supabase.from('users').insert([
+    { name: 'SUPAdmin1', email: 'supauth1@invertis.edu.in', password: supPassword, role: 'supreme', status: 'active' },
+    { name: 'SUPAdmin2', email: 'supauth2@invertis.edu.in', password: supPassword, role: 'supreme', status: 'active' },
+    { name: 'SUPAdmin3', email: 'supauth3@invertis.edu.in', password: supPassword, role: 'supreme', status: 'active' },
+  ]);
 
-  // 5. Create HOD users
-  console.log('\n🎓 Creating HODs...')
-  const hodIds = []
-  for (const hod of hodProfiles) {
-    const id = await createUser(hod.email, hod.password, {
-      role: 'hod', full_name: hod.name, email: hod.email, department: hod.dept,
-    })
-    if (id) {
-      hodIds.push(id)
-      console.log(`   ✅ HOD: ${hod.name} (${hod.email})`)
+  // ── Super Admin ────────────────────────────────────────────────────────
+  await supabase.from('users').insert({
+    name: 'Vikram Chandra', email: 'admin@invertis.edu.in',
+    password: await bcrypt.hash('Admin@2025', 10), role: 'super_admin', status: 'active'
+  });
+
+  // ── Coordinator ────────────────────────────────────────────────────────
+  await supabase.from('users').insert({
+    name: 'Sunita Tiwari', email: 'coordinator@invertis.edu.in',
+    password: await bcrypt.hash('Coord@2025', 10), role: 'coordinator', status: 'active'
+  });
+
+  // ── HODs ───────────────────────────────────────────────────────────────
+  const hodPassword = await bcrypt.hash('Hod@2025', 10);
+  const hodRows = [
+    { name: 'Dr. Priya Sharma', email: 'hod.btai@invertis.edu.in', password: hodPassword, role: 'hod', department_id: deptBTAI.id, status: 'active' },
+    { name: 'Dr. Rajesh Kumar', email: 'hod.bcs@invertis.edu.in', password: hodPassword, role: 'hod', department_id: deptBCS.id, status: 'active' },
+    { name: 'Dr. Anita Singh', email: 'hod.btec@invertis.edu.in', password: hodPassword, role: 'hod', department_id: deptBTEC.id, status: 'active' },
+    { name: 'Dr. Suresh Mishra', email: 'hod.btme@invertis.edu.in', password: hodPassword, role: 'hod', department_id: deptBTME.id, status: 'active' },
+    { name: 'Dr. Kavita Verma', email: 'hod.btce@invertis.edu.in', password: hodPassword, role: 'hod', department_id: deptBTCE.id, status: 'active' },
+  ];
+  const { data: hods } = await supabase.from('users').insert(hodRows).select();
+  console.log('✅ Staff accounts created');
+
+  // ── Faculty ────────────────────────────────────────────────────────────
+  const facultyRows = [
+    { name: 'Dr. Alan Turing', department_id: deptBTAI.id, teacher_type: 'college_faculty' },
+    { name: 'Dr. Yoshua Bengio', department_id: deptBTAI.id, teacher_type: 'trainer' },
+    { name: 'Dr. Fei-Fei Li', department_id: deptBTAI.id, teacher_type: 'college_faculty' },
+    { name: 'Dr. Grace Hopper', department_id: deptBCS.id, teacher_type: 'college_faculty' },
+    { name: 'Dr. Ada Lovelace', department_id: deptBCS.id, teacher_type: 'trainer' },
+    { name: 'Dr. Dennis Ritchie', department_id: deptBCS.id, teacher_type: 'college_faculty' },
+    { name: 'Dr. Richard Feynman', department_id: deptBTEC.id, teacher_type: 'college_faculty' },
+    { name: 'Dr. Nikola Tesla', department_id: deptBTEC.id, teacher_type: 'trainer' },
+    { name: 'Dr. Isaac Newton', department_id: deptBTME.id, teacher_type: 'college_faculty' },
+    { name: 'Dr. Marie Curie', department_id: deptBTME.id, teacher_type: 'trainer' },
+    { name: 'Dr. Ratan Tata', department_id: deptBTCE.id, teacher_type: 'college_faculty' },
+    { name: 'Dr. Sunita Williams', department_id: deptBTCE.id, teacher_type: 'trainer' },
+  ];
+  const { data: facultyList } = await supabase.from('faculty').insert(facultyRows).select();
+  const [fAI1,fAI2,fAI3,fCS1,fCS2,fCS3,fEC1,fEC2,fME1,fME2,fCE1,fCE2] = facultyList;
+  console.log('✅ Faculty created');
+
+  // ── Courses ────────────────────────────────────────────────────────────
+  const courseRows = [
+    { name: 'Machine Learning Fundamentals', code: 'BTAI301', department_id: deptBTAI.id },
+    { name: 'Deep Learning & Neural Networks', code: 'BTAI302', department_id: deptBTAI.id },
+    { name: 'Data Structures & Algorithms', code: 'BCS201', department_id: deptBCS.id },
+    { name: 'Database Systems & Cloud', code: 'BCS302', department_id: deptBCS.id },
+    { name: 'Operating Systems', code: 'BCS303', department_id: deptBCS.id },
+    { name: 'Signal Processing', code: 'BTEC301', department_id: deptBTEC.id },
+    { name: 'VLSI Design', code: 'BTEC401', department_id: deptBTEC.id },
+    { name: 'Thermodynamics', code: 'BTME201', department_id: deptBTME.id },
+    { name: 'Fluid Mechanics', code: 'BTME301', department_id: deptBTME.id },
+    { name: 'Structural Analysis', code: 'BTCE201', department_id: deptBTCE.id },
+    { name: 'Environmental Engineering', code: 'BTCE301', department_id: deptBTCE.id },
+  ];
+  const { data: courseList } = await supabase.from('courses').insert(courseRows).select();
+  const [cAI1,cAI2,cCS1,cCS2,cCS3,cEC1,cEC2,cME1,cME2,cCE1,cCE2] = courseList;
+  console.log('✅ Courses created');
+
+  // ── Sections ───────────────────────────────────────────────────────────
+  const sectionRows = [
+    { name: 'BTAI-3A', code: 'BTAI3A', semester: 3, label: 'A', department_id: deptBTAI.id },
+    { name: 'BTAI-3B', code: 'BTAI3B', semester: 3, label: 'B', department_id: deptBTAI.id },
+    { name: 'BTAI-5A', code: 'BTAI5A', semester: 5, label: 'A', department_id: deptBTAI.id },
+    { name: 'BTAI-5B', code: 'BTAI5B', semester: 5, label: 'B', department_id: deptBTAI.id },
+    { name: 'BCS-3A', code: 'BCS3A', semester: 3, label: 'A', department_id: deptBCS.id },
+    { name: 'BCS-3B', code: 'BCS3B', semester: 3, label: 'B', department_id: deptBCS.id },
+    { name: 'BCS-5A', code: 'BCS5A', semester: 5, label: 'A', department_id: deptBCS.id },
+    { name: 'BCS-5B', code: 'BCS5B', semester: 5, label: 'B', department_id: deptBCS.id },
+    { name: 'BTEC-3A', code: 'BTEC3A', semester: 3, label: 'A', department_id: deptBTEC.id },
+    { name: 'BTEC-3B', code: 'BTEC3B', semester: 3, label: 'B', department_id: deptBTEC.id },
+    { name: 'BTME-3A', code: 'BTME3A', semester: 3, label: 'A', department_id: deptBTME.id },
+    { name: 'BTME-3B', code: 'BTME3B', semester: 3, label: 'B', department_id: deptBTME.id },
+    { name: 'BTCE-3A', code: 'BTCE3A', semester: 3, label: 'A', department_id: deptBTCE.id },
+    { name: 'BTCE-3B', code: 'BTCE3B', semester: 3, label: 'B', department_id: deptBTCE.id },
+  ];
+  const { data: sectionList } = await supabase.from('sections').insert(sectionRows).select();
+  const [sAI_3A,sAI_3B,sAI_5A,sAI_5B,sCS_3A,sCS_3B,sCS_5A,sCS_5B,sEC_3A,sEC_3B,sME_3A,sME_3B,sCE_3A,sCE_3B] = sectionList;
+  console.log('✅ Sections created');
+
+  // ── SectionFaculty assignments ─────────────────────────────────────────
+  const sfRows = [
+    { section_id: sAI_3A.id, faculty_id: fAI1.id, course_id: cAI1.id },
+    { section_id: sAI_3A.id, faculty_id: fAI2.id, course_id: cAI2.id },
+    { section_id: sAI_3B.id, faculty_id: fAI2.id, course_id: cAI1.id },
+    { section_id: sAI_3B.id, faculty_id: fAI3.id, course_id: cAI2.id },
+    { section_id: sAI_5A.id, faculty_id: fAI3.id, course_id: cAI1.id },
+    { section_id: sAI_5B.id, faculty_id: fAI1.id, course_id: cAI2.id },
+    { section_id: sCS_3A.id, faculty_id: fCS1.id, course_id: cCS1.id },
+    { section_id: sCS_3A.id, faculty_id: fCS2.id, course_id: cCS2.id },
+    { section_id: sCS_3B.id, faculty_id: fCS2.id, course_id: cCS1.id },
+    { section_id: sCS_3B.id, faculty_id: fCS3.id, course_id: cCS2.id },
+    { section_id: sCS_5A.id, faculty_id: fCS1.id, course_id: cCS3.id },
+    { section_id: sCS_5B.id, faculty_id: fCS3.id, course_id: cCS3.id },
+    { section_id: sEC_3A.id, faculty_id: fEC1.id, course_id: cEC1.id },
+    { section_id: sEC_3A.id, faculty_id: fEC2.id, course_id: cEC2.id },
+    { section_id: sEC_3B.id, faculty_id: fEC1.id, course_id: cEC2.id },
+    { section_id: sME_3A.id, faculty_id: fME1.id, course_id: cME1.id },
+    { section_id: sME_3A.id, faculty_id: fME2.id, course_id: cME2.id },
+    { section_id: sME_3B.id, faculty_id: fME2.id, course_id: cME1.id },
+    { section_id: sCE_3A.id, faculty_id: fCE1.id, course_id: cCE1.id },
+    { section_id: sCE_3A.id, faculty_id: fCE2.id, course_id: cCE2.id },
+    { section_id: sCE_3B.id, faculty_id: fCE1.id, course_id: cCE2.id },
+  ];
+  const { data: sfData } = await supabase.from('section_faculty').insert(sfRows).select();
+  console.log('✅ Section-Faculty assignments created');
+
+  // ── Students ───────────────────────────────────────────────────────────
+  const firstNames = ['Aarav','Aditya','Akash','Alok','Amit','Ananya','Anjali','Ankur','Anuj','Arjun',
+    'Aryan','Ayush','Deepak','Divya','Gaurav','Ishaan','Kavya','Kunal','Manish','Meera',
+    'Mohit','Neha','Nikhil','Pallavi','Pooja','Priya','Rahul','Raj','Ravi','Rohit',
+    'Sachin','Sanjay','Shreya','Shubham','Simran','Sonal','Sumit','Suresh','Tanmay','Tanvi',
+    'Tushar','Uday','Varun','Vidya','Vikram','Virat','Vishal','Yash','Zara','Karan'];
+  const lastNames = ['Agarwal','Bhatia','Chaudhary','Dubey','Gupta','Jain','Joshi','Kumar','Mehta','Mishra',
+    'Pandey','Patel','Rao','Sharma','Singh','Srivastava','Tiwari','Verma','Yadav','Chauhan'];
+
+  const sectionGroups = [
+    { dept: deptBTAI, section: sAI_3A, code: 'BTAI', count: 6, semester: 3 },
+    { dept: deptBTAI, section: sAI_3B, code: 'BTAI', count: 6, semester: 3 },
+    { dept: deptBTAI, section: sAI_5A, code: 'BTAI', count: 5, semester: 5 },
+    { dept: deptBTAI, section: sAI_5B, code: 'BTAI', count: 5, semester: 5 },
+    { dept: deptBCS, section: sCS_3A, code: 'BCS', count: 7, semester: 3 },
+    { dept: deptBCS, section: sCS_3B, code: 'BCS', count: 7, semester: 3 },
+    { dept: deptBCS, section: sCS_5A, code: 'BCS', count: 5, semester: 5 },
+    { dept: deptBCS, section: sCS_5B, code: 'BCS', count: 5, semester: 5 },
+    { dept: deptBTEC, section: sEC_3A, code: 'BTEC', count: 8, semester: 3 },
+    { dept: deptBTEC, section: sEC_3B, code: 'BTEC', count: 8, semester: 3 },
+    { dept: deptBTME, section: sME_3A, code: 'BTME', count: 8, semester: 3 },
+    { dept: deptBTME, section: sME_3B, code: 'BTME', count: 8, semester: 3 },
+    { dept: deptBTCE, section: sCE_3A, code: 'BTCE', count: 8, semester: 3 },
+    { dept: deptBTCE, section: sCE_3B, code: 'BTCE', count: 8, semester: 3 },
+  ];
+
+  const stdPassword = await bcrypt.hash('Student@2025', 10);
+  let globalIdx = 0;
+  const deptStudentCounters = {};
+
+  for (const { dept, section, code, count, semester } of sectionGroups) {
+    if (!deptStudentCounters[code]) deptStudentCounters[code] = 1;
+
+    const studentBatch = [];
+    for (let i = 0; i < count; i++) {
+      const num = String(deptStudentCounters[code]).padStart(2, '0');
+      const studentId = `${code}2025_${num}`;
+      const fn = firstNames[globalIdx % firstNames.length];
+      const ln = lastNames[(globalIdx + 3) % lastNames.length];
+      const isActiveDemo = (i === 0);
+      const fbId = generateFeedbackId();
+
+      studentBatch.push({
+        name: `${fn} ${ln}`,
+        email: isActiveDemo ? `${studentId.toLowerCase().replace('_', '.')}@iu.edu.in` : null,
+        password: isActiveDemo ? stdPassword : null,
+        role: 'student',
+        status: isActiveDemo ? 'active' : 'pending',
+        department_id: dept.id,
+        section_id: section.id,
+        semester,
+        student_id: studentId,
+        unique_feedback_id: fbId,
+        points: Math.floor(Math.random() * 50),
+        batch: '2025'
+      });
+
+      deptStudentCounters[code]++;
+      globalIdx++;
     }
-  }
 
-  // 6. Create 50 Student users
-  console.log('\n👨‍🎓 Creating 50 Students...')
-  const studentIds = []
-  let studentIdx = 0
+    const { data: createdStudents } = await supabase.from('users').insert(studentBatch).select();
 
-  for (const dist of courseDistribution) {
-    const courseId = courseMap[dist.courseName]
-    if (!courseId) { console.warn(`   ⚠️ Course not found: ${dist.courseName}`); continue }
-
-    for (let i = 0; i < dist.count && studentIdx < 50; i++) {
-      const name = studentNames[studentIdx]
-      const email = name.toLowerCase().replace(/\s+/g, '.') + '@invertis.org'
-      const batch = batchYears[studentIdx % batchYears.length]
-      const password = 'student@2024'
-
-      const id = await createUser(email, password, {
-        role: 'student', full_name: name, email, course_id: courseId, batch_year: batch,
-      })
-      if (id) {
-        studentIds.push({ id, courseId, name })
-        if (studentIdx % 10 === 0 || studentIdx === 49) {
-          console.log(`   ✅ ${studentIdx + 1}/50 — ${name}`)
-        }
+    // Enroll students in section courses
+    const { data: sfAssignments } = await supabase.from('section_faculty').select('course_id').eq('section_id', section.id);
+    const courseIds = [...new Set((sfAssignments || []).map(sf => sf.course_id))];
+    const enrollmentBatch = [];
+    for (const student of (createdStudents || [])) {
+      for (const courseId of courseIds) {
+        enrollmentBatch.push({ student_id: student.id, course_id: courseId, section_id: section.id });
       }
-      studentIdx++
+    }
+    if (enrollmentBatch.length > 0) {
+      await supabase.from('enrollments').insert(enrollmentBatch);
     }
   }
-  console.log(`   Created ${studentIds.length} students total`)
+  console.log('✅ Students created and enrolled');
 
-  // 7. Create Feedback Forms (one per course-trainer-subject combo, ~15 forms)
-  console.log('\n📝 Creating Feedback Forms...')
-  const publisherId = adminId || hodIds[0]
-  if (!publisherId) { console.error('❌ No publisher found!'); return }
+  // ── Seed TLFQs ─────────────────────────────────────────────────────────
+  const stdQuestions = [
+    'The instructor explains course material clearly and effectively.',
+    'The instructor is responsive to questions during and outside of class.',
+    'The assignments and projects contribute significantly to my learning.',
+    'The course content is relevant and up-to-date.',
+    'The instructor is well-prepared for every lecture.',
+    'Overall, I would rate this instructor\'s effectiveness as high.',
+  ];
+  const closingDate = new Date();
+  closingDate.setDate(closingDate.getDate() + 7);
 
-  const formData = []
-  const usedCourses = new Set()
+  for (const sf of sfData) {
+    const { data: section } = await supabase.from('sections').select('name, department_id').eq('id', sf.section_id).single();
+    if (!section) continue;
+    const { data: course } = await supabase.from('courses').select('code').eq('id', sf.course_id).single();
+    const hodForDept = hods.find(h => h.department_id === section.department_id);
+    if (!hodForDept) continue;
 
-  // Create 1-2 forms per course
-  for (const dist of courseDistribution) {
-    const courseId = courseMap[dist.courseName]
-    if (!courseId) continue
+    const { data: tlfq } = await supabase.from('tlfqs').insert({
+      section_id: sf.section_id, course_id: sf.course_id, faculty_id: sf.faculty_id,
+      title: `${section.name} — ${course.code} Feedback`,
+      is_active: true, closing_time: closingDate.toISOString(),
+      created_by: hodForDept.id
+    }).select().single();
 
-    // Find subjects for this course
-    const courseSubjects = subjects.filter(s => s.course_name === dist.courseName).slice(0, 2)
-    if (courseSubjects.length === 0) continue
-
-    // Get random trainers from matching department
-    const course = courses.find(c => c.course_name === dist.courseName)
-    const deptTrainers = trainers.filter(t => t.department === course?.department)
-    const fallbackTrainers = trainers.slice(0, 3)
-    const availableTrainers = deptTrainers.length > 0 ? deptTrainers : fallbackTrainers
-
-    for (let j = 0; j < Math.min(courseSubjects.length, 2); j++) {
-      const sub = courseSubjects[j]
-      const trainer = availableTrainers[j % availableTrainers.length]
-
-      formData.push({
-        course_id: courseId,
-        trainer_id: trainer.id,
-        subject_name: sub.subject_name,
-        subject_code: sub.subject_code,
-        status: Math.random() > 0.2 ? 'active' : 'closed',
-        published_by: publisherId,
-      })
-    }
+    await supabase.from('questions').insert(
+      stdQuestions.map(q => ({ tlfq_id: tlfq.id, question_text: q }))
+    );
   }
+  console.log('✅ TLFQs and questions created');
 
-  const { data: forms, error: formErr } = await supabase.from('feedback_forms').insert(formData).select()
-  if (formErr) { console.error('❌ Failed to create forms:', formErr.message); return }
-  console.log(`   ✅ Created ${forms.length} feedback forms`)
-
-  // 8. Create Reviews (each student reviews 2-4 forms from their course)
-  console.log('\n⭐ Creating Reviews & Ratings...')
-  let reviewCount = 0
-  let answerCount = 0
-
-  for (const student of studentIds) {
-    // Find forms for this student's course
-    const studentForms = forms.filter(f => f.course_id === student.courseId && f.status === 'active')
-    // Also add some cross-course forms for variety
-    const otherForms = forms.filter(f => f.course_id !== student.courseId && f.status === 'active').slice(0, 1)
-    const formsToReview = [...studentForms, ...otherForms].slice(0, 3)
-
-    for (const form of formsToReview) {
-      const writtenFeedback = feedbackTexts[Math.floor(Math.random() * feedbackTexts.length)]
-
-      const { data: review, error: revErr } = await supabase.from('reviews').insert({
-        form_id: form.id,
-        student_id: student.id,
-        written_feedback: writtenFeedback,
-      }).select().single()
-
-      if (revErr) {
-        // Skip duplicates silently
-        if (revErr.code === '23505') continue
-        continue
-      }
-
-      reviewCount++
-
-      // Create 10 rating answers
-      const answers = []
-      for (let q = 1; q <= 10; q++) {
-        // Realistic bell-curve ratings: mostly 4-6, occasionally 2-3 or 7
-        const baseRating = 4 + Math.floor(Math.random() * 3) // 4-6
-        const variance = Math.random() > 0.8 ? (Math.random() > 0.5 ? 1 : -2) : 0
-        const rating = Math.max(1, Math.min(7, baseRating + variance))
-
-        answers.push({
-          review_id: review.id,
-          question_id: `q${q}`,
-          rating_value: rating,
-        })
-      }
-
-      const { error: ansErr } = await supabase.from('review_answers').insert(answers)
-      if (!ansErr) answerCount += 10
-    }
-  }
-
-  console.log(`   ✅ Created ${reviewCount} reviews with ${answerCount} rating answers`)
-
-  // Summary
-  console.log('\n' + '='.repeat(50))
-  console.log('🎉 SEED COMPLETE!')
-  console.log('='.repeat(50))
-  console.log(`   Admin:     1 (${adminProfile.email} / ${adminProfile.password})`)
-  console.log(`   HODs:      ${hodIds.length}`)
-  hodProfiles.forEach(h => console.log(`              ${h.email} / ${h.password}`))
-  console.log(`   Students:  ${studentIds.length} (password: student@2024)`)
-  console.log(`   Forms:     ${forms.length}`)
-  console.log(`   Reviews:   ${reviewCount}`)
-  console.log(`   Ratings:   ${answerCount}`)
-  console.log('='.repeat(50))
+  console.log('\n🎉 Seeding completed! Full structured data across 5 departments.');
+  console.log('\n📋 Login Credentials:');
+  console.log('   Supreme:     supauth1@invertis.edu.in / Super@123');
+  console.log('   Admin:       admin@invertis.edu.in / Admin@2025');
+  console.log('   Coordinator: coordinator@invertis.edu.in / Coord@2025');
+  console.log('   HOD (BTAI):  hod.btai@invertis.edu.in / Hod@2025');
+  console.log('   HOD (BCS):   hod.bcs@invertis.edu.in / Hod@2025');
+  console.log('   Student:     BTAI2025_01 / Student@2025 (or any *2025_01 ID)');
+  process.exit(0);
 }
 
-async function createUser(email, password, profileData) {
-  try {
-    // Create auth user
-    const { data: authData, error: authErr } = await supabase.auth.admin.createUser({
-      email, password, email_confirm: true,
-    })
-
-    if (authErr) {
-      if (authErr.message?.includes('already been registered')) {
-        // User exists, try to find their ID
-        const { data: users } = await supabase.auth.admin.listUsers()
-        const existing = users?.users?.find(u => u.email === email)
-        return existing?.id || null
-      }
-      console.error(`   ❌ Auth error for ${email}: ${authErr.message}`)
-      return null
-    }
-
-    const userId = authData.user.id
-
-    // Create profile
-    const { error: profileErr } = await supabase.from('profiles').upsert({
-      id: userId,
-      ...profileData,
-    })
-
-    if (profileErr) {
-      console.error(`   ❌ Profile error for ${email}: ${profileErr.message}`)
-      return null
-    }
-
-    return userId
-  } catch (err) {
-    console.error(`   ❌ Error creating ${email}: ${err.message}`)
-    return null
-  }
-}
-
-seed().catch(console.error)
+seed().catch(err => { console.error('❌ Seed failed:', err); process.exit(1); });

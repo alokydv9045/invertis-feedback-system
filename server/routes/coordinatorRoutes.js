@@ -6,8 +6,7 @@ import {
   getCourses, createCourse, deleteCourse,
   getFaculty, createFaculty, deleteFaculty,
   assignFacultyToSection, removeAssignment,
-  getStudents, preCreateStudent, resetStudentPassword, updateStudent,
-  bulkImportStudents
+  getStudents, preCreateStudent, resetStudentPassword, updateStudent
 } from '../controllers/coordinatorController.js';
 
 const router = express.Router();
@@ -41,7 +40,6 @@ router.delete('/assignments/:id',  guard, removeAssignment);
 router.get('/students',            guard, getStudents);
 router.post('/students',           guard, preCreateStudent);
 router.put('/students/:id',        guard, updateStudent);
-router.post('/students/bulk',   guard, bulkImportStudents);
 router.put('/students/:id/reset-password', guard, resetStudentPassword);
 
 export default router;
