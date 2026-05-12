@@ -1,0 +1,14 @@
+{
+  "name": "tlfq-platform",
+  "version": "1.0.0",
+  "scripts": {
+    "install:frontend": "npm install --include=dev --prefix frontend",
+    "install:server": "npm install --prefix server",
+    "build:frontend": "npm run build --prefix frontend",
+    "build": "npm run install:frontend && npm run build:frontend && npm run install:server",
+    "start": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
