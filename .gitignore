@@ -1,29 +1,37 @@
-# Environment variables (contains secrets)
-.env
-.env.*
-*.local
-
-# Dependencies
+# Node
 node_modules/
-
-# Build output
 dist/
 dist-ssr/
 
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.production
+*.local
+
 # Logs
-logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# Editor / OS files
+# IDE / Editor
 .vscode/
 .idea/
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-Thumbs.db
+.DS_Store
+
+# Databases
+*.db
+*.sqlite
+
+# Scratch / temp files
+scratch_test.js
+
+# Local credentials — NEVER commit
+CREDENTIALS.md

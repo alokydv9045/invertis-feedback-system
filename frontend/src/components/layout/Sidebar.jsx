@@ -1,43 +1,63 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
+import { useAuth } from '../../context/AuthContext'
 import {
-  LayoutDashboard, MessageSquareText, BarChart3, Users,
-  ClipboardList, History, UserCircle, BookOpen,
-  GraduationCap, Trophy, Download, HelpCircle, LogOut, Settings
+  LayoutDashboard, BookOpen, Trophy, ClipboardList, BarChart3,
+  Users, Shield, Crown, UserCog, Search as SearchIcon, LogOut
 } from 'lucide-react'
 
 const studentNav = [
-  { label: 'Home', icon: LayoutDashboard, path: '/student/dashboard' },
-  { label: 'Course Feedback', icon: MessageSquareText, path: '/student/feedback/new' },
-  { label: 'Submission History', icon: History, path: '/student/history' },
-  { label: 'My Profile', icon: UserCircle, path: '/student/profile' },
+  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { label: 'My Courses', icon: BookOpen, path: '/courses' },
+  { label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
 ]
 
 const hodNav = [
-  { label: 'Dashboard', icon: LayoutDashboard, path: '/hod/dashboard' },
-  { label: 'Feedback Forms', icon: ClipboardList, path: '/hod/forms' },
-  { label: 'Analytics', icon: BarChart3, path: '/hod/analytics' },
-  { label: 'Student Directory', icon: Users, path: '/hod/students' },
+  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { label: 'HOD Panel', icon: ClipboardList, path: '/hod' },
+  { label: 'Analytics', icon: BarChart3, path: '/analytics' },
+  { label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
 ]
 
-const adminNav = [
-  { label: 'Home', icon: LayoutDashboard, path: '/admin/dashboard' },
-  { label: 'Course Feedback', icon: MessageSquareText, path: '/admin/forms' },
-  { label: 'Faculty Analytics', icon: BarChart3, path: '/admin/leaderboard' },
-  { label: 'User Management', icon: Users, path: '/admin/users' },
-  { label: 'Courses', icon: BookOpen, path: '/admin/courses' },
-  { label: 'Trainers', icon: GraduationCap, path: '/admin/trainers' },
+const coordinatorNav = [
+  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { label: 'Coordinator Panel', icon: UserCog, path: '/coordinator' },
+  { label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
 ]
 
-const roleNavMap = { student: studentNav, hod: hodNav, admin: adminNav }
+const superAdminNav = [
+  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { label: 'Admin Panel', icon: Shield, path: '/superadmin' },
+  { label: 'Coordinator', icon: UserCog, path: '/coordinator' },
+  { label: 'Analytics', icon: BarChart3, path: '/analytics' },
+  { label: 'Identity Reveal', icon: SearchIcon, path: '/reveal' },
+  { label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
+]
+
+const supremeNav = [
+  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { label: 'Supreme Panel', icon: Crown, path: '/supreme' },
+  { label: 'Admin Panel', icon: Shield, path: '/superadmin' },
+  { label: 'Coordinator', icon: UserCog, path: '/coordinator' },
+  { label: 'Analytics', icon: BarChart3, path: '/analytics' },
+  { label: 'Identity Reveal', icon: SearchIcon, path: '/reveal' },
+  { label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
+]
+
+const roleNavMap = {
+  student: studentNav,
+  hod: hodNav,
+  coordinator: coordinatorNav,
+  super_admin: superAdminNav,
+  supreme: supremeNav,
+}
 
 export function Sidebar() {
-  const { profile, logout } = useAuth()
+  const { user, logout } = useAuth()
   const navigate = useNavigate()
-  const navItems = roleNavMap[profile?.role] || studentNav
+  const navItems = roleNavMap[user?.role] || studentNav
 
-  const handleLogout = async () => {
-    await logout()
+  const handleLogout = () => {
+    logout()
     navigate('/login')
   }
 
@@ -60,6 +80,7 @@ export function Sidebar() {
           <NavLink
             key={item.path}
             to={item.path}
+            end={item.path === '/dashboard'}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive
@@ -76,14 +97,6 @@ export function Sidebar() {
 
       {/* Bottom section */}
       <div className="px-3 pb-4 space-y-1 border-t border-gray-100 pt-3">
-        <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 w-full transition-colors">
-          <Download size={18} />
-          <span>Export Data</span>
-        </button>
-        <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 w-full transition-colors">
-          <HelpCircle size={18} />
-          <span>Support</span>
-        </button>
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 w-full transition-colors"

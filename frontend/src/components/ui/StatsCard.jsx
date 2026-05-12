@@ -1,40 +1,28 @@
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
-
-const bgColors = {
-  blue: 'bg-blue-50 text-blue-600',
-  orange: 'bg-orange-50 text-orange-600',
-  green: 'bg-emerald-50 text-emerald-600',
-  purple: 'bg-purple-50 text-purple-600',
-  red: 'bg-red-50 text-red-600',
-  indigo: 'bg-indigo-50 text-indigo-600',
+const colorMap = {
+  blue: { bg: 'bg-blue-50', text: 'text-blue-600', icon: 'text-blue-500' },
+  green: { bg: 'bg-emerald-50', text: 'text-emerald-600', icon: 'text-emerald-500' },
+  purple: { bg: 'bg-purple-50', text: 'text-purple-600', icon: 'text-purple-500' },
+  orange: { bg: 'bg-orange-50', text: 'text-orange-600', icon: 'text-orange-500' },
+  red: { bg: 'bg-red-50', text: 'text-red-600', icon: 'text-red-500' },
 }
 
-export function StatsCard({ icon: Icon, label, value, trend, trendLabel, color = 'blue' }) {
-  const isPositive = trend > 0
-  const isNeutral = trend === 0 || trend === undefined || trend === null
+export function StatsCard({ icon: Icon, label, value, trendLabel, color = 'blue' }) {
+  const c = colorMap[color] || colorMap.blue
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-card p-5 hover:shadow-card-hover transition-all duration-200">
-      <div className="flex items-start justify-between mb-4">
-        <div className={`w-11 h-11 rounded-lg ${bgColors[color]} flex items-center justify-center`}>
-          <Icon size={20} />
+    <div className="bg-white rounded-xl border border-gray-100 shadow-card p-5">
+      <div className="flex items-center justify-between mb-3">
+        <div className={`w-10 h-10 rounded-lg ${c.bg} flex items-center justify-center`}>
+          <Icon size={20} className={c.icon} />
         </div>
-        {!isNeutral && (
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-            isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
-          }`}>
-            {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-            {isPositive ? '+' : ''}{trend}%
-          </span>
-        )}
-        {isNeutral && trendLabel && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+        {trendLabel && (
+          <span className={`text-xs font-semibold ${c.text} ${c.bg} px-2 py-0.5 rounded-full`}>
             {trendLabel}
           </span>
         )}
       </div>
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{label}</p>
       <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-xs text-gray-400 mt-1 font-medium">{label}</p>
     </div>
   )
 }

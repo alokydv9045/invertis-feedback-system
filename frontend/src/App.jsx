@@ -1,94 +1,76 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider, useAuth } from '@/context/AuthContext'
-import { AuthGuard } from '@/components/guards/AuthGuard'
-import { AppLayout } from '@/components/layout/AppLayout'
-
-// Auth pages
-import LoginPage from '@/pages/auth/LoginPage'
-import RegisterPage from '@/pages/auth/RegisterPage'
-
-// Student pages
-import StudentDashboard from '@/pages/student/StudentDashboard'
-import FeedbackForm from '@/pages/student/FeedbackForm'
-import SubmissionHistory from '@/pages/student/SubmissionHistory'
-import StudentProfile from '@/pages/student/StudentProfile'
-
-// HOD pages
-import HodDashboard from '@/pages/hod/HodDashboard'
-import FormManagement from '@/pages/hod/FormManagement'
-import HodAnalytics from '@/pages/hod/HodAnalytics'
-import StudentDirectory from '@/pages/hod/StudentDirectory'
-
-// Admin pages
-import AdminDashboard from '@/pages/admin/AdminDashboard'
-import UserManagement from '@/pages/admin/UserManagement'
-import AdminFormManagement from '@/pages/admin/AdminFormManagement'
-import CourseManagement from '@/pages/admin/CourseManagement'
-import TrainerManagement from '@/pages/admin/TrainerManagement'
-import Leaderboard from '@/pages/admin/Leaderboard'
-
-function RootRedirect() {
-  const { profile, loading } = useAuth()
-  if (loading) return null
-  if (!profile) return <Navigate to="/login" replace />
-  return <Navigate to={`/${profile.role}/dashboard`} replace />
-}
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { AppLayout } from './components/layout/AppLayout';
+import Login            from './pages/Login';
+import StudentRegister  from './pages/StudentRegister';
+import Dashboard        from './pages/Dashboard';
+import CoursePage       from './pages/CoursePage';
+import TLFQPage         from './pages/TLFQPage';
+import Analytics        from './pages/Analytics';
+import HODPanel         from './pages/HODPanel';
+import CoordinatorPanel from './pages/CoordinatorPanel';
+import SuperAdminPanel  from './pages/SuperAdminPanel';
+import SupremePanel     from './pages/SupremePanel';
+import Leaderboard      from './pages/Leaderboard';
+import IdentityReveal   from './pages/IdentityReveal';
+import AdminPanel       from './pages/AdminPanel';
+import ManageStudents   from './pages/ManageStudents';
+import ManageDirectory  from './pages/ManageDirectory';
+import ProtectedRoute   from './components/ProtectedRoute';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
+    <AuthProvider>
+      <Router>
         <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/" element={<RootRedirect />} />
+          {/* Public */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<StudentRegister />} />
 
-          {/* Student routes */}
-          <Route path="/student" element={
-            <AuthGuard allowedRoles={['student']}>
+          {/* Authenticated routes with layout */}
+          <Route element={
+            <ProtectedRoute allowedRoles={['student', 'coordinator', 'hod', 'super_admin', 'supreme']}>
               <AppLayout />
-            </AuthGuard>
+            </ProtectedRoute>
           }>
-            <Route path="dashboard" element={<StudentDashboard />} />
-            <Route path="feedback/:formId" element={<FeedbackForm />} />
-            <Route path="history" element={<SubmissionHistory />} />
-            <Route path="profile" element={<StudentProfile />} />
-            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/courses/:id" element={
+              <ProtectedRoute allowedRoles={['student']}><CoursePage /></ProtectedRoute>
+            } />
+            <Route path="/courses/:id/tlfq/:tlfqId" element={
+              <ProtectedRoute allowedRoles={['student']}><TLFQPage /></ProtectedRoute>
+            } />
+            <Route path="/hod/*" element={
+              <ProtectedRoute allowedRoles={['hod']}><HODPanel /></ProtectedRoute>
+            } />
+            <Route path="/coordinator/*" element={
+              <ProtectedRoute allowedRoles={['coordinator', 'super_admin', 'supreme']}><CoordinatorPanel /></ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute allowedRoles={['super_admin', 'hod', 'supreme']}><Analytics /></ProtectedRoute>
+            } />
+            <Route path="/superadmin/*" element={
+              <ProtectedRoute allowedRoles={['super_admin', 'supreme']}><SuperAdminPanel /></ProtectedRoute>
+            } />
+            <Route path="/supreme" element={
+              <ProtectedRoute allowedRoles={['supreme']}><SupremePanel /></ProtectedRoute>
+            } />
+            <Route path="/reveal" element={
+              <ProtectedRoute allowedRoles={['super_admin', 'supreme']}><IdentityReveal /></ProtectedRoute>
+            } />
+            <Route path="/admin/students" element={
+              <ProtectedRoute allowedRoles={['super_admin', 'supreme']}><ManageStudents /></ProtectedRoute>
+            } />
+            <Route path="/hod/students" element={
+              <ProtectedRoute allowedRoles={['hod']}><ManageStudents /></ProtectedRoute>
+            } />
           </Route>
 
-          {/* HOD routes */}
-          <Route path="/hod" element={
-            <AuthGuard allowedRoles={['hod']}>
-              <AppLayout />
-            </AuthGuard>
-          }>
-            <Route path="dashboard" element={<HodDashboard />} />
-            <Route path="forms" element={<FormManagement />} />
-            <Route path="analytics" element={<HodAnalytics />} />
-            <Route path="students" element={<StudentDirectory />} />
-            <Route index element={<Navigate to="dashboard" replace />} />
-          </Route>
-
-          {/* Admin routes */}
-          <Route path="/admin" element={
-            <AuthGuard allowedRoles={['admin']}>
-              <AppLayout />
-            </AuthGuard>
-          }>
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="users" element={<UserManagement />} />
-            <Route path="forms" element={<AdminFormManagement />} />
-            <Route path="courses" element={<CourseManagement />} />
-            <Route path="trainers" element={<TrainerManagement />} />
-            <Route path="leaderboard" element={<Leaderboard />} />
-            <Route index element={<Navigate to="dashboard" replace />} />
-          </Route>
-
-          {/* Catch all */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
-      </AuthProvider>
-    </BrowserRouter>
-  )
+      </Router>
+    </AuthProvider>
+  );
 }
