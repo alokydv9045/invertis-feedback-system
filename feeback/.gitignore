@@ -35,5 +35,3 @@ scratch_test.js
 
 # Local credentials — NEVER commit
 CREDENTIALS.md
-server/env
-env
