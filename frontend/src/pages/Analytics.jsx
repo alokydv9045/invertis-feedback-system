@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardBody } from '../components/ui/Card';
 import { EmptyState } from '../components/ui/EmptyState';
+import { Tabs } from '../components/ui/Tabs';
+import { Skeleton } from '../components/ui/Skeleton';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Award, BarChart2, TrendingUp, BookOpen, MessageSquare, Star, Filter } from 'lucide-react';
 
@@ -17,10 +19,22 @@ export default function Analytics() {
 
   useEffect(() => { api.get('/responses/analytics').then(r => setData(r.data)).catch(() => {}).finally(() => setLoading(false)); }, []);
 
-  const deptFiltered = selectedDeptId === 'all' ? (data?.avgRatingPerFaculty || []) : (data?.avgRatingPerFaculty || []).filter(f => f.department_id === selectedDeptId);
-  const filteredFaculty = teacherTypeFilter === 'all' ? deptFiltered : deptFiltered.filter(f => f.teacher_type === teacherTypeFilter);
-  const filteredSubmission = selectedDeptId === 'all' ? [] : (data?.submissionRates || []).filter(c => c.department_id === selectedDeptId);
-  const filteredComments = selectedDeptId === 'all' ? (data?.recentComments || []) : (data?.recentComments || []).filter(c => c.department_id === selectedDeptId);
+  const filteredFaculty = useMemo(() => {
+    let list = data?.avgRatingPerFaculty || [];
+    if (selectedDeptId !== 'all') list = list.filter(f => f.department_id === selectedDeptId);
+    if (teacherTypeFilter !== 'all') list = list.filter(f => f.teacher_type === teacherTypeFilter);
+    return list;
+  }, [data, selectedDeptId, teacherTypeFilter]);
+
+  const filteredSubmission = useMemo(() => {
+    if (selectedDeptId === 'all') return [];
+    return (data?.submissionRates || []).filter(c => c.department_id === selectedDeptId);
+  }, [data, selectedDeptId]);
+
+  const filteredComments = useMemo(() => {
+    if (selectedDeptId === 'all') return data?.recentComments || [];
+    return (data?.recentComments || []).filter(c => c.department_id === selectedDeptId);
+  }, [data, selectedDeptId]);
 
   const tabs = [
     { id: 'faculty', label: 'Faculty Rankings', icon: Award },
@@ -29,7 +43,11 @@ export default function Analytics() {
   ];
 
   return (
-    <div className="animate-fade-in max-w-6xl mx-auto">
+    <div className="animate-fade-in max-w-6xl mx-auto relative">
+      <div className="absolute -inset-6 overflow-hidden pointer-events-none select-none">
+        <img src="/campus/hemburgure-image.webp" alt="" className="w-full h-full object-cover opacity-15" />
+      </div>
+      <div className="relative z-10">
       {/* Header */}
       <Card className="mb-6">
         <CardBody>
@@ -68,20 +86,30 @@ export default function Analytics() {
       </Card>
 
       {loading ? (
-        <Card><div className="py-20 flex justify-center"><div className="h-10 w-10 border-3 border-invertis-blue border-t-transparent rounded-full animate-spin" /></div></Card>
+        <div className="space-y-6">
+          <div className="flex gap-2">
+            {[1,2,3].map(n => <Skeleton key={n} className="h-10 w-36" rounded="rounded-lg" />)}
+          </div>
+          <Card>
+            <CardBody>
+              <Skeleton className="h-6 w-48 mb-6" />
+              <div className="space-y-3">
+                {[1,2,3,4,5].map(n => (
+                  <div key={n} className="flex items-center gap-4">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-7 flex-1" rounded="rounded-r-lg" />
+                  </div>
+                ))}
+              </div>
+            </CardBody>
+          </Card>
+        </div>
       ) : !data ? (
         <Card><EmptyState icon={BarChart2} title="No data" message="No analytics data available." /></Card>
       ) : (
         <div className="space-y-6">
           {/* Tabs */}
-          <div className="flex bg-gray-100 rounded-lg p-1 w-fit">
-            {tabs.map(({ id, label, icon: Icon }) => (
-              <button key={id} onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-md transition-all cursor-pointer ${activeTab === id ? 'bg-white text-invertis-blue shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-                <Icon size={14} /> {label}
-              </button>
-            ))}
-          </div>
+          <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
           <AnimatePresence mode="wait">
             <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
@@ -116,28 +144,30 @@ export default function Analytics() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {filteredFaculty.map((f, i) => (
-                      <Card key={f.id} hover>
-                        <CardBody className="py-4">
-                          <div className="flex items-center gap-4">
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-white ${i === 0 ? 'bg-amber-400' : i === 1 ? 'bg-gray-400' : i === 2 ? 'bg-orange-600' : 'bg-gray-200 text-gray-600'}`}>#{i + 1}</div>
-                            <div className="flex-1">
-                              <p className="text-sm font-bold text-gray-900">{f.name}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${f.teacher_type === 'trainer' ? 'text-cyan-600 bg-cyan-50' : 'text-purple-600 bg-purple-50'}`}>
-                                  {f.teacher_type === 'trainer' ? 'Trainer' : 'Faculty'}
+                      <motion.div key={f.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+                        <Card hover>
+                          <CardBody className="py-4">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-white ${i === 0 ? 'bg-amber-400' : i === 1 ? 'bg-gray-400' : i === 2 ? 'bg-orange-600' : 'bg-gray-200 text-gray-600'}`}>#{i + 1}</div>
+                              <div className="flex-1">
+                                <p className="text-sm font-bold text-gray-900">{f.name}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${f.teacher_type === 'trainer' ? 'text-cyan-600 bg-cyan-50' : 'text-purple-600 bg-purple-50'}`}>
+                                    {f.teacher_type === 'trainer' ? 'Trainer' : 'Faculty'}
+                                  </span>
+                                  <span className="text-xs text-gray-400">{f.total_responses} responses</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                                <Star size={14} className="text-amber-400 fill-amber-400" />
+                                <span className={`text-lg font-bold ${f.avg_rating >= 5 ? 'text-emerald-500' : f.avg_rating >= 3.5 ? 'text-amber-500' : 'text-red-500'}`}>
+                                  {f.avg_rating.toFixed(1)}<span className="text-xs text-gray-400 ml-0.5">/7</span>
                                 </span>
-                                <span className="text-xs text-gray-400">{f.total_responses} responses</span>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
-                              <Star size={14} className="text-amber-400 fill-amber-400" />
-                              <span className={`text-lg font-bold ${f.avg_rating >= 5 ? 'text-emerald-500' : f.avg_rating >= 3.5 ? 'text-amber-500' : 'text-red-500'}`}>
-                                {f.avg_rating.toFixed(1)}<span className="text-xs text-gray-400 ml-0.5">/7</span>
-                              </span>
-                            </div>
-                          </div>
-                        </CardBody>
-                      </Card>
+                          </CardBody>
+                        </Card>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
@@ -147,27 +177,29 @@ export default function Analytics() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {filteredSubmission.length === 0 ? (
                     <div className="col-span-full"><Card><EmptyState icon={BookOpen} title="Select a department" message="Choose a department to view course reports." /></Card></div>
-                  ) : filteredSubmission.map(c => (
-                    <Card key={c.course_id}>
-                      <CardBody>
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <span className="text-xs font-mono font-semibold text-invertis-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{c.course_code}</span>
-                            <h4 className="text-sm font-bold text-gray-900 mt-1">{c.course_name}</h4>
+                  ) : filteredSubmission.map((c, idx) => (
+                    <motion.div key={c.course_id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
+                      <Card>
+                        <CardBody>
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <span className="text-xs font-mono font-semibold text-invertis-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{c.course_code}</span>
+                              <h4 className="text-sm font-bold text-gray-900 mt-1">{c.course_name}</h4>
+                            </div>
+                            <span className={`text-xl font-bold ${c.rate >= 70 ? 'text-emerald-500' : c.rate >= 40 ? 'text-amber-500' : 'text-red-500'}`}>{c.rate}%</span>
                           </div>
-                          <span className={`text-xl font-bold ${c.rate >= 70 ? 'text-emerald-500' : c.rate >= 40 ? 'text-amber-500' : 'text-red-500'}`}>{c.rate}%</span>
-                        </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
-                          <motion.div initial={{ width: 0 }} animate={{ width: `${c.rate}%` }} transition={{ duration: 1 }}
-                            className={`h-full rounded-full ${c.rate >= 70 ? 'bg-emerald-400' : c.rate >= 40 ? 'bg-amber-400' : 'bg-red-400'}`} />
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
-                          <div><span className="text-xs text-gray-400">Enrolled</span><p className="font-semibold text-gray-700">{c.enrolled}</p></div>
-                          <div className="w-px h-6 bg-gray-200" />
-                          <div><span className="text-xs text-gray-400">Submitted</span><p className="font-semibold text-gray-700">{c.submitted}</p></div>
-                        </div>
-                      </CardBody>
-                    </Card>
+                          <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
+                            <motion.div initial={{ width: 0 }} animate={{ width: `${c.rate}%` }} transition={{ duration: 1 }}
+                              className={`h-full rounded-full ${c.rate >= 70 ? 'bg-emerald-400' : c.rate >= 40 ? 'bg-amber-400' : 'bg-red-400'}`} />
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
+                            <div><span className="text-xs text-gray-400">Enrolled</span><p className="font-semibold text-gray-700">{c.enrolled}</p></div>
+                            <div className="w-px h-6 bg-gray-200" />
+                            <div><span className="text-xs text-gray-400">Submitted</span><p className="font-semibold text-gray-700">{c.submitted}</p></div>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -184,13 +216,15 @@ export default function Analytics() {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {filteredComments.map((c, i) => (
-                        <Card key={i}><CardBody>
-                          <p className="text-sm text-gray-700 italic leading-relaxed mb-4">"{c.comment}"</p>
-                          <div className="pt-3 border-t border-gray-100">
-                            <p className="text-sm font-semibold"><span className="text-invertis-blue">{c.faculty_name}</span> · {c.course_name}</p>
-                            <p className="text-xs text-gray-400 mt-1">{new Date(c.submitted_at).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                          </div>
-                        </CardBody></Card>
+                        <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+                          <Card><CardBody>
+                            <p className="text-sm text-gray-700 italic leading-relaxed mb-4">"{c.comment}"</p>
+                            <div className="pt-3 border-t border-gray-100">
+                              <p className="text-sm font-semibold"><span className="text-invertis-blue">{c.faculty_name}</span> · {c.course_name}</p>
+                              <p className="text-xs text-gray-400 mt-1">{new Date(c.submitted_at).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            </div>
+                          </CardBody></Card>
+                        </motion.div>
                       ))}
                     </div>
                   )}
@@ -200,6 +234,7 @@ export default function Analytics() {
           </AnimatePresence>
         </div>
       )}
+      </div>{/* close z-10 */}
     </div>
   );
 }

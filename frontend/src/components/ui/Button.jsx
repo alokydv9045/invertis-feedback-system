@@ -15,7 +15,7 @@ const sizes = {
 export function Button({ children, variant = 'primary', size = 'md', className = '', icon: Icon, iconPosition = 'left', disabled = false, ...props }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200 ${variants[variant]} ${sizes[size]} ${
+      className={`inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-200 active:scale-[0.97] ${variants[variant]} ${sizes[size]} ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       } ${className}`}
       disabled={disabled}
