@@ -24,17 +24,17 @@ const roleHint = (id) => {
 
 export default function Login() {
   const { login } = useAuth();
-  const navigate   = useNavigate();
+  const navigate = useNavigate();
 
-  const [step,       setStep]       = useState(1);
+  const [step, setStep] = useState(1);
   const [identifier, setIdentifier] = useState('');
-  const [password,   setPassword]   = useState('');
-  const [showPass,   setShowPass]   = useState(false);
-  const [error,      setError]      = useState('');
-  const [loading,    setLoading]    = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPass, setShowPass] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [pendingStudent, setPendingStudent] = useState(null);
-  const [regEmail,   setRegEmail]   = useState('');
-  const [regPass,    setRegPass]    = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPass, setRegPass] = useState('');
   const [regConfirm, setRegConfirm] = useState('');
   const [showRegPass, setShowRegPass] = useState(false);
 
@@ -116,38 +116,34 @@ export default function Login() {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel — Branding */}
-      <div className="hidden lg:flex lg:w-[45%] bg-gradient-to-br from-invertis-navy via-invertis-blue to-blue-500 relative overflow-hidden items-center justify-center p-12">
-        <div className="relative z-10 text-white">
-          <img src="/logo.png" alt="Invertis University" className="w-20 h-20 rounded-2xl object-contain bg-white/20 backdrop-blur-sm p-2 mb-8" />
+      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden items-center justify-center p-12">
+        {/* Campus background */}
+        <img src="/campus/hemburgure-image.webp" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-br from-invertis-navy/90 via-invertis-blue/85 to-blue-600/80" />
+        <div className="relative z-10 text-white flex flex-col items-start">
+          {/* Large professional logo */}
+          <div className="bg-white rounded-2xl p-4 shadow-lg shadow-black/20 mb-8">
+            <img src="/logo.png" alt="Invertis University Bareilly" className="w-52 h-auto object-contain" />
+          </div>
           <h1 className="text-4xl font-bold leading-tight mb-4">
-            Invertis<br />Feedback System
+            Feedback<br />System
           </h1>
-          <p className="text-blue-100 text-lg leading-relaxed max-w-md">
+          <p className="text-blue-100 text-base leading-relaxed max-w-md">
             Empowering academic excellence through structured, anonymous, and actionable student feedback.
           </p>
-          <div className="mt-12 space-y-3 text-blue-200 text-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-emerald-400" /> Anonymous & Secure Submissions
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-amber-400" /> Real-time Analytics Dashboard
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-purple-400" /> 5-Tier Role-based Access
-            </div>
-          </div>
         </div>
-        {/* Decorative */}
-        <img src="/images.jpg" alt="" className="absolute right-0 bottom-0 w-48 h-48 object-cover rounded-full opacity-20 blur-sm" />
+        {/* Decorative circles */}
         <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full" />
         <div className="absolute right-20 -bottom-32 w-48 h-48 bg-white/5 rounded-full" />
         <div className="absolute -left-10 bottom-20 w-32 h-32 bg-white/5 rounded-full" />
       </div>
 
-      {/* Right Panel — Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+      {/* Right Panel — Login Form with campus image */}
+      <div className="flex-1 flex items-center justify-center p-8 relative overflow-hidden bg-gray-50">
+        {/* Campus image on the right side */}
+        <img src="/campus/gate.jpg" alt="" className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none select-none" />
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="w-full max-w-md">
+          className="w-full max-w-md relative z-10 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg shadow-black/5 border border-gray-100">
 
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">

@@ -5,6 +5,7 @@ import api from '../services/api';
 import { Card, CardBody } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
+import { Skeleton } from '../components/ui/Skeleton';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Send, RefreshCw, Volume2, Mic, CheckCircle2, Lock, GraduationCap, BookOpen, Users } from 'lucide-react';
 
@@ -72,18 +73,43 @@ export default function TLFQPage() {
       <div className="flex items-center justify-center min-h-[60vh] animate-fade-in">
         <Card className="max-w-lg w-full text-center">
           <CardBody className="py-12">
-            <div className="w-20 h-20 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-6">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+              className="w-20 h-20 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-6"
+            >
               <CheckCircle2 size={40} className="text-emerald-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Submission Successful</h2>
-            <p className="text-sm text-gray-500 mb-6">Your feedback has been recorded anonymously.</p>
-            <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6 text-left">
-              <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                <Lock size={12} className="text-emerald-500" /> Security Protocol Active
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-2xl font-bold text-gray-900 mb-3"
+            >
+              Submission Successful
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35 }}
+              className="text-sm text-gray-500 mb-6"
+            >
+              Your feedback has been recorded anonymously.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+            >
+              <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6 text-left">
+                <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+                  <Lock size={12} className="text-emerald-500" /> Security Protocol Active
+                </div>
+                <p className="text-xs text-gray-500">Identity hashing completed. Response is immutable and decoupled from your profile.</p>
               </div>
-              <p className="text-xs text-gray-500">Identity hashing completed. Response is immutable and decoupled from your profile.</p>
-            </div>
-            <Button onClick={() => navigate('/dashboard')} icon={GraduationCap} className="w-full justify-center">Back to My Courses</Button>
+              <Button onClick={() => navigate('/dashboard')} icon={GraduationCap} className="w-full justify-center">Back to My Courses</Button>
+            </motion.div>
           </CardBody>
         </Card>
       </div>
@@ -106,12 +132,37 @@ export default function TLFQPage() {
       </div>
 
       {loading ? (
-        <Card><div className="py-20 flex flex-col items-center gap-3">
-          <div className="h-10 w-10 border-3 border-invertis-blue border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs text-gray-400">Loading questionnaire...</span>
-        </div></Card>
+        <div className="space-y-6">
+          <Card>
+            <CardBody>
+              <Skeleton className="h-6 w-2/3 mb-3" />
+              <div className="flex gap-4">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-40" />
+              </div>
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody className="py-4">
+              <Skeleton className="h-2.5 w-full" rounded="rounded-full" />
+            </CardBody>
+          </Card>
+          {[1, 2, 3].map(n => (
+            <Card key={n}>
+              <CardBody>
+                <div className="flex gap-4 mb-6">
+                  <Skeleton className="h-9 w-9 flex-shrink-0" rounded="rounded-xl" />
+                  <Skeleton className="h-5 flex-1" />
+                </div>
+                <div className="flex gap-2.5 pl-0 md:pl-13">
+                  {[1,2,3,4,5,6,7].map(b => <Skeleton key={b} className="h-12 w-12" rounded="rounded-2xl" />)}
+                </div>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
       ) : error && !evaluation ? (
-        <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 text-center">{error}</div>
+        <div role="alert" className="p-6 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 text-center">{error}</div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Header */}
@@ -132,7 +183,7 @@ export default function TLFQPage() {
             </CardBody>
           </Card>
 
-          {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 text-center">{error}</div>}
+          {error && <div role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 text-center">{error}</div>}
 
           {/* Progress */}
           <Card>
@@ -148,24 +199,31 @@ export default function TLFQPage() {
             </CardBody>
           </Card>
 
-          {/* Questions */}
+          {/* Questions — staggered animation */}
           {questions.map((q, idx) => (
-            <Card key={q.id || q._id} className="hover:border-invertis-blue/20 transition-all">
-              <CardBody>
-                <div className="flex justify-between items-start gap-4 mb-6">
-                  <div className="flex gap-4">
-                    <span className="shrink-0 flex items-center justify-center w-9 h-9 bg-invertis-blue/10 text-invertis-blue font-bold rounded-xl text-sm">{idx + 1}</span>
-                    <p className="text-base font-semibold text-gray-800 pt-1">{q.question_text}</p>
+            <motion.div
+              key={q.id || q._id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.05, ease: 'easeOut' }}
+            >
+              <Card className="hover:border-invertis-blue/20 transition-all">
+                <CardBody>
+                  <div className="flex justify-between items-start gap-4 mb-6">
+                    <div className="flex gap-4">
+                      <span className="shrink-0 flex items-center justify-center w-9 h-9 bg-invertis-blue/10 text-invertis-blue font-bold rounded-xl text-sm">{idx + 1}</span>
+                      <p className="text-base font-semibold text-gray-800 pt-1">{q.question_text}</p>
+                    </div>
+                    <button type="button" onClick={() => speakQuestion(q.question_text)} className="shrink-0 w-9 h-9 rounded-xl bg-gray-50 text-gray-400 hover:text-invertis-blue transition flex items-center justify-center cursor-pointer" title="Read aloud" aria-label={`Read question ${idx + 1} aloud`}>
+                      <Volume2 size={16} />
+                    </button>
                   </div>
-                  <button type="button" onClick={() => speakQuestion(q.question_text)} className="shrink-0 w-9 h-9 rounded-xl bg-gray-50 text-gray-400 hover:text-invertis-blue transition flex items-center justify-center cursor-pointer" title="Read aloud">
-                    <Volume2 size={16} />
-                  </button>
-                </div>
-                <div className="pl-0 md:pl-13">
-                  <RatingScale value={answers[q.id || q._id]} onChange={val => handleRatingChange(q.id || q._id, val)} />
-                </div>
-              </CardBody>
-            </Card>
+                  <div className="pl-0 md:pl-13">
+                    <RatingScale value={answers[q.id || q._id]} onChange={val => handleRatingChange(q.id || q._id, val)} />
+                  </div>
+                </CardBody>
+              </Card>
+            </motion.div>
           ))}
 
           {/* Comment */}
@@ -178,7 +236,9 @@ export default function TLFQPage() {
                 </div>
                 {voiceSupported && (
                   <button type="button" onClick={startVoiceInput}
-                    className={`flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition border cursor-pointer ${listening ? 'bg-red-50 border-red-200 text-red-600 animate-pulse' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}>
+                    className={`flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition border cursor-pointer ${listening ? 'bg-red-50 border-red-200 text-red-600 animate-pulse' : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'}`}
+                    aria-label={listening ? 'Listening for voice input' : 'Start voice input'}
+                  >
                     <Mic size={14} /> {listening ? 'Listening...' : 'Voice'}
                   </button>
                 )}

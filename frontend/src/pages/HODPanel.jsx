@@ -7,6 +7,11 @@ import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
 import { StatsCard } from '../components/ui/StatsCard';
 import { EmptyState } from '../components/ui/EmptyState';
+import { Input } from '../components/ui/Input';
+import { Select } from '../components/ui/Select';
+import { Tabs } from '../components/ui/Tabs';
+import { Alert } from '../components/ui/Alert';
+import { Skeleton } from '../components/ui/Skeleton';
 import { LayoutDashboard, Plus, ToggleLeft, ToggleRight, Clock, FileText, Check, X, Users, BookOpen, Layers, Activity } from 'lucide-react';
 
 const STD_QUESTIONS = [
@@ -79,10 +84,12 @@ export default function HODPanel() {
     catch { setMsg({ type: 'error', text: 'Failed.' }); }
   };
 
-  const inputClass = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-invertis-blue/20 focus:border-invertis-blue transition-all text-gray-900";
-
   return (
-    <div className="animate-fade-in max-w-5xl">
+    <div className="animate-fade-in max-w-5xl relative">
+      <div className="absolute -inset-6 overflow-hidden pointer-events-none select-none">
+        <img src="/campus/academic-block.jpg" alt="" className="w-full h-full object-cover opacity-15" />
+      </div>
+      <div className="relative z-10">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 rounded-xl bg-invertis-blue/10 flex items-center justify-center">
           <LayoutDashboard size={20} className="text-invertis-blue" />
@@ -93,23 +100,10 @@ export default function HODPanel() {
         </div>
       </div>
 
-      {msg && (
-        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-          className={`mb-4 p-3 border text-sm font-semibold rounded-lg flex items-center justify-between ${msg.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-600 border-red-200'}`}>
-          {msg.text}
-          <button onClick={() => setMsg(null)} className="cursor-pointer"><X size={14} /></button>
-        </motion.div>
-      )}
+      {msg && <Alert type={msg.type} onClose={() => setMsg(null)} className="mb-4">{msg.text}</Alert>}
 
       {/* Tabs */}
-      <div className="flex bg-gray-100 rounded-lg p-1 mb-6 w-fit">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button key={id} onClick={() => setTab(id)}
-            className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-md transition-all cursor-pointer ${tab === id ? 'bg-white text-invertis-blue shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-            <Icon size={14} /> {label}
-          </button>
-        ))}
-      </div>
+      <Tabs tabs={TABS} activeTab={tab} onTabChange={setTab} className="mb-6" />
 
       <AnimatePresence mode="wait">
         <motion.div key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
@@ -117,7 +111,7 @@ export default function HODPanel() {
           {/* DASHBOARD TAB */}
           {tab === 'dashboard' && (
             <div className="space-y-6">
-              {stats && (
+              {stats ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <StatsCard icon={Layers} label="Sections" value={stats.sections} color="blue" />
                   <StatsCard icon={Users} label="Faculty" value={stats.faculty} color="purple" />
@@ -125,6 +119,16 @@ export default function HODPanel() {
                   <StatsCard icon={Users} label="Students" value={stats.students} color="orange" />
                   <StatsCard icon={FileText} label="My Forms" value={stats.myForms} color="blue" />
                   <StatsCard icon={Activity} label="Open Forms" value={stats.openForms} color="red" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {[1,2,3,4,5,6].map(n => (
+                    <div key={n} className="bg-white rounded-2xl border border-gray-200/60 p-5 space-y-3">
+                      <Skeleton className="h-10 w-10" rounded="rounded-lg" />
+                      <Skeleton className="h-7 w-16" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -156,28 +160,16 @@ export default function HODPanel() {
               <CardBody>
                 <form onSubmit={handleCreate} className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1.5">Section</label>
-                      <select value={sectionId} onChange={e => setSectionId(e.target.value)} className={inputClass}>
-                        <option value="">Select Section…</option>
-                        {sections.map(s => <option key={s.id} value={s.id}>{s.name} (Sem {s.semester})</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1.5">Faculty & Course</label>
-                      <select value={selectedSf} onChange={e => setSelectedSf(e.target.value)} disabled={!sectionId} className={`${inputClass} disabled:opacity-50`}>
-                        <option value="">Select Faculty & Course…</option>
-                        {sfList.map(sf => <option key={sf.id} value={sf.id}>{sf.faculty_name} — [{sf.course_code}] {sf.course_name}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1.5">Form Title</label>
-                      <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Spring 2025 — DSA Feedback" className={inputClass} />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1.5">Closing Time</label>
-                      <input type="datetime-local" value={closingTime} onChange={e => setClosingTime(e.target.value)} className={inputClass} />
-                    </div>
+                    <Select label="Section" value={sectionId} onChange={e => setSectionId(e.target.value)}>
+                      <option value="">Select Section…</option>
+                      {sections.map(s => <option key={s.id} value={s.id}>{s.name} (Sem {s.semester})</option>)}
+                    </Select>
+                    <Select label="Faculty & Course" value={selectedSf} onChange={e => setSelectedSf(e.target.value)} disabled={!sectionId}>
+                      <option value="">Select Faculty & Course…</option>
+                      {sfList.map(sf => <option key={sf.id} value={sf.id}>{sf.faculty_name} — [{sf.course_code}] {sf.course_name}</option>)}
+                    </Select>
+                    <Input label="Form Title" type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Spring 2025 — DSA Feedback" />
+                    <Input label="Closing Time" type="datetime-local" value={closingTime} onChange={e => setClosingTime(e.target.value)} />
                   </div>
 
                   <div className="border-t border-gray-100 pt-5">
@@ -191,7 +183,7 @@ export default function HODPanel() {
                     {questions.map((q, i) => (
                       <div key={i} className="flex gap-2 items-center mb-2">
                         <span className="w-8 h-8 text-xs font-bold text-invertis-blue bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">Q{i + 1}</span>
-                        <input type="text" value={q} onChange={e => { const u = [...questions]; u[i] = e.target.value; setQuestions(u); }} className={`flex-1 ${inputClass}`} />
+                        <Input value={q} onChange={e => { const u = [...questions]; u[i] = e.target.value; setQuestions(u); }} className="flex-1" />
                         {questions.length > 1 && (
                           <button type="button" onClick={() => setQuestions(questions.filter((_, j) => j !== i))}
                             className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"><X size={16} /></button>
@@ -213,39 +205,47 @@ export default function HODPanel() {
             <div className="space-y-4">
               {forms.length === 0 ? (
                 <Card><EmptyState icon={FileText} title="No forms created yet" message='Use "Create Form" to get started.' /></Card>
-              ) : forms.map(f => (
-                <Card key={f.id}>
-                  <CardBody>
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge status={f.status === 'open' ? 'active' : f.status === 'expired' ? 'closed' : 'pending'}>{f.status}</Badge>
-                          <span className="text-xs text-gray-400">{f.responses} responses</span>
+              ) : forms.map((f, idx) => (
+                <motion.div
+                  key={f.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.04 }}
+                >
+                  <Card>
+                    <CardBody>
+                      <div className="flex flex-col md:flex-row md:items-center gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge status={f.status === 'open' ? 'active' : f.status === 'expired' ? 'closed' : 'pending'}>{f.status}</Badge>
+                            <span className="text-xs text-gray-400">{f.responses} responses</span>
+                          </div>
+                          <div className="text-sm font-bold text-gray-900">{f.title}</div>
+                          <div className="text-xs text-gray-500 mt-1">{f.section_name} • {f.faculty_name} • {f.course_code}</div>
+                          <div className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
+                            <Clock size={11} /> Closes: {new Date(f.closing_time).toLocaleString()}
+                          </div>
                         </div>
-                        <div className="text-sm font-bold text-gray-900">{f.title}</div>
-                        <div className="text-xs text-gray-500 mt-1">{f.section_name} • {f.faculty_name} • {f.course_code}</div>
-                        <div className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
-                          <Clock size={11} /> Closes: {new Date(f.closing_time).toLocaleString()}
-                        </div>
+                        {!f.expired && (
+                          <Button
+                            variant={f.is_active ? 'danger' : 'success'}
+                            size="sm"
+                            icon={f.is_active ? ToggleRight : ToggleLeft}
+                            onClick={() => toggleForm(f.id, f.is_active)}
+                          >
+                            {f.is_active ? 'Close Form' : 'Open Form'}
+                          </Button>
+                        )}
                       </div>
-                      {!f.expired && (
-                        <Button
-                          variant={f.is_active ? 'danger' : 'success'}
-                          size="sm"
-                          icon={f.is_active ? ToggleRight : ToggleLeft}
-                          onClick={() => toggleForm(f.id, f.is_active)}
-                        >
-                          {f.is_active ? 'Close Form' : 'Open Form'}
-                        </Button>
-                      )}
-                    </div>
-                  </CardBody>
-                </Card>
+                    </CardBody>
+                  </Card>
+                </motion.div>
               ))}
             </div>
           )}
         </motion.div>
       </AnimatePresence>
+      </div>{/* close z-10 */}
     </div>
   );
 }
