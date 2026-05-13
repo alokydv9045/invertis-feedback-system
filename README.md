@@ -556,4 +556,4 @@ All pages feature subtle campus photography backgrounds at **15% opacity** for i
 
 ## 📝 License
 
-MIT License — Developed for **Invertis University, Bareilly** by Team Saraswat.
+MIT License — Developed for **Invertis University, Bareilly** by APS.
