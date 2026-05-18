@@ -400,9 +400,9 @@
 }
 
 .admin-layout {
-  @apply flex flex-col md:flex-row min-h-[calc(100vh-64px)];
+  @apply flex flex-col md:flex-row min-h-[calc(100vh-64px)] min-h-0 min-w-0;
 }
 
 .admin-content {
-  @apply flex-1 p-4 md:p-8 max-w-[1600px] mx-auto w-full;
+  @apply flex-1 p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto w-full overflow-auto min-w-0;
 }

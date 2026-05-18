@@ -142,12 +142,11 @@ export const login = async (req, res) => {
     if (user.status === 'pending') {
       return res.status(403).json({ message: 'ACCOUNT_PENDING', student_id: user.student_id, name: user.name });
     }
+    if (user.status === 'alumni' || user.status === 'graduated') {
+      return res.status(403).json({ message: 'Alumni accounts can no longer access the feedback portal.' });
+    }
     if (user.status !== 'active') {
       return res.status(403).json({ message: 'ACCOUNT_INACTIVE', status: user.status });
-    }
-
-    if (user.status === 'alumni') {
-      return res.status(403).json({ message: 'Alumni accounts can no longer access the feedback portal.' });
     }
 
     const isValid = await bcrypt.compare(password, user.password);

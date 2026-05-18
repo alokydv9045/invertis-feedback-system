@@ -51,11 +51,11 @@ export default function Analytics() {
     : 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F1FAEE] text-[#212529] font-sans selection:bg-primary-500/30">
+    <div className="min-h-screen flex flex-col bg-[var(--bg-main)] text-[var(--text-main)] font-sans selection:bg-primary-500/30">
       <Navbar />
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 p-5 md:p-7 overflow-auto">
+        <main className="flex-1 p-4 sm:p-5 md:p-7 overflow-auto">
 
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] pointer-events-none" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] pointer-events-none" />
@@ -77,26 +77,26 @@ export default function Analytics() {
               </div>
 
               <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-                <div className="flex items-center gap-3 p-1.5 rounded-2xl border border-[#E6E9EE]">
-                  <div className="pl-3 text-slate-500 dark:text-slate-400"><Filter size={16} /></div>
+                <div className="flex items-center gap-3 p-1.5 rounded-2xl border border-[#E6E9EE] w-full md:w-auto">
+                  <div className="pl-3 text-slate-500"><Filter size={16} /></div>
                   <select
                     value={selectedDeptId}
                     onChange={e => setSelectedDeptId(e.target.value)}
-                    className="bg-transparent pl-1 pr-10 py-2.5 text-sm font-bold text-[#212529] focus:outline-none cursor-pointer appearance-none w-full md:w-52"
+                    className="bg-transparent pl-1 pr-10 py-2.5 text-sm font-bold text-[var(--text-main)] focus:outline-none cursor-pointer appearance-none w-full md:w-52"
                     style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
                   >
-                    <option value="all" className="bg-slate-900">All Departments</option>
+                    <option value="all" className="bg-white dark:bg-slate-900">All Departments</option>
                     {data?.deptOverview?.map(d => (
-                      <option key={d.id} value={d.id} className="bg-slate-900">{d.name}</option>
+                      <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900">{d.name}</option>
                     ))}
                   </select>
                 </div>
-                <div className="flex items-center gap-1 p-1.5 rounded-2xl border border-[#E6E9EE]">
+                <div className="flex items-center gap-1 p-1.5 rounded-2xl border border-[#E6E9EE] flex-wrap w-full md:w-auto">
                   {[['all', 'All'], ['college_faculty', 'Faculty'], ['trainer', 'Trainer']].map(([val, lbl]) => (
                     <button key={val} onClick={() => setTeacherTypeFilter(val)}
-                      className={`px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${teacherTypeFilter === val
+                      className={`px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex-1 md:flex-initial text-center ${teacherTypeFilter === val
                           ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
-                          : 'text-slate-600 hover:text-[#212529] hover:bg-black/5'
+                          : 'text-slate-600 hover:text-[var(--text-main)] hover:bg-black/5'
                         }`}> 
                       {lbl}
                     </button>
@@ -106,7 +106,7 @@ export default function Analytics() {
             </div>
 
             {/* Quick Insight Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { label: 'Total Responses', value: totalSubmissions, icon: MessageSquare, color: 'text-primary-400', bg: 'bg-primary-500/10' },
                 { label: 'Avg Rating', value: avgSystemRating, icon: Star, color: 'text-amber-400', bg: 'bg-amber-500/10' },
@@ -121,12 +121,12 @@ export default function Analytics() {
                   key={stat.label} 
                   className="card-main p-6 flex items-center gap-4 shadow transition-colors cursor-default"
                 >
-                  <div className={`h-12 w-12 ${stat.bg} rounded-2xl flex items-center justify-center shadow-inner`}>
+                  <div className={`h-12 w-12 ${stat.bg} rounded-2xl flex items-center justify-center shadow-inner flex-shrink-0`}>
                     <stat.icon size={20} className={stat.color} />
                   </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{stat.label}</div>
-                    <div className="text-2xl font-black text-[#1D3557]">{stat.value}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider truncate">{stat.label}</div>
+                    <div className="text-2xl font-black text-[#1D3557] truncate">{stat.value}</div>
                   </div>
                 </motion.div>
               ))}
@@ -141,16 +141,16 @@ export default function Analytics() {
             ) : (
               <div className="flex flex-col gap-6">
                 {/* Tabs */}
-                <div className="flex flex-wrap gap-2 p-1 rounded-2xl w-fit bg-transparent">
+                <div className="flex flex-nowrap overflow-x-auto no-scrollbar gap-2 p-1 rounded-2xl w-full sm:w-fit bg-transparent pb-2">
                   {tabs.map(({ id, label, icon: Icon }) => (
                     <motion.button
                       key={id}
                       onClick={() => setActiveTab(id)}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl transition-all cursor-pointer ${activeTab === id
+                      className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${activeTab === id
                           ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
-                          : 'text-slate-600 hover:text-[#212529] hover:bg-black/5'
+                          : 'text-slate-600 hover:text-[var(--text-main)] hover:bg-black/5'
                         }`}
                     >
                       <Icon size={16} /> {label}

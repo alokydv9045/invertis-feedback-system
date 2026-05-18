@@ -67,14 +67,14 @@ export default function StudentRegister() {
         className="w-full max-w-md z-10">
 
         {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-8 text-center">
           <div className="relative mb-4">
             <div className="h-16 w-16 rounded-2xl flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, #10b981 0%, #0d9488 100%)', boxShadow: '0 0 40px rgba(16,185,129,0.4)' }}>
               <GraduationCap size={30} className="text-white" />
             </div>
           </div>
-          <h1 className="text-2xl font-black text-white">Student Portal</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">Student Portal</h1>
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1.5">Invertis Feedback System</p>
         </div>
 
@@ -84,17 +84,17 @@ export default function StudentRegister() {
             { n: 1, label: 'Verify ID' },
             { n: 2, label: 'Set Password' },
           ].map(({ n, label }, i) => (
-            <>
-              {i > 0 && <div key={`div-${n}`} className={`flex-1 h-px transition-colors ${step > 1 ? 'bg-emerald-500/40' : 'bg-white/8'}`} />}
-              <div key={n} className="flex items-center gap-2 flex-shrink-0">
+            <div key={`step-wrap-${n}`} className="flex items-center gap-2 flex-1">
+              {i > 0 && <div className={`flex-1 h-px transition-colors ${step > 1 ? 'bg-emerald-500/40' : 'bg-slate-300 dark:bg-white/8'}`} />}
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <div className={`h-7 w-7 rounded-lg flex items-center justify-center text-xs font-black transition-all ${
-                  step > n ? 'bg-emerald-500 text-white' : step === n ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'hover:bg-black/5 dark:hover:bg-white/5 text-slate-600'
+                  step > n ? 'bg-emerald-500 text-white' : step === n ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30' : 'bg-slate-100 dark:bg-white/5 text-slate-500'
                 }`}>
                   {step > n ? <CheckCircle2 size={14} /> : n}
                 </div>
-                <span className={`text-[11px] font-bold ${step === n ? 'text-[var(--text-main)]' : 'text-slate-600'}`}>{label}</span>
+                <span className={`text-[11px] font-bold ${step === n ? 'text-[var(--text-main)]' : 'text-slate-500'}`}>{label}</span>
               </div>
-            </>
+            </div>
           ))}
         </div>
 
@@ -108,15 +108,15 @@ export default function StudentRegister() {
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
-                <h2 className="text-base font-bold text-white mb-1">Enter your Student ID</h2>
-                <p className="text-[12px] text-slate-500 dark:text-slate-400 mb-5">Provided by your department coordinator. (e.g. BCS2025_01)</p>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white mb-1">Enter your Student ID</h2>
+                <p className="text-[12px] text-slate-600 dark:text-slate-400 mb-5">Provided by your department coordinator. (e.g. BCS2025_01)</p>
                 <form onSubmit={handleCheckId} className="flex flex-col gap-4">
                   <Input
                     type="text"
                     value={studentId}
                     onChange={(e) => setStudentId(e.target.value.toUpperCase())}
                     placeholder="BCS2025_01"
-                    className="font-mono-styled tracking-widest"
+                    className="font-mono tracking-widest"
                   />
                   <Button type="submit" disabled={loading} loading={loading} fullWidth size="lg">
                     <ArrowRight size={16} />
@@ -129,12 +129,12 @@ export default function StudentRegister() {
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
                 <div className="flex items-center gap-2 mb-1">
-                  <button onClick={() => { setStep(1); setError(''); }} className="text-slate-600 hover:text-slate-700 dark:text-slate-300 cursor-pointer transition-colors">
+                  <button onClick={() => { setStep(1); setError(''); }} className="text-slate-500 hover:text-[var(--text-main)] cursor-pointer transition-colors">
                     <ChevronLeft size={19} />
                   </button>
-                  <h2 className="text-base font-bold text-white">Hello, {studentName}!</h2>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Hello, {studentName}!</h2>
                 </div>
-                <p className="text-[12px] text-slate-500 dark:text-slate-400 mb-5 ml-7">Set your email and password to activate your account.</p>
+                <p className="text-[12px] text-slate-600 dark:text-slate-400 mb-5 ml-7">Set your email and password to activate your account.</p>
                 <form onSubmit={handleRegister} className="flex flex-col gap-3.5">
                   <Input
                     type="email"

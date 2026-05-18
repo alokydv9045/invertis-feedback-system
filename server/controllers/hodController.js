@@ -174,18 +174,23 @@ export const updateDeadline = async (req, res) => {
 export const getHodStats = async (req, res) => {
   try {
     const { department_id } = req.user;
-    const sections  = await Section.count({ where: { department_id } });
-    const faculty   = await Faculty.count({ where: { department_id } });
-    const courses   = await Course.count({ where: { department_id } });
-    const students  = await User.count({ where: { role: 'student', department_id } });
-    const myForms   = await Tlfq.count({ where: { created_by: req.user.id } });
-    const openForms = await Tlfq.count({ 
-      where: { 
-        created_by: req.user.id, 
-        is_active: true, 
-        closing_time: { gt: new Date() } 
-      } 
-    });
+    const now = new Date();
+    
+    // Run all 6 count queries in parallel instead of sequentially
+    const [sections, faculty, courses, students, myForms, openForms] = await Promise.all([
+      Section.count({ where: { department_id } }),
+      Faculty.count({ where: { department_id } }),
+      Course.count({ where: { department_id } }),
+      User.count({ where: { role: 'student', department_id } }),
+      Tlfq.count({ where: { created_by: req.user.id } }),
+      Tlfq.count({ 
+        where: { 
+          created_by: req.user.id, 
+          is_active: true, 
+          closing_time: { gt: now } 
+        } 
+      })
+    ]);
     
     return res.json({ sections, faculty, courses, students, myForms, openForms });
   } catch (err) {

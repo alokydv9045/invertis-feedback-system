@@ -14,10 +14,10 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 const { Pool } = pkg;
 const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  max: 20, // Increase max connections for high traffic
-  idleTimeoutMillis: 30000,
-  // Increase connection timeout to allow slower DB responses (ms)
-  connectionTimeoutMillis: 60000,
+  max: 10, // PgBouncer-safe: keep below Supabase pool limit
+  idleTimeoutMillis: 20000,
+  connectionTimeoutMillis: 15000, // Fail fast instead of hanging
+  statement_timeout: 30000, // Kill queries running longer than 30s
 });
 const adapter = new PrismaPg(pool);
 
@@ -469,5 +469,17 @@ export const initDb = async () => {
   } catch (err) {
     console.error('Database initialization error:', err);
     throw err;
+  }
+};
+
+/** Graceful shutdown — drain pool and disconnect Prisma. */
+export const gracefulShutdown = async () => {
+  console.log('[db] Graceful shutdown initiated...');
+  try {
+    await prisma.$disconnect();
+    await pool.end();
+    console.log('[db] All connections closed.');
+  } catch (err) {
+    console.error('[db] Shutdown error:', err.message);
   }
 };

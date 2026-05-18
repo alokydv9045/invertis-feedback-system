@@ -235,26 +235,26 @@ export default function SuperAdminPanel() {
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 p-6 md:p-8">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-6xl">
             
             {/* Header */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full">
-                <div className="flex items-center gap-4">
-                  <div className="h-14 w-14 bg-gradient-to-br from-accent-500 to-accent-600 rounded-2xl flex items-center justify-center shadow-lg shadow-accent-500/20 flex-shrink-0">
-                    <Shield size={28} className="text-white" />
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 w-full">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-gradient-to-br from-accent-500 to-accent-600 rounded-2xl flex items-center justify-center shadow-lg shadow-accent-500/20 flex-shrink-0">
+                    <Shield size={24} className="text-white sm:w-7 sm:h-7" />
                   </div>
                   <div>
-                    <h1 className="text-3xl font-black text-[var(--text-main)]">User Management</h1>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 font-medium">Create and manage departments, HODs, coordinators & student records</p>
+                    <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-main)]">User Management</h1>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5 sm:mt-1 font-medium">Create and manage departments, HODs, coordinators & student records</p>
                   </div>
                 </div>
 
                 <button 
                   onClick={handleSemesterChange}
-                  className="flex items-center gap-3 px-6 py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-2xl text-[11px] uppercase tracking-widest transition-all shadow-lg shadow-amber-500/20 active:scale-95 group"
+                  className="flex items-center justify-center gap-3 px-6 py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-2xl text-[11px] uppercase tracking-widest transition-all shadow-lg shadow-amber-500/20 active:scale-95 group flex-shrink-0 w-full sm:w-auto cursor-pointer"
                 >
                   <RefreshCcw size={16} className="group-hover:rotate-180 transition-transform duration-500" />
                   Semester Change
@@ -262,10 +262,10 @@ export default function SuperAdminPanel() {
               </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 flex-wrap overflow-x-auto">
+            <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 flex-nowrap overflow-x-auto no-scrollbar pb-1">
               {TABS.map(({ id, label, icon: Icon }) => (
                 <button key={id} onClick={() => setTab(id)}
-                  className={`flex items-center gap-2.5 px-6 py-4 text-sm font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${tab === id
+                  className={`flex items-center gap-2.5 px-5 py-3 sm:py-4 text-xs sm:text-sm font-black border-b-2 transition -mb-[5px] cursor-pointer uppercase tracking-widest whitespace-nowrap flex-shrink-0 ${tab === id
                     ? 'border-primary-600 text-primary-600 dark:text-primary-400'
                     : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-[var(--text-main)]'
                   }`}>

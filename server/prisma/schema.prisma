@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ── Enums ────────────────────────────────────────────────────────────────────
@@ -181,6 +180,7 @@ model Enrollment {
   section    Section @relation(fields: [section_id], references: [id])
   student    User    @relation(fields: [student_id], references: [id])
 
+  @@unique([student_id, course_id])
   @@index([student_id])
   @@index([course_id])
   @@index([section_id])
@@ -229,6 +229,7 @@ model Response {
   student      User     @relation(fields: [student_id], references: [id])
   tlfq         Tlfq     @relation(fields: [tlfq_id], references: [id])
 
+  @@unique([student_id, tlfq_id])
   @@index([student_id])
   @@index([tlfq_id])
 }

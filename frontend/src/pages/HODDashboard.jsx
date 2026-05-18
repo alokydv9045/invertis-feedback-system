@@ -59,32 +59,32 @@ export default function HODDashboard() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 p-6 md:p-10">
+        <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-auto">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-7xl mx-auto w-full">
 
             {/* Header */}
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <BarChart2 size={24} className="text-primary-600 dark:text-primary-400" />
-                <h1 className="text-3xl font-black tracking-tight">Department Portal</h1>
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Department Portal</h1>
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 font-medium">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                 Feedback insights for your department — all data is strictly anonymous.
               </p>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800 flex-wrap overflow-x-auto no-scrollbar">
+            <div className="flex gap-2 sm:gap-4 border-b border-slate-200 dark:border-slate-800 flex-nowrap overflow-x-auto no-scrollbar pb-1">
               {tabs.map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-2.5 px-6 py-4 text-sm font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${
+                  className={`flex items-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-black border-b-2 transition -mb-[5px] cursor-pointer uppercase tracking-widest whitespace-nowrap flex-shrink-0 ${
                     activeTab === id
                       ? 'border-primary-600 text-primary-600 dark:text-primary-400'
-                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-600 dark:hover:text-[var(--text-main)]'
+                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-[var(--text-main)]'
                   }`}
                 >
                   <Icon size={16} /> {label}
@@ -97,24 +97,24 @@ export default function HODDashboard() {
                 {[1, 2, 3, 4].map(n => <div key={n} className="h-44 bg-white dark:bg-slate-900/50 animate-pulse rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm" />)}
               </div>
             ) : !data ? (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 font-bold shadow-sm">No analytics available for this department.</div>
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-12 sm:p-20 text-center text-slate-500 dark:text-slate-400 font-bold shadow-sm">No analytics available for this department.</div>
             ) : (
               <div className="flex flex-col gap-8">
                 {/* OVERVIEW TAB */}
                 {activeTab === 'overview' && (
                   <div className="flex flex-col gap-8">
                     {(data.deptOverview || []).map(dept => (
-                      <div key={dept.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-10 shadow-sm group relative overflow-hidden">
+                      <div key={dept.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-10 shadow-sm group relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
                            <Building2 size={120} />
                         </div>
-                        <div className="flex items-start justify-between mb-10 relative z-10">
+                        <div className="flex items-start justify-between mb-8 sm:mb-10 relative z-10">
                           <div>
-                            <div className="flex items-center gap-3">
-                              <h3 className="text-lg font-bold text-[var(--text-main)]">{dept.name}</h3>
+                            <div className="flex items-center gap-3 flex-wrap">
+                              <h3 className="text-lg sm:text-xl font-bold text-[var(--text-main)]">{dept.name}</h3>
                               <button
                                 onClick={() => handleTogglePortal(dept.id, dept.portal_open)}
-                                className={`px-2 py-0.5 rounded text-xs font-bold transition-all cursor-pointer ${
+                                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                                   dept.portal_open
                                     ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
                                     : 'bg-accent-500/20 text-accent-400 border border-accent-500/30 hover:bg-accent-500/30'
@@ -123,19 +123,21 @@ export default function HODDashboard() {
                                 {dept.portal_open ? '● Forms Open' : '○ Forms Closed'}
                               </button>
                             </div>
-                            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">{dept.code}</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1 block">{dept.code}</span>
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-6 relative z-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 relative z-10">
                           {[
                             { icon: BookOpen, label: 'Course Modules', value: dept.course_count, color: 'text-blue-500' },
                             { icon: Award, label: 'Faculty Records', value: dept.faculty_count, color: 'text-primary-500' },
                             { icon: Users, label: 'Enrolled Students', value: dept.student_count, color: 'text-emerald-500' },
                           ].map(({ icon: Icon, label, value, color }) => (
-                            <div key={label} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-[1.5rem] p-6 group-hover:border-primary-500/20 transition-all text-center">
-                              <Icon size={18} className={`${color} mx-auto mb-2`} />
-                              <div className="text-2xl font-black text-slate-900 dark:text-[var(--text-main)]">{value}</div>
-                              <div className="text-[10px] font-black text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">{label}</div>
+                            <div key={label} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-5 sm:p-6 group-hover:border-primary-500/20 transition-all flex items-center sm:flex-col justify-between sm:justify-normal text-left sm:text-center">
+                              <div className="flex items-center gap-3 sm:flex-col sm:gap-2">
+                                <Icon size={20} className={`${color}`} />
+                                <div className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest sm:mt-1">{label}</div>
+                              </div>
+                              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-[var(--text-main)]">{value}</div>
                             </div>
                           ))}
                         </div>

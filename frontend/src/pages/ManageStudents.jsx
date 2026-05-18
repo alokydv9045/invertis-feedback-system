@@ -128,7 +128,7 @@ export default function ManageStudents() {
               <div className="z-10 flex items-start gap-8">
                 <button
                   onClick={() => window.history.back()}
-                  className="mt-1 h-14 w-14 flex items-center justify-center bg-slate-50 dark:bg-slate-800 hover:bg-primary-600 text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 hover:text-white rounded-[1.5rem] transition-all cursor-pointer border border-slate-100 dark:border-slate-700 active:scale-90 shadow-sm"
+                  className="mt-1 h-14 w-14 hidden md:flex items-center justify-center bg-slate-50 dark:bg-slate-800 hover:bg-primary-600 text-slate-600 dark:text-slate-400 hover:text-white rounded-[1.5rem] transition-all cursor-pointer border border-slate-100 dark:border-slate-700 active:scale-90 shadow-sm"
                 >
                   <ArrowLeft size={24} />
                 </button>

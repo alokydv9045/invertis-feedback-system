@@ -16,7 +16,7 @@ const PageShell = ({ children }) => (
     <Navbar />
     <div className="flex flex-col md:flex-row flex-1 min-h-0">
       <Sidebar />
-      <main className="flex-1 p-5 md:p-7 overflow-auto">
+      <main className="flex-1 p-4 sm:p-5 md:p-7 overflow-auto">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
           {children}
         </motion.div>
@@ -27,14 +27,14 @@ const PageShell = ({ children }) => (
 
 function StatCard({ icon: Icon, label, value, color, glow }) {
   return (
-    <motion.div whileHover={{ y: -2 }} className="bg-white rounded-lg shadow border border-[#DEE2E6] hover:shadow-md transition-shadow p-5 flex items-center gap-4">
+    <motion.div whileHover={{ y: -2 }} className="bg-white rounded-lg shadow border border-[#DEE2E6] hover:shadow-md transition-shadow p-4 sm:p-5 flex items-center gap-4">
       <div className={`h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}
         style={{ boxShadow: `0 0 20px ${glow}` }}>
         <Icon size={19} className="text-white" />
       </div>
       <div>
-        <div className="text-2xl font-black text-[#1D3557] tracking-tight">{value ?? '—'}</div>
-        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">{label}</div>
+        <div className="text-xl sm:text-2xl font-black text-[#1D3557] tracking-tight">{value ?? '—'}</div>
+        <div className="text-[11px] text-slate-500 font-medium mt-0.5">{label}</div>
       </div>
     </motion.div>
   );
@@ -84,7 +84,7 @@ function AdminDashboard() {
           <span className="text-[10px] font-bold text-accent-400 uppercase tracking-widest">Super Admin</span>
         </div>
         <h1 className="text-2xl font-black text-[#212529]">Control Tower</h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">University-wide system overview and management.</p>
+        <p className="text-sm text-slate-600 mt-1">University-wide system overview and management.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -93,7 +93,7 @@ function AdminDashboard() {
       </div>
 
       <div>
-        <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Quick Actions</h3>
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {actions.map(({ label, desc, path, icon: Icon, glow }) => (
             <motion.button key={path} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
@@ -105,9 +105,9 @@ function AdminDashboard() {
               </div>
               <div>
                 <div className="text-sm font-bold text-[#1D3557] transition-colors">{label}</div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{desc}</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">{desc}</div>
               </div>
-              <ArrowRight size={14} className="text-slate-600 group-hover:text-slate-600 dark:text-slate-400 transition-colors mt-auto" />
+              <ArrowRight size={14} className="text-slate-600 group-hover:text-slate-600 transition-colors mt-auto" />
             </motion.button>
           ))}
         </div>
@@ -130,11 +130,11 @@ function HODOverview() {
     <div className="flex flex-col gap-6 max-w-3xl">
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <div className="h-2 w-2 rounded-full #E63946 shadow-sm shadow-blue-400/50" />
-          <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Head of Department</span>
+          <div className="h-2 w-2 rounded-full bg-[#E63946] shadow-sm shadow-red-400/50" />
+          <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Head of Department</span>
         </div>
         <h1 className="text-2xl font-black text-[#212529]">Welcome back, {user?.name?.split(' ')[1] || user?.name}</h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Manage your department's feedback cycle.</p>
+        <p className="text-sm text-slate-600 mt-1">Manage your department's feedback cycle.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -148,9 +148,9 @@ function HODOverview() {
             </div>
               <div>
                 <div className="text-sm font-bold text-[#1D3557]">{label}</div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{desc}</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">{desc}</div>
               </div>
-            <ArrowRight size={14} className="text-slate-600 group-hover:text-slate-700 dark:text-slate-300 transition-colors" />
+            <ArrowRight size={14} className="text-slate-600 group-hover:text-slate-700 transition-colors" />
           </motion.button>
         ))}
       </div>
@@ -196,20 +196,25 @@ function StudentDashboard() {
           <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Student Dashboard</span>
         </div>
         <h1 className="text-2xl font-black text-[#212529]">Hey, {user?.name?.split(' ')[0]} 👋</h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Your section's feedback forms for this semester.</p>
+        <p className="text-sm text-slate-600 mt-1">Your section's feedback forms for this semester.</p>
       </div>
 
       {/* Stats strip */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           { icon: Clock,          label: 'Pending',   value: pendingCount,   color: 'text-amber-400',  bg: 'bg-amber-400/10 border-amber-400/20' },
           { icon: CheckCircle2,   label: 'Completed', value: completedCount, color: 'text-emerald-400',bg: 'bg-emerald-400/10 border-emerald-400/20' },
           { icon: TrendingUp,     label: 'Progress',  value: `${progress}%`, color: 'text-primary-400', bg: 'bg-primary-400/10 border-primary-400/20' },
         ].map(({ icon: Icon, label, value, color, bg }) => (
-          <div key={label} className={`card p-4 border ${bg} flex flex-col gap-1.5`}>
-            <Icon size={15} className={color} />
-            <div className={`text-xl font-black ${color}`}>{value}</div>
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{label}</div>
+          <div key={label} className={`card p-4 border ${bg} flex items-center sm:flex-col sm:items-start justify-between sm:justify-normal gap-2`}>
+            <div className="flex items-center gap-2 sm:gap-1.5">
+              <Icon size={16} className={color} />
+              <div className="text-xs font-bold text-slate-600 sm:hidden">{label}</div>
+            </div>
+            <div className="text-right sm:text-left">
+              <div className={`text-xl sm:text-2xl font-black ${color}`}>{value}</div>
+              <div className="hidden sm:block text-[10px] text-slate-500 font-medium">{label}</div>
+            </div>
           </div>
         ))}
       </div>
@@ -217,13 +222,13 @@ function StudentDashboard() {
       {/* Progress bar */}
       {total > 0 && (
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between text-[11px] text-slate-500 dark:text-slate-400">
-            <span>Completion</span>
-            <span>{completedCount}/{total} forms</span>
+          <div className="flex justify-between text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+            <span>Overall Feedback Completion</span>
+            <span>{completedCount} of {total} forms completed</span>
           </div>
-          <div className="h-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full overflow-hidden">
+          <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-300/50 dark:border-slate-700/50">
             <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="h-full rounded-full" style={{ background: 'linear-gradient(90deg, #0F2D52, #1D4E89)' }} />
+              className="h-full rounded-full bg-gradient-to-r from-primary-600 to-emerald-500 shadow-sm" />
           </div>
         </div>
       )}
@@ -238,13 +243,13 @@ function StudentDashboard() {
           <div className="h-14 w-14 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center">
             <GraduationCap size={26} className="text-slate-600" />
           </div>
-          <p className="text-slate-600 dark:text-slate-400 text-sm">No active feedback forms for your section right now.</p>
-          <p className="text-slate-600 text-xs">Forms appear here when opened by your HOD.</p>
+          <p className="text-slate-600 dark:text-slate-400 text-sm font-bold">No active feedback forms for your section right now.</p>
+          <p className="text-slate-500 dark:text-slate-500 text-xs">Forms appear here when opened by your HOD.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {courses.map(course => (
-            <motion.div key={course.id} whileHover={{ y: -2 }} className="bg-white rounded-lg shadow border border-[#DEE2E6] hover:shadow-md transition-shadow p-5 flex flex-col gap-4">
+            <motion.div key={course.id} whileHover={{ y: -2 }} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow p-4 sm:p-5 flex flex-col gap-4">
               {/* Course header */}
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">

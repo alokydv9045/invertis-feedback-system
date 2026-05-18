@@ -52,7 +52,7 @@ export default function CoursePage() {
             <div>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-1.5 text-xs font-black text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition mb-6 cursor-pointer uppercase tracking-widest"
+                className="hidden md:flex items-center gap-1.5 text-xs font-black text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition mb-6 cursor-pointer uppercase tracking-widest"
               >
                 <ArrowLeft size={14} /> Back to Dashboard
               </button>

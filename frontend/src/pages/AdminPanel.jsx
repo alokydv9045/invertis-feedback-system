@@ -91,11 +91,11 @@ export default function AdminPanel() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col transition-colors duration-500">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 p-6 md:p-10">
+        <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-auto">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-10 max-w-5xl mx-auto w-full">
             
             {/* Header section */}
@@ -103,17 +103,17 @@ export default function AdminPanel() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <ClipboardList size={28} className="text-primary-600 dark:text-primary-400" />
-                  <h1 className="text-3xl font-black tracking-tight">Evaluation Forge</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Evaluation Forge</h1>
                 </div>
-                <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 font-medium">Design and deploy high-fidelity academic feedback instruments.</p>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Design and deploy high-fidelity academic feedback instruments.</p>
               </div>
-              <div className="flex gap-3">
-                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm">
-                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400">Global Repository Sync: Active</span>
+              <div className="flex flex-wrap gap-3">
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 rounded-2xl flex items-center gap-3 shadow-sm w-full sm:w-auto justify-center">
+                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 truncate">Global Repository Sync: Active</span>
                   </div>
                   {currentSession && (
-                   <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2 rounded-2xl flex items-center gap-2 shadow-sm">
+                   <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2 rounded-2xl flex items-center gap-2 shadow-sm w-full sm:w-auto justify-center">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Session</span>
                     <span className="text-sm font-black text-slate-800 dark:text-white">{currentSession}</span>
                    </div>
@@ -150,7 +150,7 @@ export default function AdminPanel() {
                   </h2>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="flex flex-col gap-3">
-                      <label className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 tracking-[0.2em] ml-1">Target Course Module</label>
+                      <label className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-400 tracking-[0.2em] ml-1">Target Course Module</label>
                       <select
                         value={courseId} onChange={e => setCourseId(e.target.value)}
                         className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 text-sm text-slate-700 dark:text-[var(--text-main)] font-bold focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all cursor-pointer shadow-inner appearance-none"
@@ -167,7 +167,7 @@ export default function AdminPanel() {
                     </div>
 
                     <div className="flex flex-col gap-3">
-                      <label className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 tracking-[0.2em] ml-1">Assigned Academic Staff</label>
+                      <label className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-400 tracking-[0.2em] ml-1">Assigned Academic Staff</label>
                       <select
                         value={facultyId} onChange={e => setFacultyId(e.target.value)}
                         className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 text-sm text-slate-700 dark:text-[var(--text-main)] font-bold focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all cursor-pointer shadow-inner appearance-none"
@@ -224,8 +224,8 @@ export default function AdminPanel() {
                 </div>
 
                 {/* Instruments/Questions Section */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] p-10 shadow-sm flex flex-col gap-10">
-                  <div className="flex items-center justify-between gap-4">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[3rem] p-6 sm:p-10 shadow-sm flex flex-col gap-8">
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
                     <h2 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
                        <div className="h-1.5 w-1.5 rounded-full bg-primary-500" />
                        Evaluation Instruments
@@ -245,22 +245,22 @@ export default function AdminPanel() {
                         key={idx} 
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="flex gap-4 items-center group"
+                        className="flex gap-3 sm:gap-4 items-center group flex-wrap sm:flex-nowrap"
                       >
-                        <div className="h-14 w-14 flex items-center justify-center bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/30 font-black rounded-2xl text-[10px] text-primary-600 dark:text-primary-400 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+                        <div className="h-12 w-12 sm:h-14 sm:w-14 flex items-center justify-center bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/30 font-black rounded-2xl text-[10px] text-primary-600 dark:text-primary-400 flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform">
                           IN-{idx + 1}
                         </div>
                         <input
                           type="text" value={qText}
                           onChange={e => { const u = [...questions]; u[idx] = e.target.value; setQuestions(u); }}
                           placeholder="Compose evaluation instrument text..."
-                          className="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-6 py-4 text-sm text-slate-700 dark:text-[var(--text-main)] font-bold placeholder-slate-400 dark:placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all shadow-inner"
+                          className="flex-1 min-w-[200px] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-4 sm:px-6 py-3 sm:py-4 text-sm text-slate-700 dark:text-[var(--text-main)] font-bold placeholder-slate-400 dark:placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all shadow-inner"
                         />
                         {questions.length > 1 && (
                           <button
                             type="button"
                             onClick={() => setQuestions(questions.filter((_, i) => i !== idx))}
-                            className="h-14 w-14 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-accent-500 hover:bg-accent-50 dark:hover:bg-accent-950/30 rounded-2xl transition-all cursor-pointer"
+                            className="h-12 w-12 sm:h-14 sm:w-14 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-accent-500 hover:bg-accent-50 dark:hover:bg-accent-950/30 rounded-2xl transition-all cursor-pointer flex-shrink-0"
                             title="Decommission Instrument"
                           >
                             <Trash2 size={18} />
@@ -274,23 +274,23 @@ export default function AdminPanel() {
                      <div className="h-8 w-8 bg-primary-100 dark:bg-primary-900/50 rounded-lg flex items-center justify-center shrink-0">
                         <ClipboardList size={16} className="text-primary-600 dark:text-primary-400" />
                      </div>
-                     <p className="text-[10px] font-black text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-relaxed">
+                     <p className="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest leading-relaxed">
                         Evaluations use a standardized Likert scale (1-7). Questions should be objective and focused on instructional quality.
                      </p>
                   </div>
                 </div>
 
                 {/* Submit Section */}
-                <div className="flex gap-6">
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                   <button
                     type="submit"
-                    className="flex-1 flex items-center justify-center gap-3 bg-primary-600 hover:bg-primary-700 text-white font-black py-5 px-10 rounded-[2.5rem] text-sm transition-all shadow-2xl shadow-primary-500/30 cursor-pointer uppercase tracking-[0.2em]"
+                    className="flex-1 flex items-center justify-center gap-3 bg-primary-600 hover:bg-primary-700 text-white font-black py-4 sm:py-5 px-8 sm:px-10 rounded-[2.5rem] text-sm transition-all shadow-2xl shadow-primary-500/30 cursor-pointer uppercase tracking-[0.2em]"
                   >
                     <Check size={20} /> Deploy Evaluation Cluster
                   </button>
                   <button
                     type="button" onClick={() => { setQuestions([...DEFAULT_QUESTIONS]); setTitle(''); }}
-                    className="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 font-black py-5 px-12 rounded-[2.5rem] text-sm border border-slate-200 dark:border-slate-800 transition cursor-pointer uppercase tracking-widest shadow-sm"
+                    className="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 font-black py-4 sm:py-5 px-8 sm:px-12 rounded-[2.5rem] text-sm border border-slate-200 dark:border-slate-800 transition cursor-pointer uppercase tracking-widest shadow-sm"
                   >
                     Clear Slate
                   </button>

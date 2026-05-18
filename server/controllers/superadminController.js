@@ -1,4 +1,4 @@
-import { User, Section, SectionFaculty, Tlfq, Department } from '../db.js';
+import { prisma, User, Section, SectionFaculty, Tlfq, Department } from '../db.js';
 import bcrypt from 'bcryptjs';
 
 // ── Create Super Admin (only Supreme Authority can do this) ──────────────
@@ -179,38 +179,40 @@ export const semesterChange = async (req, res) => {
   try {
     const departments = await Department.findMany();
 
-    // 1. Move students in their last semester to 'alumni' status
-    for (const dept of departments) {
-      const maxSem = dept.max_semester || 8;
-      await User.updateMany({
-        where: { role: 'student', department_id: dept.id, semester: { gte: maxSem } },
-        data: { status: 'alumni' }
+    // Wrap ALL steps in a transaction — if any step fails, everything rolls back
+    await prisma.$transaction(async (tx) => {
+      // 1. Move students in their last semester to 'alumni' status
+      for (const dept of departments) {
+        const maxSem = dept.max_semester || 8;
+        await tx.user.updateMany({
+          where: { role: 'student', department_id: dept.id, semester: { gte: maxSem } },
+          data: { status: 'alumni' }
+        });
+      }
+
+      // 2. Increment semester for all non-alumni students
+      await tx.user.updateMany({
+        where: { role: 'student', status: { not: 'alumni' } },
+        data: { semester: { increment: 1 } }
       });
-    }
 
-    // 2. Increment semester for all non-alumni students
-    await User.updateMany({
-      where: { role: 'student', status: { not: 'alumni' } },
-      data: { semester: { increment: 1 } }
-    });
+      // 3. Increment semester for all sections
+      await tx.section.updateMany({
+        data: { semester: { increment: 1 } }
+      });
 
-    // 2. Increment semester for all sections
-    await Section.updateMany({
-      data: { semester: { increment: 1 } }
-    });
+      // 4. Clear faculty assignments (teachers change every semester)
+      await tx.sectionFaculty.deleteMany({});
 
-    // 3. Clear faculty assignments (SectionFaculty) for every class
-    // Since teachers change every semester, we reset these.
-    await SectionFaculty.deleteMany({});
-
-    // 4. Optionally: deactivate old TLFQ forms
-    await Tlfq.updateMany({
-      data: { is_active: false }
+      // 5. Deactivate old TLFQ forms
+      await tx.tlfq.updateMany({
+        data: { is_active: false }
+      });
     });
 
     return res.json({ message: 'Semester changed successfully. All students advanced and faculty assignments reset.' });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Semester change failed. Transaction rolled back. No data was modified.' });
   }
 };
