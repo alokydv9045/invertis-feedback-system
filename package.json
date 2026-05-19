@@ -6,7 +6,8 @@
     "install:server": "npm install --prefix server",
     "build:frontend": "npm run build --prefix frontend",
     "build": "npm run install:frontend && npm run build:frontend && npm run install:server",
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "postinstall": "npm run install:server"
   },
   "engines": {
     "node": ">=18.0.0"
