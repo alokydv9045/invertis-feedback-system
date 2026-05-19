@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: tlfq-api
+    env: node
+    region: oregon
+    plan: free
+    rootDir: server
+    buildCommand: npm install && npx prisma generate
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: SEED_DATA
+        value: "false"
+    autoDeploy: true
+    healthCheckPath: /health
+    healthCheckInterval: 300
