@@ -16,10 +16,13 @@ const PageShell = ({ children }) => (
     <Navbar />
     <div className="flex flex-col md:flex-row flex-1 min-h-0">
       <Sidebar />
-      <main className="flex-1 p-4 sm:p-5 md:p-7 overflow-auto">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+      <main className="flex-1 p-4 sm:p-5 md:p-7 overflow-auto flex flex-col justify-between">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex-1">
           {children}
         </motion.div>
+        <footer className="mt-8 pt-4 border-t border-slate-200 text-center text-slate-500 w-full">
+          <p className="text-xs">© 2026 Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.</p>
+        </footer>
       </main>
     </div>
   </div>

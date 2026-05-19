@@ -109,6 +109,9 @@ export default function Leaderboard() {
               </div>
             )}
           </motion.div>
+                  <footer className="mt-8 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-slate-500 w-full">
+            <p className="text-xs">© 2026 Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.</p>
+          </footer>
         </main>
       </div>
     </div>

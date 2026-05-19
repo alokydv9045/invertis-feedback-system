@@ -233,11 +233,9 @@ export default function Login() {
       </div>
 
       {/* Footer */}
-      <div className="w-full bg-black text-white text-center py-3 px-4">
-        <p className="text-xs">
-          © {new Date().getFullYear()} Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.
-        </p>
-      </div>
+      <footer className="w-full bg-[#1D3557] py-4 text-center text-white border-t-4 border-[#E63946]">
+        <p className="text-xs">© 2026 Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.</p>
+      </footer>
     </div>
   );
 }
