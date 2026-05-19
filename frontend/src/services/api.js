@@ -12,7 +12,7 @@ if (envApiUrl && !envApiUrl.endsWith('/api')) {
 const baseURL =
   envApiUrl ||
   (import.meta.env.PROD
-    ? 'https://invertis-feedback-system-6s1e.onrender.com/api'
+    ? 'https://invertis-feedback-system-0chx.onrender.com/api'
     : 'http://localhost:5000/api');
 
 const api = axios.create({ baseURL });

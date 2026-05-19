@@ -1,23 +1,59 @@
 services:
+  # ── Backend API Web Service ────────────────────────────────────────────────
   - type: web
     name: tlfq-api
     env: node
     region: oregon
     plan: free
     rootDir: server
-    buildCommand: npm install && npx prisma generate
+    buildCommand: npm install && npx prisma generate && npx prisma db push
     startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: tlfq-db
+          property: connectionString
       - key: JWT_SECRET
-        sync: false
+        generateValue: true
       - key: CORS_ORIGIN
-        sync: false
+        value: https://invertis-feedback-system-2.onrender.com
       - key: SEED_DATA
-        value: "false"
+        value: "true"
     autoDeploy: true
     healthCheckPath: /health
     healthCheckInterval: 300
+
+  # ── Frontend Static Site (CDN) ─────────────────────────────────────────────
+  - type: static
+    name: tlfq-frontend
+    env: static
+    region: oregon
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    headers:
+      - key: X-Content-Type-Options
+        value: nosniff
+      - key: X-Frame-Options
+        value: DENY
+      - key: X-XSS-Protection
+        value: 1; mode=block
+      - key: Referrer-Policy
+        value: strict-origin-when-cross-origin
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://invertis-feedback-system-0chx.onrender.com
+    autoDeploy: true
+
+# ── Provision Managed PostgreSQL Database ─────────────────────────────────────
+databases:
+  - name: tlfq-db
+    databaseName: tlfq
+    plan: free

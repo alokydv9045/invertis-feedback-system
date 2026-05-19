@@ -34,6 +34,9 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [];
+    if (process.env.CORS_ORIGIN) {
+      allowedOrigins.push(...process.env.CORS_ORIGIN.split(',').map(o => o.trim()));
+    }
     
     // Allow localhost if in development
     if (process.env.NODE_ENV !== 'production' && origin.startsWith('http://localhost')) {

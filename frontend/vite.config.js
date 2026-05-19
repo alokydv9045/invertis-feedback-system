@@ -7,7 +7,10 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1000,
   },
+  server: {
+    allowedHosts: true,
+  },
   preview: {
-    allowedHosts: ['invertis-feedback-system-1-nn84.onrender.com'],
+    allowedHosts: true,
   },
 })
