@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import {
-  User as UserIcon, GraduationCap, AlertCircle, ShieldCheck
+  User as UserIcon, AlertCircle, ShieldCheck
 } from 'lucide-react';
 import { Button, Input, Alert } from '../components/ui';
 import api from '../services/api';
@@ -12,7 +12,7 @@ const roleHint = (id) => {
   if (id.includes('@')) {
     if (id.includes('admin')) return { label: 'Super Admin' };
     if (id.includes('coordinator')) return { label: 'Coordinator' };
-    if (id.includes('hod')) return { label: 'Head of Department'};
+    if (id.includes('hod')) return { label: 'Head of Department' };
     return { label: 'Staff Account' };
   }
   if (/^[A-Z]{2,4}\d{4}_\d+$/.test(id.toUpperCase())) {
@@ -116,13 +116,8 @@ export default function Login() {
     <div className="min-h-screen flex flex-col bg-[#F1FAEE]">
       {/* Header */}
       <div className="w-full bg-[#1D3557] px-6 py-4 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center">
-          <GraduationCap className="w-7 h-7 text-white" />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold text-white tracking-wide">INVERTIS</h1>
-          <p className="text-xs text-[#A8DADC] tracking-widest uppercase">University Bareilly</p>
-        </div>
+        <img src="/main logo.png" alt="Invertis University Logo" className="w-[116px] h-12 object-contain" />
+
       </div>
       <div className="w-full h-1 bg-[#E63946]" />
 

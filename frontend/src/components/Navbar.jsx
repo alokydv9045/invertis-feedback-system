@@ -158,9 +158,7 @@ export default function Navbar() {
       >
         {/* Brand */}
         <div className="flex items-center gap-4 cursor-pointer" onClick={() => window.location.href = '/'}>
-          <div className="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center bg-white/10">
-            <GraduationCap className="w-7 h-7 text-white" />
-          </div>
+          <img src="/main logo.png" alt="Invertis University Logo" className="w-[116px] h-12 object-contain" />
           <div className="hidden sm:block">
             <h1 className="text-xl font-bold text-white tracking-wide leading-tight">INVERTIS</h1>
             <p className="text-[10px] text-[#A8DADC] tracking-widest uppercase leading-tight">University Bareilly</p>
