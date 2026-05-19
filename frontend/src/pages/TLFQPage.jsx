@@ -153,7 +153,7 @@ export default function TLFQPage() {
               <div>
                 <button
                   onClick={() => navigate(-1)}
-                  className="flex items-center gap-1.5 text-[10px] font-black text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition mb-4 cursor-pointer uppercase tracking-widest"
+                  className="hidden md:flex items-center gap-1.5 text-[10px] font-black text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition mb-4 cursor-pointer uppercase tracking-widest"
                 >
                   <ArrowLeft size={14} /> Back to Course
                 </button>

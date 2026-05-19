@@ -290,12 +290,26 @@ export const executePromotion = async (req, res) => {
 
     const logEntry = await prisma.$transaction(async (tx) => {
       if (promotionIds.length > 0) {
+        // Group promoteActions by destination (to_semester, to_section_id)
+        const groupMap = {};
         for (const action of plan.promoteActions) {
-          await tx.user.update({
-            where: { id: action.student_id },
+          const key = `${action.to_semester}:::${action.to_section_id}`;
+          if (!groupMap[key]) {
+            groupMap[key] = {
+              to_semester: action.to_semester,
+              to_section_id: action.to_section_id,
+              student_ids: []
+            };
+          }
+          groupMap[key].student_ids.push(action.student_id);
+        }
+
+        for (const grp of Object.values(groupMap)) {
+          await tx.user.updateMany({
+            where: { id: { in: grp.student_ids } },
             data: {
-              semester: action.to_semester,
-              section_id: action.to_section_id,
+              semester: grp.to_semester,
+              section_id: grp.to_section_id,
               academic_session_id: plan.nextSession.id,
             },
           });
@@ -319,7 +333,10 @@ export const executePromotion = async (req, res) => {
       }
 
       if (enrollmentRows.length > 0) {
-        await tx.enrollment.createMany({ data: enrollmentRows });
+        await tx.enrollment.createMany({ 
+          data: enrollmentRows,
+          skipDuplicates: true
+        });
       }
 
       if (activate_next_session) {

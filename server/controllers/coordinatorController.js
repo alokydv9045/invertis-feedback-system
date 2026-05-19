@@ -126,7 +126,9 @@ export const createSection = async (req, res) => {
 export const deleteSection = async (req, res) => {
   try {
     const id = req.params.id;
-    // Prisma cascading deletes if configured in schema, or manual cleanup
+    await Tlfq.updateMany({ where: { section_id: id }, data: { is_active: false } });
+    await Enrollment.deleteMany({ where: { section_id: id } });
+    await User.updateMany({ where: { section_id: id }, data: { section_id: null } });
     await SectionFaculty.deleteMany({ where: { section_id: id } });
     await Section.delete({ where: { id } });
     return res.json({ message: 'Section deleted' });
@@ -353,7 +355,8 @@ export const preCreateStudent = async (req, res) => {
           student_id: student.id,
           course_id: courseId,
           section_id
-        }))
+        })),
+        skipDuplicates: true
       });
     }
 
@@ -405,10 +408,38 @@ export const bulkImportStudents = async (req, res) => {
   try {
     const { students } = req.body;
     if (!students || !Array.isArray(students)) return res.status(400).json({ message: 'Invalid payload. "students" array required.' });
+    if (students.length > 1000) return res.status(400).json({ message: 'Maximum 1000 students per import batch.' });
 
     const results = { success: 0, failed: 0, errors: [] };
 
-    for (const s of students) {
+    // Pre-validate and normalize all student IDs
+    const normalizedStudents = students.map(s => ({
+      ...s,
+      student_id: s.student_id?.toString().trim().toUpperCase()
+    }));
+
+    // Batch check: get all existing student IDs in one query
+    const allInputIds = normalizedStudents.map(s => s.student_id).filter(Boolean);
+    const existingUsers = await User.findMany({
+      where: { student_id: { in: allInputIds } },
+      select: { student_id: true }
+    });
+    const existingIdSet = new Set(existingUsers.map(u => u.student_id));
+
+    // Pre-fetch section-faculty map (one query instead of N)
+    const uniqueSectionIds = [...new Set(normalizedStudents.map(s => s.section_id).filter(Boolean))];
+    const allSectionFaculty = await SectionFaculty.findMany({
+      where: { section_id: { in: uniqueSectionIds } },
+      select: { section_id: true, course_id: true }
+    });
+    const sectionCourseMap = {};
+    for (const sf of allSectionFaculty) {
+      if (!sectionCourseMap[sf.section_id]) sectionCourseMap[sf.section_id] = new Set();
+      sectionCourseMap[sf.section_id].add(sf.course_id);
+    }
+
+    // Process students — create individually but skip expensive lookups
+    for (const s of normalizedStudents) {
       try {
         const { name, student_id, department_id, section_id, semester, batch } = s;
         if (!name || !student_id || !department_id || !section_id || !semester) {
@@ -417,19 +448,16 @@ export const bulkImportStudents = async (req, res) => {
           continue;
         }
 
-        const normalizedId = student_id.toString().trim().toUpperCase();
-        const exists = await User.findFirst({ where: { student_id: normalizedId } });
-        
-        if (exists) {
+        if (existingIdSet.has(student_id)) {
           results.failed++;
-          results.errors.push(`${normalizedId}: Already exists`);
+          results.errors.push(`${student_id}: Already exists`);
           continue;
         }
 
         const student = await User.create({
           data: {
             name,
-            student_id: normalizedId,
+            student_id,
             department_id,
             section_id,
             semester: Number(semester),
@@ -439,19 +467,20 @@ export const bulkImportStudents = async (req, res) => {
           }
         });
 
-        // Auto-enroll in section courses
-        const sfList = await SectionFaculty.findMany({ where: { section_id } });
-        const courseIds = [...new Set(sfList.map(sf => sf.course_id))];
-        
-        if (courseIds.length > 0) {
+        // Auto-enroll using pre-fetched map (0 additional queries)
+        const courseIds = sectionCourseMap[section_id];
+        if (courseIds && courseIds.size > 0) {
           await Enrollment.createMany({
-            data: courseIds.map(courseId => ({
+            data: [...courseIds].map(courseId => ({
               student_id: student.id,
               course_id: courseId,
               section_id
-            }))
+            })),
+            skipDuplicates: true
           });
         }
+
+        existingIdSet.add(student_id); // Prevent duplicates within same batch
         results.success++;
       } catch (err) {
         results.failed++;

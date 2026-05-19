@@ -40,7 +40,6 @@ export default function SupremePanel() {
   };
 
   useEffect(() => { loadAdmins(); }, []);
-  useEffect(() => { loadAdmins(); }, []);
 
   const createAdmin = async () => {
     if (!name || !email || !password) return toast.error('All fields are required.');
@@ -70,11 +69,11 @@ export default function SupremePanel() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] text-[var(--text-main)] flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 p-6 md:p-8 max-w-4xl">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-4xl overflow-auto">
 
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">

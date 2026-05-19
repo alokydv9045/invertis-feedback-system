@@ -18,11 +18,11 @@ export default function Leaderboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] text-[var(--text-main)] flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 p-6 md:p-8">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6 max-w-4xl mx-auto">
 
             {/* Header */}
@@ -30,8 +30,8 @@ export default function Leaderboard() {
               <div className="inline-flex h-16 w-16 bg-gradient-to-br from-accent-400 to-accent-600 rounded-3xl items-center justify-center shadow-xl shadow-accent-600/30 mb-4">
                 <Trophy size={32} className="text-white" />
               </div>
-              <h1 className="text-3xl font-black text-[var(--text-main)]">Top Contributors</h1>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+              <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-main)]">Top Contributors</h1>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2">
                 Earn points by submitting feedback and improving teaching quality.
               </p>
             </div>
@@ -47,11 +47,11 @@ export default function Leaderboard() {
             </div>
 
             {loading ? (
-              <div className="card rounded-3xl p-12 flex justify-center">
+              <div className="card-main rounded-3xl p-12 flex justify-center">
                 <div className="h-10 w-10 border-4 border-accent-500 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : students.length === 0 ? (
-              <div className="card rounded-3xl p-12 text-center flex flex-col items-center">
+              <div className="card-main rounded-3xl p-12 text-center flex flex-col items-center">
                 <Users size={40} className="text-slate-600 mb-4" />
                 <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">No data available yet</h3>
                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Submit feedback to appear on the leaderboard!</p>
@@ -64,11 +64,11 @@ export default function Leaderboard() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.04 }}
-                    className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
+                    className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border transition-all ${
                       idx === 0 ? 'bg-gradient-to-r from-accent-900/40 to-slate-900/80 border-accent-500/50 shadow-lg shadow-accent-900/30 scale-[1.02]' :
-                      idx === 1 ? 'card border-primary-500/30' :
-                      idx === 2 ? 'card border-accent-700/30' :
-                      'card hover:border-white/15'
+                      idx === 1 ? 'card-main border-primary-500/30' :
+                      idx === 2 ? 'card-main border-accent-700/30' :
+                      'card-main hover:border-white/15'
                     }`}
                   >
                     {/* Rank badge */}

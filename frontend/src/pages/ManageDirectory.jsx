@@ -115,18 +115,18 @@ export default function ManageDirectory() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col transition-colors duration-500">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 p-6 md:p-10">
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-6xl">
+        <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-auto">
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-6xl w-full mx-auto">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <Settings size={24} className="text-primary-500" />
-                <h1 className="text-3xl font-black">Directory Hub</h1>
+                <h1 className="text-2xl sm:text-3xl font-black">Directory Hub</h1>
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 font-medium">Manage the structural entities of the feedback system.</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Manage the structural entities of the feedback system.</p>
             </div>
 
             {msg.text && (
@@ -138,15 +138,15 @@ export default function ManageDirectory() {
             )}
 
             {/* Tabs */}
-            <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800 flex-wrap overflow-x-auto no-scrollbar">
+            <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800 flex-nowrap overflow-x-auto no-scrollbar pb-1">
               {TABS.map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-2.5 px-6 py-4 text-sm font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${
+                  className={`flex items-center gap-2.5 px-4 sm:px-6 py-4 text-xs sm:text-sm font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest whitespace-nowrap flex-shrink-0 ${
                     activeTab === id
                       ? 'border-primary-600 text-primary-600 dark:text-primary-400'
-                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-600 dark:hover:text-[var(--text-main)]'
+                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-[var(--text-main)]'
                   }`}
                 >
                   <Icon size={16} /> {label}
@@ -199,7 +199,7 @@ export default function ManageDirectory() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="font-black text-slate-900 dark:text-white text-base truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{d.name}</h3>
-                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-[10px] font-black text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 uppercase tracking-widest border border-slate-200/50 dark:border-slate-700/50 mt-1.5">
+                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest border border-slate-200/50 dark:border-slate-700/50 mt-1.5">
                                   {d.code}
                                 </div>
                               </div>
@@ -271,7 +271,7 @@ export default function ManageDirectory() {
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="card-main flex flex-col gap-6 h-fit">
                       <h3 className="font-black text-slate-900 dark:text-[var(--text-main)] flex items-center gap-2 text-sm uppercase tracking-wider"><Plus size={18} className="text-primary-500" /> New Faculty</h3>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Adding a faculty record allows them to be assigned to feedback questionnaires. These are informational entities.</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Adding a faculty record allows them to be assigned to feedback questionnaires. These are informational entities.</p>
                       <form onSubmit={handleCreateFaculty} className="flex flex-col gap-4">
                         <input type="text" placeholder="Full Professional Name" value={facultyName} onChange={e => setFacultyName(e.target.value)} className={inputCls} />
                         <select value={facultyDept} onChange={e => setFacultyDept(e.target.value)} className={inputCls + ' cursor-pointer'}>
@@ -308,7 +308,7 @@ export default function ManageDirectory() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="font-black text-slate-900 dark:text-white text-base truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{f.name}</h3>
-                                <div className="text-[10px] text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.1em] mt-2">{f.department_name}</div>
+                                <div className="text-[10px] text-slate-600 dark:text-slate-400 font-black uppercase tracking-[0.1em] mt-2">{f.department_name}</div>
                               </div>
                             </div>
                           </motion.div>
@@ -328,7 +328,7 @@ export default function ManageDirectory() {
                         </div>
                         <div>
                           <h3 className="font-black text-slate-900 dark:text-[var(--text-main)] uppercase tracking-wider">Export Ledger</h3>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 mt-0.5">Securely download the entire system state.</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Securely download the entire system state.</p>
                         </div>
                       </div>
                       <button onClick={handleExportData} className="w-full bg-primary-600 hover:bg-primary-500 text-white font-black py-4.5 rounded-2xl text-xs flex items-center justify-center gap-3 cursor-pointer uppercase tracking-widest transition-all shadow-xl shadow-primary-500/20 active:scale-95">
@@ -342,18 +342,18 @@ export default function ManageDirectory() {
                         </div>
                         <div>
                           <h3 className="font-black text-slate-900 dark:text-[var(--text-main)] uppercase tracking-wider">State Synchronizer</h3>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 mt-0.5">Upload and reconcile directory records.</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Upload and reconcile directory records.</p>
                         </div>
                       </div>
-                      <input type="file" accept="application/json" onChange={e => setImportFile(e.target.files[0])} className="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 cursor-pointer focus:outline-none" />
+                      <input type="file" accept="application/json" onChange={e => setImportFile(e.target.files[0])} className="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-slate-500 dark:text-slate-400 cursor-pointer focus:outline-none" />
                       <div className="grid grid-cols-2 gap-3">
                         {['merge', 'overwrite'].map(m => (
-                          <button key={m} onClick={() => setSyncMode(m)} className={`py-3.5 px-4 rounded-2xl border text-[10px] font-black transition-all cursor-pointer uppercase tracking-widest ${syncMode === m ? 'bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400'}`}>
+                          <button key={m} onClick={() => setSyncMode(m)} className={`py-3.5 px-4 rounded-2xl border text-[10px] font-black transition-all cursor-pointer uppercase tracking-widest ${syncMode === m ? 'bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-500/20' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'}`}>
                             {m === 'merge' ? 'Merge (Add)' : 'Full Wipe & Set'}
                           </button>
                         ))}
                       </div>
-                      <button onClick={handleImportData} disabled={!importFile} className={`w-full font-black py-4.5 rounded-2xl text-xs flex items-center justify-center gap-3 cursor-pointer uppercase tracking-widest transition-all ${importFile ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-500/20 active:scale-95' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 dark:text-slate-600 cursor-not-allowed'}`}>
+                      <button onClick={handleImportData} disabled={!importFile} className={`w-full font-black py-4.5 rounded-2xl text-xs flex items-center justify-center gap-3 cursor-pointer uppercase tracking-widest transition-all ${importFile ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xl shadow-emerald-500/20 active:scale-95' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 cursor-not-allowed'}`}>
                         <RefreshCw size={16} className={importFile ? 'animate-spin-slow' : ''} /> Execute Synchronization
                       </button>
                     </div>

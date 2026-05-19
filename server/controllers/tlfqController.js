@@ -1,38 +1,15 @@
 import { Department, Course, Faculty, Enrollment, Tlfq, Question, Response, User } from '../db.js';
+import cache from '../cache.js';
+import {
+  getDepartments, createDepartment, deleteDepartment,
+  createCourse, deleteCourse,
+  createFaculty, deleteFaculty
+} from './coordinatorController.js';
 
-// ── GET /api/tlfq/departments
-export const getDepartments = async (req, res) => {
-  try {
-    const depts = await Department.findMany();
-    return res.status(200).json(depts);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
-// ── POST /api/tlfq/departments  [super_admin only]
-export const createDepartment = async (req, res) => {
-  try {
-    const { name, code } = req.body;
-    if (!name || !code) return res.status(400).json({ message: 'Name and code are required' });
-    const result = await Department.create({ data: { name, code } });
-    return res.status(201).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
-// ── DELETE /api/tlfq/departments/:id  [super_admin only]
-export const deleteDepartment = async (req, res) => {
-  try {
-    await Department.delete({ where: { id: req.params.id } });
-    return res.status(200).json({ message: 'Department deleted' });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
+export {
+  getDepartments, createDepartment, deleteDepartment,
+  createCourse, deleteCourse,
+  createFaculty, deleteFaculty
 };
 
 // ── PUT /api/tlfq/departments/:id/portal  [hod + super_admin + admin]
@@ -141,30 +118,6 @@ export const getCourses = async (req, res) => {
   }
 };
 
-// ── POST /api/tlfq/courses  [super_admin only]
-export const createCourse = async (req, res) => {
-  try {
-    const { name, code, department_id } = req.body;
-    if (!name || !code || !department_id) return res.status(400).json({ message: 'name, code, department_id required' });
-    const result = await Course.create({ data: { name, code, department_id } });
-    return res.status(201).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
-// ── DELETE /api/tlfq/courses/:id  [super_admin only]
-export const deleteCourse = async (req, res) => {
-  try {
-    await Course.delete({ where: { id: req.params.id } });
-    return res.status(200).json({ message: 'Course deleted successfully' });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
 // ── GET /api/tlfq/faculty
 export const getAllFaculty = async (req, res) => {
   try {
@@ -178,32 +131,6 @@ export const getAllFaculty = async (req, res) => {
       ...f,
       department_name: f.department ? f.department.name : 'Unknown'
     })));
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
-// ── POST /api/tlfq/faculty  [super_admin only]
-export const createFaculty = async (req, res) => {
-  try {
-    const { name, department_id, teacher_type } = req.body;
-    if (!name || !department_id) return res.status(400).json({ message: 'name and department_id required' });
-    const result = await Faculty.create({ 
-      data: { name, department_id, teacher_type: teacher_type || 'college_faculty' } 
-    });
-    return res.status(201).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
-// ── DELETE /api/tlfq/faculty/:id  [super_admin only]
-export const deleteFaculty = async (req, res) => {
-  try {
-    await Faculty.delete({ where: { id: req.params.id } });
-    return res.status(200).json({ message: 'Faculty deleted successfully' });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -303,21 +230,45 @@ export const createTlfq = async (req, res) => {
 export const getStudents = async (req, res) => {
   try {
     const { role, department_id } = req.user;
+    const { page = 1, limit = 50 } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
+    const take = Math.min(Number(limit), 200); // Cap at 200 per page
+
     const where = { role: 'student' };
     if (role === 'hod' || role === 'admin') where.department_id = department_id;
 
-    const students = await User.findMany({ where });
+    const [students, total] = await Promise.all([
+      User.findMany({
+        where,
+        skip,
+        take,
+        orderBy: { name: 'asc' },
+        select: {
+          id: true, name: true, email: true, student_id: true,
+          unique_feedback_id: true, department_id: true, points: true, batch: true
+        }
+      }),
+      User.count({ where })
+    ]);
     
-    return res.status(200).json(students.map(s => ({
-      id: s.id,
-      name: (role === 'super_admin' || role === 'coordinator') ? s.name : '— Anonymous —',
-      email: (role === 'super_admin' || role === 'coordinator') ? s.email : '—',
-      student_id: s.student_id,
-      unique_feedback_id: s.unique_feedback_id,
-      department_id: s.department_id,
-      points: s.points,
-      batch: s.batch,
-    })));
+    return res.status(200).json({
+      students: students.map(s => ({
+        id: s.id,
+        name: (role === 'super_admin' || role === 'coordinator') ? s.name : '— Anonymous —',
+        email: (role === 'super_admin' || role === 'coordinator') ? s.email : '—',
+        student_id: s.student_id,
+        unique_feedback_id: s.unique_feedback_id,
+        department_id: s.department_id,
+        points: s.points,
+        batch: s.batch,
+      })),
+      pagination: {
+        total,
+        page: Number(page),
+        limit: take,
+        totalPages: Math.ceil(total / take)
+      }
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -351,26 +302,24 @@ export const getAdminStats = async (req, res) => {
     const { role, department_id } = req.user;
     const deptFilter = (role === 'hod') ? { department_id } : {};
 
-    const totalStudents    = await User.count({ where: { role: 'student', ...deptFilter } });
-    const totalFaculty     = await Faculty.count({ where: deptFilter });
-    const totalCourses     = await Course.count({ where: deptFilter });
-    const totalDepts       = await Department.count();
-    const totalTlfqs       = await Tlfq.count();
-    const totalResponses   = await Response.count();
-    const totalEnrollments = await Enrollment.count();
+    // Run all 7 count queries in parallel instead of sequentially
+    const [totalStudents, totalFaculty, totalCourses, totalDepts, totalTlfqs, totalResponses, totalEnrollments] = await Promise.all([
+      User.count({ where: { role: 'student', ...deptFilter } }),
+      Faculty.count({ where: deptFilter }),
+      Course.count({ where: deptFilter }),
+      Department.count(),
+      Tlfq.count(),
+      Response.count(),
+      Enrollment.count()
+    ]);
     
     const completionRate = totalEnrollments > 0
       ? Math.round((totalResponses / totalEnrollments) * 100)
       : 0;
 
     return res.status(200).json({
-      totalStudents,
-      totalFaculty,
-      totalCourses,
-      totalDepts,
-      totalTlfqs,
-      totalResponses,
-      completionRate
+      totalStudents, totalFaculty, totalCourses, totalDepts,
+      totalTlfqs, totalResponses, completionRate
     });
   } catch (err) {
     console.error(err);
@@ -382,6 +331,10 @@ export const getAdminStats = async (req, res) => {
 export const getLeaderboard = async (req, res) => {
   try {
     const { role, department_id } = req.user;
+    const cacheKey = `leaderboard:tlfq:${role}:${department_id || 'all'}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return res.status(200).json(cached);
+
     const where = { role: 'student', points: { gt: 0 } };
     if (role === 'hod') where.department_id = department_id;
 
@@ -391,7 +344,7 @@ export const getLeaderboard = async (req, res) => {
       take: 50
     });
 
-    return res.status(200).json(students.map((s, idx) => ({
+    const result = students.map((s, idx) => ({
       rank: idx + 1,
       unique_feedback_id: s.unique_feedback_id || 'ANO-?????',
       points: s.points,
@@ -399,7 +352,10 @@ export const getLeaderboard = async (req, res) => {
       department_id: s.department_id,
       name: (role === 'super_admin' || role === 'coordinator') ? s.name : null,
       student_id: (role === 'super_admin' || role === 'coordinator') ? s.student_id : null,
-    })));
+    }));
+
+    cache.set(cacheKey, result, 60);
+    return res.status(200).json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });

@@ -1,4 +1,5 @@
-import { Department, Section, Course, Faculty, Tlfq, Question, Response, Answer, User, Enrollment, REWARD_POINTS } from '../db.js';
+import { prisma, Department, Section, Course, Faculty, Tlfq, Question, Response, Answer, User, Enrollment, REWARD_POINTS } from '../db.js';
+import cache from '../cache.js';
 
 // ── Student: GET courses + TLFQs for their section ─────────────────────────
 export const getStudentCourses = async (req, res) => {
@@ -28,7 +29,8 @@ export const getStudentCourses = async (req, res) => {
         course: true,
         faculty: true,
         responses: {
-          where: { student_id: userId }
+          where: { student_id: userId },
+          select: { id: true } // Only need existence check, not full data
         }
       }
     });
@@ -96,11 +98,22 @@ export const getEvaluation = async (req, res) => {
   }
 };
 
-// ── POST /api/student/submit ────────────────────────────────────────────────
+// ── POST /api/student/submit — FIXED: uses transaction to prevent race condition ─
 export const submitResponse = async (req, res) => {
   try {
     const { id: student_id, department_id } = req.user;
     const { tlfq_id, answers, comment } = req.body;
+
+    if (!tlfq_id || !answers || !Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({ message: 'tlfq_id and answers array are required.' });
+    }
+
+    // Validate ratings are within bounds
+    for (const a of answers) {
+      if (!a.question_id || !a.rating || a.rating < 1 || a.rating > 7) {
+        return res.status(400).json({ message: 'Each answer must have question_id and rating (1-7).' });
+      }
+    }
 
     const student = await User.findUnique({ where: { id: student_id } });
     if (!student || student.status !== 'active') {
@@ -117,30 +130,52 @@ export const submitResponse = async (req, res) => {
       return res.status(403).json({ message: 'This evaluation form is closed or expired.' });
     }
 
-    const existing = await Response.findFirst({
-      where: { student_id, tlfq_id }
-    });
-    if (existing) return res.status(400).json({ message: 'Evaluation already submitted.' });
-
-    const resp = await Response.create({
-      data: {
-        student_id,
-        tlfq_id,
-        submitted_at: new Date().toISOString(),
-        comment: comment || '',
-        answers: {
-          create: answers.map(a => ({
-            question_id: a.question_id,
-            rating: Number(a.rating)
-          }))
+    // Use a transaction to atomically check + insert (prevents race condition)
+    try {
+      await prisma.$transaction(async (tx) => {
+        // Check for existing submission inside transaction
+        const existing = await tx.response.findUnique({
+          where: { student_id_tlfq_id: { student_id, tlfq_id } }
+        });
+        if (existing) {
+          throw new Error('ALREADY_SUBMITTED');
         }
-      }
-    });
 
-    await User.update({
-      where: { id: student_id },
-      data: { points: { increment: REWARD_POINTS } }
-    });
+        // Create response + answers atomically
+        await tx.response.create({
+          data: {
+            student_id,
+            tlfq_id,
+            submitted_at: new Date().toISOString(),
+            comment: comment || '',
+            answers: {
+              create: answers.map(a => ({
+                question_id: a.question_id,
+                rating: Number(a.rating)
+              }))
+            }
+          }
+        });
+
+        // Award points
+        await tx.user.update({
+          where: { id: student_id },
+          data: { points: { increment: REWARD_POINTS } }
+        });
+      });
+    } catch (txErr) {
+      if (txErr.message === 'ALREADY_SUBMITTED') {
+        return res.status(400).json({ message: 'Evaluation already submitted.' });
+      }
+      // P2002 = unique constraint violation (DB-level duplicate prevention)
+      if (txErr.code === 'P2002') {
+        return res.status(400).json({ message: 'Evaluation already submitted.' });
+      }
+      throw txErr;
+    }
+
+    // Invalidate leaderboard cache since points changed
+    cache.invalidatePrefix('leaderboard');
 
     return res.status(201).json({ message: `Feedback submitted successfully. +${REWARD_POINTS} points!` });
   } catch (err) {
@@ -149,112 +184,113 @@ export const submitResponse = async (req, res) => {
   }
 };
 
-// ── Analytics (super_admin) ─────────────────────────────────────────────────
+// ── Analytics — REWRITTEN for 20k student scale ─────────────────────────────
+// Uses targeted queries with filters instead of loading entire DB into memory
 export const getAnalytics = async (req, res) => {
   try {
     const { department_id } = req.query;
 
-    const allDepts = await Department.findMany({
-      include: {
-        courses: {
-          include: {
-            enrollments: true,
-            tlfqs: {
-              include: { responses: true }
-            }
-          }
-        }
-      }
-    });
-    
-    // 1. Submission Rates (Course-wise)
-    const submissionRates = [];
-    allDepts.forEach(dept => {
-      // If dept filter is active, we only calculate for that dept
-      if (department_id && dept.id !== department_id) return;
-      
-      dept.courses.forEach(course => {
-        const enrolled = course.enrollments.length;
-        // Count unique students who submitted feedback for any TLFQ of this course
-        const submittedSet = new Set();
-        course.tlfqs.forEach(tlfq => {
-          tlfq.responses.forEach(r => submittedSet.add(r.student_id));
-        });
-        const submitted = submittedSet.size;
-        const rate = enrolled > 0 ? Math.round((submitted / enrolled) * 100) : 0;
-        
-        submissionRates.push({
-          course_id: course.id,
-          course_name: course.name,
-          course_code: course.code,
-          department_id: dept.id,
-          enrolled,
-          submitted,
-          rate
-        });
-      });
+    // Check cache first (analytics is expensive)
+    const cacheKey = `analytics:${department_id || 'all'}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return res.json(cached);
+
+    // 1. Submission Rates — query only needed dept's courses
+    const courseFilter = department_id ? { department_id } : {};
+    const courses = await Course.findMany({
+      where: courseFilter,
+      include: { department: true }
     });
 
-    // 2. Faculty Rankings & Attribute Analysis
+    const submissionRates = await Promise.all(courses.map(async (course) => {
+      const [enrolled, submittedRows] = await Promise.all([
+        Enrollment.count({ where: { course_id: course.id } }),
+        Response.findMany({
+          where: { tlfq: { course_id: course.id } },
+          select: { student_id: true },
+          distinct: ['student_id']
+        })
+      ]);
+
+      const submitted = submittedRows.length;
+      return {
+        course_id: course.id,
+        course_name: course.name,
+        course_code: course.code,
+        department_id: course.department_id,
+        enrolled,
+        submitted,
+        rate: enrolled > 0 ? Math.round((submitted / enrolled) * 100) : 0
+      };
+    }));
+
+    // 2. Faculty Rankings — use aggregation instead of loading all responses
+    const facultyFilter = department_id ? { department_id } : {};
     const facultyList = await Faculty.findMany({
-      where: department_id ? { department_id } : {},
-      include: {
-        department: true,
-        tlfqs: {
-          include: {
-            responses: {
-              include: {
-                answers: { include: { question: true } }
-              }
-            }
-          }
-        }
-      }
+      where: facultyFilter,
+      include: { department: true }
     });
 
-    const attributeMap = {}; // To store ratings per question text
-
-    const avgRatingPerFaculty = facultyList.map(f => {
-      let totalRating = 0;
-      let totalResponses = 0;
-
-      f.tlfqs.forEach(tlfq => {
-        tlfq.responses.forEach(resp => {
-          if (resp.answers.length > 0) {
-            const avg = resp.answers.reduce((s, a) => s + a.rating, 0) / resp.answers.length;
-            totalRating += avg;
-            totalResponses++;
-
-            // Track question-wise scores for radar chart
-            resp.answers.forEach(ans => {
-              const qText = ans.question.question_text;
-              if (!attributeMap[qText]) attributeMap[qText] = { sum: 0, count: 0 };
-              attributeMap[qText].sum += ans.rating;
-              attributeMap[qText].count++;
-            });
-          }
-        });
+    const avgRatingPerFaculty = (await Promise.all(facultyList.map(async (f) => {
+      const agg = await Answer.aggregate({
+        where: { response: { tlfq: { faculty_id: f.id } } },
+        _avg: { rating: true },
+        _count: { rating: true }
       });
+      
+      const count = agg._count.rating || 0;
+      if (count === 0) return null;
+      
+      const responseCount = await Response.count({ where: { tlfq: { faculty_id: f.id } } });
 
       return {
         id: f.id,
         name: f.name,
         department_id: f.department_id,
         teacher_type: f.teacher_type,
-        total_responses: totalResponses,
-        avg_rating: totalResponses > 0 ? parseFloat((totalRating / totalResponses).toFixed(2)) : 0
+        total_responses: responseCount,
+        avg_rating: agg._avg.rating ? parseFloat(agg._avg.rating.toFixed(2)) : 0
       };
-    }).filter(f => f.total_responses > 0)
+    }))).filter(Boolean).filter(f => f.total_responses > 0)
       .sort((a, b) => b.avg_rating - a.avg_rating);
 
-    // Format attributes for Radar Chart
-    const attributeAnalytics = Object.keys(attributeMap).map(key => ({
+    // 3. Attribute Analysis — only for filtered faculty
+    const facultyIds = avgRatingPerFaculty.map(f => f.id);
+    const questionAgg = facultyIds.length > 0 ? await Answer.groupBy({
+      by: ['question_id'],
+      where: { response: { tlfq: { faculty_id: { in: facultyIds } } } },
+      _avg: { rating: true },
+      _count: { rating: true }
+    }) : [];
+
+    const qIds = questionAgg.map(q => q.question_id);
+    const questions = qIds.length > 0 ? await Question.findMany({
+      where: { id: { in: qIds } },
+      select: { id: true, question_text: true }
+    }) : [];
+    const qMap = {};
+    for (const q of questions) { qMap[q.id] = q.question_text; }
+
+    const attrMap = {};
+    for (const agg of questionAgg) {
+      const qText = qMap[agg.question_id];
+      const avg = agg._avg.rating;
+      const cnt = agg._count.rating || 0;
+      if (qText && avg && cnt > 0) {
+        if (!attrMap[qText]) attrMap[qText] = { total: 0, weight: 0 };
+        attrMap[qText].total += avg * cnt;
+        attrMap[qText].weight += cnt;
+      }
+    }
+
+    const attributeAnalytics = Object.keys(attrMap).map(key => ({
       attribute: key.length > 20 ? key.substring(0, 17) + '...' : key,
-      score: parseFloat((attributeMap[key].sum / attributeMap[key].count).toFixed(2)),
+      score: parseFloat((attrMap[key].total / attrMap[key].weight).toFixed(2)),
       full_text: key
     }));
 
-    // 3. Department Overview & Performance
+    // 4. Department Overview — lightweight
+    const allDepts = await Department.findMany();
     const deptOverview = allDepts.map(d => {
       const deptFaculty = avgRatingPerFaculty.filter(f => f.department_id === d.id);
       const avgDeptRating = deptFaculty.length > 0 
@@ -262,50 +298,45 @@ export const getAnalytics = async (req, res) => {
         : 0;
 
       return {
-        id: d.id, 
-        name: d.name, 
-        code: d.code, 
-        portal_open: d.portal_open,
-        avg_rating: avgDeptRating,
-        faculty_count: deptFaculty.length
+        id: d.id, name: d.name, code: d.code, portal_open: d.portal_open,
+        avg_rating: avgDeptRating, faculty_count: deptFaculty.length
       };
     });
 
-    // 4. Timeline Trends (Responses per day)
-    const allResponses = await Response.findMany({
-      where: department_id ? { tlfq: { faculty: { department_id } } } : {},
+    // 5. Timeline — only recent 90 days, limited query
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+    const timelineResponses = await Response.findMany({
+      where: {
+        submitted_at: { gte: ninetyDaysAgo },
+        ...(department_id ? { tlfq: { faculty: { department_id } } } : {})
+      },
       select: { submitted_at: true }
     });
 
     const trendMap = {};
-    allResponses.forEach(r => {
+    for (const r of timelineResponses) {
       try {
         const date = new Date(r.submitted_at).toISOString().split('T')[0];
         trendMap[date] = (trendMap[date] || 0) + 1;
-      } catch (e) {
-        // Skip malformed dates if any
-      }
-    });
+      } catch (_) { /* skip malformed */ }
+    }
 
-    const timelineData = Object.keys(trendMap).map(date => ({
-      date,
-      count: trendMap[date]
-    })).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const timelineData = Object.keys(trendMap)
+      .map(date => ({ date, count: trendMap[date] }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 5. Recent comments
+    // 6. Recent comments — limited to 20
     const recentResponses = await Response.findMany({
       where: {
         comment: { not: "" },
-        tlfq: {
-          faculty: department_id ? { department_id } : {}
-        }
+        tlfq: { faculty: department_id ? { department_id } : {} }
       },
       include: {
         tlfq: {
           include: {
-            faculty: { include: { department: true } },
-            course: true,
-            section: true
+            faculty: { select: { name: true, department_id: true } },
+            course: { select: { name: true } },
+            section: { select: { name: true } }
           }
         }
       },
@@ -322,39 +353,52 @@ export const getAnalytics = async (req, res) => {
       department_id: r.tlfq.faculty?.department_id
     }));
 
-    return res.json({ 
-      avgRatingPerFaculty, 
-      submissionRates, 
-      recentComments, 
-      deptOverview,
-      attributeAnalytics,
-      timelineData
-    });
+    const result = { 
+      avgRatingPerFaculty, submissionRates, recentComments, 
+      deptOverview, attributeAnalytics, timelineData
+    };
+
+    // Cache for 30 seconds — prevents hammering on dashboard refresh
+    cache.set(cacheKey, result, 30);
+
+    return res.json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-// ── Leaderboard ─────────────────────────────────────────────────────────────
+// ── Leaderboard — with caching ──────────────────────────────────────────────
 export const getLeaderboard = async (req, res) => {
   try {
     const { role, department_id } = req.user;
+    const cacheKey = `leaderboard:${role}:${department_id || 'all'}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return res.json(cached);
+
     const where = { role: 'student', points: { gt: 0 } };
     if (role === 'hod') where.department_id = department_id;
 
     const students = await User.findMany({
       where,
       orderBy: { points: 'desc' },
-      take: 50
+      take: 50,
+      select: {
+        unique_feedback_id: true,
+        points: true,
+        batch: true
+      }
     });
 
-    return res.json(students.map((s, i) => ({
+    const result = students.map((s, i) => ({
       rank: i + 1,
       unique_feedback_id: s.unique_feedback_id || 'ANO-?????',
       points: s.points,
       batch: s.batch,
-    })));
+    }));
+
+    cache.set(cacheKey, result, 60); // 1 min cache
+    return res.json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });

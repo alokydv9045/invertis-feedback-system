@@ -65,18 +65,35 @@ export const getAllUsers = async (req, res) => {
       return res.status(403).json({ message: 'Unauthorized' });
     }
 
-    const users = await User.findMany({
-      include: {
-        department: true
-      }
-    });
+    const { page = 1, limit = 50 } = req.query;
+    const skip = (Number(page) - 1) * Number(limit);
+    const take = Math.min(Number(limit), 200); // Cap at 200
+
+    const [users, total] = await Promise.all([
+      User.findMany({
+        include: { department: true },
+        skip,
+        take,
+        orderBy: { name: 'asc' }
+      }),
+      User.count()
+    ]);
 
     const result = users.map(u => ({
       ...u,
+      password: undefined, // Never expose password hashes
       department_name: u.department ? u.department.name : 'N/A'
     }));
 
-    return res.status(200).json(result);
+    return res.status(200).json({
+      users: result,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: take,
+        totalPages: Math.ceil(total / take)
+      }
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -181,7 +198,10 @@ export const createUser = async (req, res) => {
       }
     });
 
-    return res.status(201).json(newUser);
+    const result = { ...newUser };
+    delete result.password;
+
+    return res.status(201).json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });

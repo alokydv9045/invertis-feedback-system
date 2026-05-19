@@ -104,27 +104,27 @@ export default function HODPanel() {
   const statusColor = s => s === 'open' ? 'text-emerald-400 bg-emerald-900/30 border-emerald-800/40' : s === 'expired' ? 'text-slate-500 dark:text-slate-400 bg-slate-800/40 border-slate-700/40' : 'text-amber-400 bg-amber-900/30 border-amber-800/40';
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] text-[var(--text-main)] flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
-        <main className="flex-1 p-6 md:p-8 max-w-5xl">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-5xl overflow-auto">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+            <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
               <LayoutDashboard size={20} className="text-white" />
             </div>
             <div>
               <h1 className="text-2xl font-black text-[#1D3557]">HOD Panel</h1>
-              <p className="text-sm text-slate-600">Manage evaluation forms and departmental portal</p>
+              <p className="text-xs sm:text-sm text-slate-600">Manage evaluation forms and departmental portal</p>
             </div>
           </div>
 
 
           {/* Tabs */}
-          <div className="flex gap-1.5 p-1.5 card-main rounded-2xl mb-6 w-fit">
+          <div className="flex gap-1.5 p-1.5 card-main rounded-2xl mb-6 w-full sm:w-fit overflow-x-auto no-scrollbar flex-nowrap">
             {TABS.map(({ id, label, icon: Icon }) => (
               <button key={id} onClick={() => setTab(id)}
-                className={`flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${tab === id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-500 dark:text-slate-400 hover:text-[var(--text-main)] hover:hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-2 text-xs font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${tab === id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-500 dark:text-slate-400 hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/5'}`}>
                 <Icon size={14} /> {label}
               </button>
             ))}
@@ -137,7 +137,7 @@ export default function HODPanel() {
               {tab === 'dashboard' && (
                 <div className="flex flex-col gap-6">
                   {stats && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                       {[
                         { label: 'Sections', val: stats.sections, color: 'from-blue-500 to-cyan-600' },
                         { label: 'Faculty', val: stats.faculty, color: 'from-violet-500 to-primary-600' },
@@ -146,9 +146,12 @@ export default function HODPanel() {
                         { label: 'My Forms', val: stats.myForms, color: 'from-amber-500 to-orange-600' },
                         { label: 'Open Forms', val: stats.openForms, color: 'from-accent-500 to-pink-600' },
                       ].map(({ label, val, color }) => (
-                        <div key={label} className="card-main rounded-2xl p-5">
-                          <div className="text-2xl font-black text-[#1D3557]">{val ?? '—'}</div>
-                          <div className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">{label}</div>
+                        <div key={label} className="card-main rounded-2xl p-5 flex items-center justify-between sm:block">
+                          <div className="text-sm font-bold text-slate-600 dark:text-slate-400 sm:hidden">{label}</div>
+                          <div className="text-right sm:text-left">
+                            <div className="text-2xl font-black text-[#1D3557]">{val ?? '—'}</div>
+                            <div className="hidden sm:block text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">{label}</div>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -156,15 +159,15 @@ export default function HODPanel() {
 
                   {/* Portal control */}
                   {portal && (
-                    <div className="card-main rounded-2xl p-6 flex items-center justify-between">
+                    <div className="card-main rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div>
                         <h3 className="text-base font-bold text-[#1D3557]">Department Portal</h3>
-                        <p className="text-sm text-slate-600 mt-1">
+                        <p className="text-xs sm:text-sm text-slate-600 mt-1">
                           When closed, students cannot see or submit any feedback forms.
                         </p>
                       </div>
                       <button onClick={togglePortal}
-                        className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer ${portal.portal_open ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-slate-700 hover:bg-slate-600 text-[var(--text-main)]'}`}>
+                        className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer w-full sm:w-auto flex-shrink-0 ${portal.portal_open ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-700 hover:bg-slate-600 text-[var(--text-main)] shadow-lg shadow-slate-700/20'}`}>
                         {portal.portal_open ? <><ToggleRight size={20} /> Portal Open</> : <><ToggleLeft size={20} /> Portal Closed</>}
                       </button>
                     </div>
