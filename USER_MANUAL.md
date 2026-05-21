@@ -234,9 +234,14 @@ BTME2026_03   →  BTME dept, batch 2026, student #03
 | Role | Email | Password |
 |------|-------|----------|
 | **Super Admin** | `admin@invertis.edu.in` | `Admin@2025` |
-| **Coordinator** | `coordinator@invertis.edu.in` | `Coord@2025` |
-| **HOD — B.Tech AI** | `hod.btai@invertis.edu.in` | `Hod@2025` |
+| **Supreme Authority 1** | `supauth1@invertis.edu.in` | `Super@123` |
+| **Supreme Authority 2** | `supauth2@invertis.edu.in` | `Super@123` |
+| **Supreme Authority 3** | `supauth3@invertis.edu.in` | `Super@123` |
+| **Coordinator 1** | `coordinator@invertis.edu.in` | `Coord@2025` |
+| **Coordinator 2** | `coordinator2@invertis.edu.in` | `Coord@2025` |
+| **Coordinator 3** | `coordinator3@invertis.edu.in` | `Coord@2025` |
 | **HOD — B.Tech CS** | `hod.bcs@invertis.edu.in` | `Hod@2025` |
+| **HOD — B.Tech AI** | `hod.btai@invertis.edu.in` | `Hod@2025` |
 | **HOD — Electronics** | `hod.btec@invertis.edu.in` | `Hod@2025` |
 | **HOD — Mechanical** | `hod.btme@invertis.edu.in` | `Hod@2025` |
 | **HOD — Civil** | `hod.btce@invertis.edu.in` | `Hod@2025` |
@@ -245,14 +250,18 @@ BTME2026_03   →  BTME dept, batch 2026, student #03
 
 | Student ID | Email | Password | Department | Section | Status |
 |-----------|-------|----------|-----------|---------|--------|
-| `BTAI2025_01` | `btai2025.01@iu.edu.in` | `Student@2025` | B.Tech AI | BTAI-3A, Sem 3 | ✅ Active |
 | `BCS2025_01` | `bcs2025.01@iu.edu.in` | `Student@2025` | B.Tech CS | BCS-3A, Sem 3 | ✅ Active |
+| `BCS2025_23` | _(not set)_ | — | B.Tech CS | BCS-3A, Sem 3 | ⏳ Pending |
+| `BTAI2025_01` | `btai2025.01@iu.edu.in` | `Student@2025` | B.Tech AI | BTAI-3A, Sem 3 | ✅ Active |
+| `BTAI2025_23` | _(not set)_ | — | B.Tech AI | BTAI-3A, Sem 3 | ⏳ Pending |
 | `BTEC2025_01` | `btec2025.01@iu.edu.in` | `Student@2025` | Electronics | BTEC-3A, Sem 3 | ✅ Active |
-| `BTAI2025_02` | _(not set)_ | — | B.Tech AI | BTAI-3A, Sem 3 | ⏳ Pending |
-| `BCS2025_02` | _(not set)_ | — | B.Tech CS | BCS-3A, Sem 3 | ⏳ Pending |
+| `BTEC2025_23` | _(not set)_ | — | Electronics | BTEC-3A, Sem 3 | ⏳ Pending |
 | `BTME2025_01` | `btme2025.01@iu.edu.in` | `Student@2025` | Mechanical | BTME-3A, Sem 3 | ✅ Active |
+| `BTME2025_23` | _(not set)_ | — | Mechanical | BTME-3A, Sem 3 | ⏳ Pending |
+| `BTCE2025_01` | `btce2025.01@iu.edu.in` | `Student@2025` | Civil | BTCE-3A, Sem 3 | ✅ Active |
+| `BTCE2025_23` | _(not set)_ | — | Civil | BTCE-3A, Sem 3 | ⏳ Pending |
 
-> **To test Student Registration:** Enter `BTAI2025_02` on the login page → you'll be prompted to set email + password.
+> **To test Student Registration:** Enter any pending student ID (e.g., `BCS2025_23` or `BTAI2025_23`) on the login page → you'll be prompted to set email + password.
 
 ---
 

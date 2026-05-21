@@ -205,267 +205,397 @@ export const initDb = async () => {
     console.log('Synchronizing system data (Supreme Auths & Demo Records)...');
     
     const supremeHashedPw = await bcrypt.hash('Super@123', 10);
-      const adminHashedPw = await bcrypt.hash(adminPass, 10);
-      const coordHashedPw = await bcrypt.hash('Coord@2025', 10);
-      const hodHashedPw = await bcrypt.hash('Hod@2025', 10);
-      const studentHashedPw = await bcrypt.hash('Student@2025', 10);
+    const adminHashedPw = await bcrypt.hash(adminPass, 10);
+    const coordHashedPw = await bcrypt.hash('Coord@2025', 10);
+    const hodHashedPw = await bcrypt.hash('Hod@2025', 10);
+    const studentHashedPw = await bcrypt.hash('Student@2025', 10);
 
-      // 1. Create Supreme Authority
-      console.log('Creating Supreme Authority accounts...');
-      const supremeUsers = [
-        { name: 'SUPAdmin1', email: 'supauth1@invertis.edu.in', password: supremeHashedPw, role: 'supreme', status: 'active' },
-        { name: 'SUPAdmin2', email: 'supauth2@invertis.edu.in', password: supremeHashedPw, role: 'supreme', status: 'active' },
-        { name: 'SUPAdmin3', email: 'supauth3@invertis.edu.in', password: supremeHashedPw, role: 'supreme', status: 'active' },
-      ];
+    // 1. Create Supreme Authority (Exactly 3)
+    console.log('Creating Supreme Authority accounts...');
+    const supremeUsers = [
+      { name: 'SUPAdmin1', email: 'supauth1@invertis.edu.in', password: supremeHashedPw, role: 'supreme', status: 'active' },
+      { name: 'SUPAdmin2', email: 'supauth2@invertis.edu.in', password: supremeHashedPw, role: 'supreme', status: 'active' },
+      { name: 'SUPAdmin3', email: 'supauth3@invertis.edu.in', password: supremeHashedPw, role: 'supreme', status: 'active' },
+    ];
 
-      for (const s of supremeUsers) {
-        await User.upsert({
-          where: { email: s.email },
-          update: { password: s.password },
-          create: s
-        });
-      }
-      
-      // 2. Create Departments
-      const deptsData = [
-        { name: 'B.Tech AI', code: 'BTAI' },
-        { name: 'B.Tech CS', code: 'BCS' },
-        { name: 'Electronics', code: 'BTEC' },
-        { name: 'Mechanical', code: 'BTME' },
-        { name: 'Civil', code: 'BTCE' },
-      ];
-
-      const depts = {};
-      for (const d of deptsData) {
-        depts[d.code] = await Department.upsert({
-          where: { code: d.code },
-          update: {},
-          create: { ...d, portal_open: true }
-        });
-      }
-
-      // 3. Create Super Admin
+    for (const s of supremeUsers) {
       await User.upsert({
-        where: { email: adminEmail },
-        update: { password: adminHashedPw },
+        where: { email: s.email },
+        update: { password: s.password },
+        create: s
+      });
+    }
+    
+    // 2. Create Departments (Exactly 5 to match HODs)
+    const deptsData = [
+      { name: 'B.Tech CS', code: 'BCS' },
+      { name: 'B.Tech AI', code: 'BTAI' },
+      { name: 'Electronics', code: 'BTEC' },
+      { name: 'Mechanical', code: 'BTME' },
+      { name: 'Civil', code: 'BTCE' },
+    ];
+
+    const depts = {};
+    for (const d of deptsData) {
+      depts[d.code] = await Department.upsert({
+        where: { code: d.code },
+        update: {},
+        create: { ...d, portal_open: true }
+      });
+    }
+
+    // 3. Create Super Admin (Exactly 1)
+    await User.upsert({
+      where: { email: adminEmail },
+      update: { password: adminHashedPw },
+      create: {
+        name: 'System Admin',
+        email: adminEmail,
+        password: adminHashedPw,
+        role: 'super_admin',
+        status: 'active'
+      }
+    });
+
+    // 4. Create Coordinators (Exactly 3)
+    console.log('Creating Coordinator accounts...');
+    const coordUsers = [
+      { name: 'Coordinator 1', email: 'coordinator@invertis.edu.in', password: coordHashedPw, role: 'coordinator', status: 'active' },
+      { name: 'Coordinator 2', email: 'coordinator2@invertis.edu.in', password: coordHashedPw, role: 'coordinator', status: 'active' },
+      { name: 'Coordinator 3', email: 'coordinator3@invertis.edu.in', password: coordHashedPw, role: 'coordinator', status: 'active' },
+    ];
+
+    for (const c of coordUsers) {
+      await User.upsert({
+        where: { email: c.email },
+        update: { password: c.password },
+        create: c
+      });
+    }
+
+    // 5. Create HODs (Exactly 5)
+    console.log('Creating HOD accounts...');
+    for (const code of Object.keys(depts)) {
+      await User.upsert({
+        where: { email: `hod.${code.toLowerCase()}@invertis.edu.in` },
+        update: {},
         create: {
-          name: 'System Admin',
-          email: adminEmail,
-          password: adminHashedPw,
-          role: 'super_admin',
+          name: `HOD ${code}`,
+          email: `hod.${code.toLowerCase()}@invertis.edu.in`,
+          password: hodHashedPw,
+          role: 'hod',
+          department_id: depts[code].id,
           status: 'active'
         }
       });
+    }
 
-      // 4. Create Coordinator
-      const coord = await User.upsert({
-        where: { email: 'coordinator@invertis.edu.in' },
-        update: {},
-        create: {
-          name: 'University Coordinator',
-          email: 'coordinator@invertis.edu.in',
-          password: coordHashedPw,
-          role: 'coordinator',
-          status: 'active'
-        }
-      });
-
-      // 5. Create HODs
-      for (const code of Object.keys(depts)) {
-        await User.upsert({
-          where: { email: `hod.${code.toLowerCase()}@invertis.edu.in` },
-          update: {},
-          create: {
-            name: `HOD ${code}`,
-            email: `hod.${code.toLowerCase()}@invertis.edu.in`,
-            password: hodHashedPw,
-            role: 'hod',
-            department_id: depts[code].id,
-            status: 'active'
-          }
-        });
+    // 6. Create Sample Sections
+    const bcs3a = await Section.upsert({
+      where: { code: 'BCS3A' },
+      update: {},
+      create: {
+        name: 'BCS-3A',
+        code: 'BCS3A',
+        semester: 3,
+        label: 'A',
+        department_id: depts['BCS'].id
       }
+    });
 
-      // 6. Create Sample Sections
-      const bcs3a = await Section.upsert({
-        where: { code: 'BCS3A' },
-        update: {},
-        create: {
-          name: 'BCS-3A',
-          code: 'BCS3A',
-          semester: 3,
-          label: 'A',
-          department_id: depts['BCS'].id
-        }
-      });
-
-      const btai3a = await Section.upsert({
-        where: { code: 'BTAI3A' },
-        update: {},
-        create: {
-          name: 'BTAI-3A',
-          code: 'BTAI3A',
-          semester: 3,
-          label: 'A',
-          department_id: depts['BTAI'].id
-        }
-      });
-
-      // 7. Create Courses
-      const c1 = await Course.upsert({
-        where: { code: 'CS201' },
-        update: {},
-        create: { name: 'Data Structures', code: 'CS201', department_id: depts['BCS'].id }
-      });
-      const c2 = await Course.upsert({
-        where: { code: 'AI301' },
-        update: {},
-        create: { name: 'Artificial Intelligence', code: 'AI301', department_id: depts['BTAI'].id }
-      });
-      const c3 = await Course.upsert({
-        where: { code: 'CS202' },
-        update: {},
-        create: { name: 'Database Management', code: 'CS202', department_id: depts['BCS'].id }
-      });
-
-      // 8. Create Faculty
-      // Faculty doesn't have a unique constraint besides ID, so we find or create
-      let f1 = await Faculty.findFirst({ where: { name: 'Dr. R.K. Singh' } });
-      if (!f1) f1 = await Faculty.create({ data: { name: 'Dr. R.K. Singh', department_id: depts['BCS'].id, teacher_type: 'college_faculty' } });
-      
-      let f2 = await Faculty.findFirst({ where: { name: 'Dr. Vikram Chandra' } });
-      if (!f2) f2 = await Faculty.create({ data: { name: 'Dr. Vikram Chandra', department_id: depts['BTAI'].id, teacher_type: 'college_faculty' } });
-      
-      let f3 = await Faculty.findFirst({ where: { name: 'Prof. Manish Gupta' } });
-      if (!f3) f3 = await Faculty.create({ data: { name: 'Prof. Manish Gupta', department_id: depts['BCS'].id, teacher_type: 'trainer' } });
-
-      // 9. Assign Faculty to Sections
-      const assignments = [
-        { section_id: bcs3a.id, faculty_id: f1.id, course_id: c1.id },
-        { section_id: btai3a.id, faculty_id: f2.id, course_id: c2.id },
-        { section_id: bcs3a.id, faculty_id: f3.id, course_id: c3.id },
-      ];
-
-      for (const a of assignments) {
-        const exists = await SectionFaculty.findFirst({ where: a });
-        if (!exists) await SectionFaculty.create({ data: a });
+    const btai3a = await Section.upsert({
+      where: { code: 'BTAI3A' },
+      update: {},
+      create: {
+        name: 'BTAI-3A',
+        code: 'BTAI3A',
+        semester: 3,
+        label: 'A',
+        department_id: depts['BTAI'].id
       }
+    });
 
-      // 10. Create Sample Students
-      const studentsData = [
-        { name: 'Rahul Kumar', student_id: 'BCS2025_01', email: 'bcs2025.01@iu.edu.in', dept: 'BCS', section: bcs3a },
-        { name: 'Anjali Gupta', student_id: 'BTAI2025_01', email: 'btai2025.01@iu.edu.in', dept: 'BTAI', section: btai3a },
-        { name: 'Amit Singh', student_id: 'BTAI2025_02', email: null, dept: 'BTAI', section: btai3a, status: 'pending' },
-        { name: 'Priya Sharma', student_id: 'BCS2025_02', email: 'bcs2025.02@iu.edu.in', dept: 'BCS', section: bcs3a },
-      ];
+    const btec3a = await Section.upsert({
+      where: { code: 'BTEC3A' },
+      update: {},
+      create: {
+        name: 'BTEC-3A',
+        code: 'BTEC3A',
+        semester: 3,
+        label: 'A',
+        department_id: depts['BTEC'].id
+      }
+    });
 
-      const students = [];
-      for (const s of studentsData) {
+    const btme3a = await Section.upsert({
+      where: { code: 'BTME3A' },
+      update: {},
+      create: {
+        name: 'BTME-3A',
+        code: 'BTME3A',
+        semester: 3,
+        label: 'A',
+        department_id: depts['BTME'].id
+      }
+    });
+
+    const btce3a = await Section.upsert({
+      where: { code: 'BTCE3A' },
+      update: {},
+      create: {
+        name: 'BTCE-3A',
+        code: 'BTCE3A',
+        semester: 3,
+        label: 'A',
+        department_id: depts['BTCE'].id
+      }
+    });
+
+    // 7. Create Courses
+    const c1 = await Course.upsert({
+      where: { code: 'CS201' },
+      update: {},
+      create: { name: 'Data Structures', code: 'CS201', department_id: depts['BCS'].id }
+    });
+    const c2 = await Course.upsert({
+      where: { code: 'AI301' },
+      update: {},
+      create: { name: 'Artificial Intelligence', code: 'AI301', department_id: depts['BTAI'].id }
+    });
+    const c3 = await Course.upsert({
+      where: { code: 'EC101' },
+      update: {},
+      create: { name: 'Basic Electronics', code: 'EC101', department_id: depts['BTEC'].id }
+    });
+    const c4 = await Course.upsert({
+      where: { code: 'ME101' },
+      update: {},
+      create: { name: 'Thermodynamics', code: 'ME101', department_id: depts['BTME'].id }
+    });
+    const c5 = await Course.upsert({
+      where: { code: 'CE101' },
+      update: {},
+      create: { name: 'Structural Analysis', code: 'CE101', department_id: depts['BTCE'].id }
+    });
+
+    // 8. Create Faculty
+    let f1 = await Faculty.findFirst({ where: { name: 'Dr. R.K. Singh' } });
+    if (!f1) f1 = await Faculty.create({ data: { name: 'Dr. R.K. Singh', department_id: depts['BCS'].id, teacher_type: 'college_faculty' } });
+    
+    let f2 = await Faculty.findFirst({ where: { name: 'Dr. Vikram Chandra' } });
+    if (!f2) f2 = await Faculty.create({ data: { name: 'Dr. Vikram Chandra', department_id: depts['BTAI'].id, teacher_type: 'college_faculty' } });
+    
+    let f3 = await Faculty.findFirst({ where: { name: 'Dr. Amit Dixit' } });
+    if (!f3) f3 = await Faculty.create({ data: { name: 'Dr. Amit Dixit', department_id: depts['BTEC'].id, teacher_type: 'college_faculty' } });
+
+    let f4 = await Faculty.findFirst({ where: { name: 'Prof. Manish Gupta' } });
+    if (!f4) f4 = await Faculty.create({ data: { name: 'Prof. Manish Gupta', department_id: depts['BTME'].id, teacher_type: 'college_faculty' } });
+
+    let f5 = await Faculty.findFirst({ where: { name: 'Er. Sandeep Kumar' } });
+    if (!f5) f5 = await Faculty.create({ data: { name: 'Er. Sandeep Kumar', department_id: depts['BTCE'].id, teacher_type: 'college_faculty' } });
+
+    // 9. Assign Faculty to Sections
+    const assignments = [
+      { section_id: bcs3a.id, faculty_id: f1.id, course_id: c1.id },
+      { section_id: btai3a.id, faculty_id: f2.id, course_id: c2.id },
+      { section_id: btec3a.id, faculty_id: f3.id, course_id: c3.id },
+      { section_id: btme3a.id, faculty_id: f4.id, course_id: c4.id },
+      { section_id: btce3a.id, faculty_id: f5.id, course_id: c5.id },
+    ];
+
+    for (const a of assignments) {
+      const exists = await SectionFaculty.findFirst({ where: a });
+      if (!exists) await SectionFaculty.create({ data: a });
+    }
+
+    // 10. Create 25 Students per Section (22 Active, 3 Pending)
+    console.log('Generating 25 students per field (total 125)...');
+    const deptsMapping = [
+      { deptCode: 'BCS', section: bcs3a, prefix: 'BCS2025_', courseId: c1.id },
+      { deptCode: 'BTAI', section: btai3a, prefix: 'BTAI2025_', courseId: c2.id },
+      { deptCode: 'BTEC', section: btec3a, prefix: 'BTEC2025_', courseId: c3.id },
+      { deptCode: 'BTME', section: btme3a, prefix: 'BTME2025_', courseId: c4.id },
+      { deptCode: 'BTCE', section: btce3a, prefix: 'BTCE2025_', courseId: c5.id },
+    ];
+
+    const students = [];
+    for (const dm of deptsMapping) {
+      for (let i = 1; i <= 25; i++) {
+        const suffix = String(i).padStart(2, '0');
+        const studentId = `${dm.prefix}${suffix}`;
+        const isPending = i > 22;
+        const status = isPending ? 'pending' : 'active';
+        const email = isPending ? null : `${dm.deptCode.toLowerCase()}2025.${suffix}@iu.edu.in`;
+        const name = `${dm.deptCode} Student ${suffix}`;
+
         const student = await User.upsert({
-          where: { student_id: s.student_id },
-          update: {},
+          where: { student_id: studentId },
+          update: { password: studentHashedPw },
           create: {
-            name: s.name,
-            student_id: s.student_id,
-            email: s.email,
+            name,
+            student_id: studentId,
+            email,
             password: studentHashedPw,
             role: 'student',
-            status: s.status || 'active',
-            department_id: depts[s.dept].id,
-            section_id: s.section.id,
+            status,
+            department_id: depts[dm.deptCode].id,
+            section_id: dm.section.id,
             semester: 3,
             academic_session_id: currentSession.id,
             batch: '2022-26',
             unique_feedback_id: generateFeedbackId(),
-            points: s.status === 'pending' ? 0 : 50
+            points: isPending ? 0 : 50
           }
         });
         students.push(student);
 
         // Enrollments
-        const courseId = s.dept === 'BCS' ? c1.id : c2.id;
-        const e1 = await Enrollment.findFirst({ where: { student_id: student.id, course_id: courseId } });
-        if (!e1) await Enrollment.create({ data: { student_id: student.id, course_id: courseId, section_id: s.section.id } });
-        
-        if (s.dept === 'BCS') {
-          const e2 = await Enrollment.findFirst({ where: { student_id: student.id, course_id: c3.id } });
-          if (!e2) await Enrollment.create({ data: { student_id: student.id, course_id: c3.id, section_id: s.section.id } });
-        }
-      }
-
-      // 11. Create TLFQ Forms
-      console.log('Creating sample TLFQ forms...');
-      const t1 = await Tlfq.upsert({
-        where: { id: 'sample-tlfq-1' }, // Dummy ID for upsert or find by title
-        update: {},
-        create: {
-          id: 'sample-tlfq-1',
-          title: 'Data Structures Mid-Term Feedback',
-          section_id: bcs3a.id,
-          course_id: c1.id,
-          faculty_id: f1.id,
-          is_active: true,
-          closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          created_by: coord.id
-        }
-      });
-
-      const t2 = await Tlfq.upsert({
-        where: { id: 'sample-tlfq-2' },
-        update: {},
-        create: {
-          id: 'sample-tlfq-2',
-          title: 'AI Concept Evaluation',
-          section_id: btai3a.id,
-          course_id: c2.id,
-          faculty_id: f2.id,
-          is_active: true,
-          closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          created_by: coord.id
-        }
-      });
-
-      // 12. Add Questions
-      const questionsText = [
-        'How well does the teacher explain concepts?',
-        'Is the teacher punctual and regular?',
-        'Does the teacher encourage student participation?',
-        'Is the study material provided helpful?',
-        'Overall satisfaction with the teaching method?'
-      ];
-
-      for (const tlfqId of [t1.id, t2.id]) {
-        for (const qText of questionsText) {
-          const exists = await Question.findFirst({ where: { tlfq_id: tlfqId, question_text: qText } });
-          if (!exists) await Question.create({ data: { tlfq_id: tlfqId, question_text: qText } });
-        }
-      }
-
-      // 13. Responses
-      console.log('Generating sample responses...');
-      for (const student of students) {
-        if (student.status !== 'active') continue;
-        const tlfqId = student.section_id === bcs3a.id ? t1.id : t2.id;
-        
-        const hasResponded = await Response.findFirst({ where: { student_id: student.id, tlfq_id: tlfqId } });
-        if (!hasResponded) {
-          const resp = await Response.create({
+        const enrollExists = await Enrollment.findFirst({ where: { student_id: student.id, course_id: dm.courseId } });
+        if (!enrollExists) {
+          await Enrollment.create({
             data: {
               student_id: student.id,
-              tlfq_id: tlfqId,
-              submitted_at: new Date().toISOString(),
-              comment: 'Great teaching!'
+              course_id: dm.courseId,
+              section_id: dm.section.id
             }
           });
-          const qs = await Question.findMany({ where: { tlfq_id: tlfqId } });
-          for (const q of qs) {
-            await Answer.create({ data: { response_id: resp.id, question_id: q.id, rating: Math.floor(Math.random() * 3) + 5 } });
-          }
-          await User.update({ where: { id: student.id }, data: { points: { increment: REWARD_POINTS } } });
         }
       }
+    }
 
-      console.log('System data seeded successfully with Supreme Authority and demo feedback.');
+    // 11. Create TLFQ Forms
+    console.log('Creating sample TLFQ forms...');
+    const coord1 = await User.findFirst({ where: { email: 'coordinator@invertis.edu.in' } });
+    const t1 = await Tlfq.upsert({
+      where: { id: 'sample-tlfq-1' },
+      update: {},
+      create: {
+        id: 'sample-tlfq-1',
+        title: 'Data Structures Mid-Term Feedback',
+        section_id: bcs3a.id,
+        course_id: c1.id,
+        faculty_id: f1.id,
+        is_active: true,
+        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        created_by: coord1.id
+      }
+    });
+
+    const t2 = await Tlfq.upsert({
+      where: { id: 'sample-tlfq-2' },
+      update: {},
+      create: {
+        id: 'sample-tlfq-2',
+        title: 'AI Concept Evaluation',
+        section_id: btai3a.id,
+        course_id: c2.id,
+        faculty_id: f2.id,
+        is_active: true,
+        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        created_by: coord1.id
+      }
+    });
+
+    const t3 = await Tlfq.upsert({
+      where: { id: 'sample-tlfq-3' },
+      update: {},
+      create: {
+        id: 'sample-tlfq-3',
+        title: 'Basic Electronics Assessment',
+        section_id: btec3a.id,
+        course_id: c3.id,
+        faculty_id: f3.id,
+        is_active: true,
+        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        created_by: coord1.id
+      }
+    });
+
+    const t4 = await Tlfq.upsert({
+      where: { id: 'sample-tlfq-4' },
+      update: {},
+      create: {
+        id: 'sample-tlfq-4',
+        title: 'Thermodynamics Course Evaluation',
+        section_id: btme3a.id,
+        course_id: c4.id,
+        faculty_id: f4.id,
+        is_active: true,
+        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        created_by: coord1.id
+      }
+    });
+
+    const t5 = await Tlfq.upsert({
+      where: { id: 'sample-tlfq-5' },
+      update: {},
+      create: {
+        id: 'sample-tlfq-5',
+        title: 'Structural Analysis Feedback',
+        section_id: btce3a.id,
+        course_id: c5.id,
+        faculty_id: f5.id,
+        is_active: true,
+        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        created_by: coord1.id
+      }
+    });
+
+    // 12. Add Questions
+    const questionsText = [
+      'How well does the teacher explain concepts?',
+      'Is the teacher punctual and regular?',
+      'Does the teacher encourage student participation?',
+      'Is the study material provided helpful?',
+      'Overall satisfaction with the teaching method?'
+    ];
+
+    for (const tlfqId of [t1.id, t2.id, t3.id, t4.id, t5.id]) {
+      for (const qText of questionsText) {
+        const exists = await Question.findFirst({ where: { tlfq_id: tlfqId, question_text: qText } });
+        if (!exists) await Question.create({ data: { tlfq_id: tlfqId, question_text: qText } });
+      }
+    }
+
+    // 13. Responses
+    console.log('Generating sample responses...');
+    const comments = [
+      'Excellent teacher! Explains concepts very clearly.',
+      'Very punctual, covers the syllabus thoroughly.',
+      'Engages the class and makes learning fun.',
+      'Always helpful during and after class hours.',
+      'Teaching style is very interactive and helpful.'
+    ];
+    for (const student of students) {
+      if (student.status !== 'active') continue;
+      
+      let tlfqId;
+      if (student.section_id === bcs3a.id) tlfqId = t1.id;
+      else if (student.section_id === btai3a.id) tlfqId = t2.id;
+      else if (student.section_id === btec3a.id) tlfqId = t3.id;
+      else if (student.section_id === btme3a.id) tlfqId = t4.id;
+      else if (student.section_id === btce3a.id) tlfqId = t5.id;
+
+      const hasResponded = await Response.findFirst({ where: { student_id: student.id, tlfq_id: tlfqId } });
+      if (!hasResponded) {
+        const comment = comments[Math.floor(Math.random() * comments.length)];
+        const resp = await Response.create({
+          data: {
+            student_id: student.id,
+            tlfq_id: tlfqId,
+            submitted_at: new Date().toISOString(),
+            comment
+          }
+        });
+        const qs = await Question.findMany({ where: { tlfq_id: tlfqId } });
+        for (const q of qs) {
+          await Answer.create({ data: { response_id: resp.id, question_id: q.id, rating: Math.floor(Math.random() * 3) + 5 } });
+        }
+        await User.update({ where: { id: student.id }, data: { points: { increment: REWARD_POINTS } } });
+      }
+    }
+
+    console.log('System data seeded successfully with Supreme Authority and demo feedback.');
   } catch (err) {
     console.error('Database initialization error:', err);
     throw err;
