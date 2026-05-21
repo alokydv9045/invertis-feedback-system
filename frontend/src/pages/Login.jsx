@@ -136,11 +136,6 @@ export default function Login() {
                 {step === 2 && 'Enter Password'}
                 {step === 3 && 'Complete Registration'}
               </h2>
-              {step > 1 && (
-                <button onClick={resetToStep1} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white text-xs underline">
-                  Back
-                </button>
-              )}
             </div>
 
             <div className="px-8 py-8 space-y-5">
