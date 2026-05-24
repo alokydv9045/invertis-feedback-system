@@ -65,7 +65,7 @@ export const COLORS = {
     200: '#F5C6C9',
     300: '#EFA4A8',
     400: '#E36067',
-    500: '#E63946',
+    500: '#FF2A00',
     600: '#CF333F',
     700: '#8A222A',
     800: '#671A20',
@@ -74,7 +74,7 @@ export const COLORS = {
   semantic: {
     success: '#10B981',
     warning: '#F59E0B',
-    error: '#E63946',
+    error: '#FF2A00',
     info: '#3B82F6',
   },
 };
@@ -84,14 +84,14 @@ export const ROLE_COLORS = {
     bg: 'var(--color-error)',
     text: '#FEA3AA',
     border: 'rgba(230, 57, 70, 0.3)',
-    light: { bg: '#FEF2F2', text: '#E63946' },
+    light: { bg: '#FFF7ED', text: '#FF2A00' },
     dark: { bg: '#451115', text: '#FEA3AA' },
   },
   super_admin: {
     bg: 'var(--color-error)',
     text: '#FEA3AA',
     border: 'rgba(230, 57, 70, 0.3)',
-    light: { bg: '#FEF2F2', text: '#E63946' },
+    light: { bg: '#FFF7ED', text: '#FF2A00' },
     dark: { bg: '#451115', text: '#FEA3AA' },
   },
   coordinator: {

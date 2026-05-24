@@ -153,7 +153,7 @@ export default function Navbar() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-[#1D3557] border-b-4 border-[#E63946] select-none"
+        className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-[#1D3557] border-b-4 border-[#FF2A00] select-none"
         
       >
         {/* Brand */}

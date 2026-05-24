@@ -26,7 +26,7 @@ export default {
           200: '#F5C6C9',
           300: '#EFA4A8',
           400: '#E36067',
-          500: '#E63946', // Changed to match Invertis theme red
+          500: '#FF2A00', // Changed to match Invertis theme orange
           600: '#CF333F',
           700: '#8A222A',
           800: '#671A20',
@@ -34,7 +34,7 @@ export default {
         },
         invertis: {
           bg: '#F1FAEE', // Page background
-          red: '#E63946',
+          orange: '#FF2A00',
           blue: '#1D3557',
         },
         slate: {

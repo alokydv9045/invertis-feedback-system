@@ -133,7 +133,7 @@ function HODOverview() {
     <div className="flex flex-col gap-6 max-w-3xl">
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <div className="h-2 w-2 rounded-full bg-[#E63946] shadow-sm shadow-red-400/50" />
+          <div className="h-2 w-2 rounded-full bg-[#FF2A00] shadow-sm shadow-red-400/50" />
           <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Head of Department</span>
         </div>
         <h1 className="text-2xl font-black text-[#212529]">Welcome back, {user?.name?.split(' ')[1] || user?.name}</h1>

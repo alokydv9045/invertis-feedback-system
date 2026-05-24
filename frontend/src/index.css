@@ -40,13 +40,13 @@
     --text-main: #212529;
     --text-muted: #6C757D;
     --border-base: #DEE2E6;
-    --border-accent: rgba(230, 57, 70, 0.25);
+    --border-accent: rgba(249, 115, 22, 0.25);
     --glass-bg: #ffffff;
-    --accent: #E63946;
-    --accent-glow: rgba(230, 57, 70, 0.2);
+    --accent: #FF2A00;
+    --accent-glow: rgba(249, 115, 22, 0.2);
     --premium-gradient-1: linear-gradient(135deg, #1D3557 0%, #2A4A6A 100%);
     --premium-gradient-2: linear-gradient(135deg, #1D3557 0%, #1D3557 100%);
-    --premium-gradient-accent: linear-gradient(135deg, #E63946 0%, #CF333F 100%);
+    --premium-gradient-accent: linear-gradient(135deg, #FF2A00 0%, #CC2200 100%);
     --premium-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 

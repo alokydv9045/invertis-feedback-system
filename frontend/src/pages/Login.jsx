@@ -115,22 +115,21 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col bg-[#F1FAEE]">
       {/* Header */}
-      <div className="w-full bg-[#1D3557] px-6 py-4 flex items-center gap-4">
+      <div className="w-full bg-white px-6 py-4 flex items-center gap-4">
         <img src="/main logo.png" alt="Invertis University Logo" className="w-[116px] h-12 object-contain" />
 
       </div>
-      <div className="w-full h-1 bg-[#E63946]" />
+      <div className="w-full h-1 bg-[#FF2A00]" />
 
       {/* Main content area */}
       <div className="flex-1 flex items-center justify-center p-4 relative">
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: 'radial-gradient(circle at 25% 25%, #1D3557 1px, transparent 1px), radial-gradient(circle at 75% 75%, #E63946 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90" style={{
+          backgroundImage: "url('/ib2.jpg')"
         }} />
 
         <div className="w-full max-w-md relative z-10">
           <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-[#DEE2E6]">
-            <div className="bg-[#E63946] px-6 py-4 text-center relative text-white">
+            <div className="bg-[#FF2A00] px-6 py-4 text-center relative text-white">
               <h2 className="text-xl font-semibold">
                 {step === 1 && 'Sign in to your account'}
                 {step === 2 && 'Enter Password'}
@@ -228,7 +227,7 @@ export default function Login() {
       </div>
 
       {/* Footer */}
-      <footer className="w-full bg-[#1D3557] py-4 text-center text-white border-t-4 border-[#E63946]">
+      <footer className="w-full bg-[#1D3557] py-4 text-center text-white border-t-4 border-[#FF2A00]">
         <p className="text-xs">© 2026 Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.</p>
       </footer>
     </div>
