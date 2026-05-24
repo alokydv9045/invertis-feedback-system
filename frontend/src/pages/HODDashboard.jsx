@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
@@ -6,7 +7,7 @@ import api from '../services/api';
 import { motion } from 'framer-motion';
 import {
   BarChart2, Star, Users, BookOpen, Building2,
-  MessageSquare, TrendingUp, Award, ChevronDown
+  MessageSquare, TrendingUp, Award, ChevronDown, Lock
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -25,7 +26,14 @@ export default function HODDashboard() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [selectedFacultyFilter, setSelectedFacultyFilter] = useState('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'overview';
+  const setActiveTab = (tab) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', tab);
+    setSearchParams(params, { replace: true });
+  };
 
   useEffect(() => {
     api.get('/responses/analytics')
@@ -57,7 +65,7 @@ export default function HODDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-transparent text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
       <Navbar />
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
@@ -165,8 +173,8 @@ export default function HODDashboard() {
                         <div className="h-80">
                           <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data.avgRatingPerFaculty} layout="vertical" margin={{ left: 10, right: 30 }}>
-                              <XAxis type="number" domain={[0, 7]} tick={{ fill: '#64748b', fontSize: 11, fontWeight: 'bold' }} stroke="#cbd5e1" />
-                              <YAxis type="category" dataKey="name" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 'bold' }} width={140} stroke="#cbd5e1" />
+                              <XAxis type="number" domain={[0, 7]} tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }} stroke="#cbd5e1" />
+                              <YAxis type="category" dataKey="name" tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }} width={140} stroke="#cbd5e1" />
                               <Tooltip
                                 contentStyle={{ 
                                   backgroundColor: '#1e293b', 
@@ -268,43 +276,69 @@ export default function HODDashboard() {
                 )}
 
                 {/* COMMENTS TAB */}
-                {activeTab === 'comments' && (
-                  <div className="flex flex-col gap-6">
-                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40 rounded-2xl p-5 flex items-center gap-4 text-xs font-bold text-amber-700 dark:text-amber-400">
-                      <div className="h-10 w-10 bg-amber-100 dark:bg-amber-900/50 rounded-xl flex items-center justify-center shrink-0">
-                         <MessageSquare size={20} />
-                      </div>
-                      All student feedback narratives are fully anonymous. Systems ensure zero identity traceability for subjective responses.
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {(data.recentComments || []).length === 0 ? (
-                        <div className="col-span-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center shadow-sm">
-                           <MessageSquare size={48} className="text-[var(--text-main)] dark:text-slate-700 mx-auto mb-6" />
-                           <p className="text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">No feedback narratives received yet.</p>
+                {activeTab === 'comments' && (() => {
+                  const uniqueFaculty = Array.from(new Set((data.recentComments || []).map(c => c.faculty_name).filter(Boolean)));
+                  const filteredComments = selectedFacultyFilter === 'all'
+                    ? (data.recentComments || [])
+                    : (data.recentComments || []).filter(c => c.faculty_name === selectedFacultyFilter);
+
+                  return (
+                    <div className="flex flex-col gap-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 card-main p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl">
+                        <div>
+                          <h3 className="text-sm font-black text-slate-800 dark:text-[var(--text-main)] uppercase tracking-wider">Feedback Insights</h3>
+                          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Filter feedback narrative comments by instructor</p>
                         </div>
-                      ) : (
-                        (data.recentComments || []).map((c, i) => (
-                          <motion.div 
-                            key={i} 
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-all"
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-slate-600 dark:text-slate-400 font-black uppercase tracking-wider">Faculty:</span>
+                          <select
+                            value={selectedFacultyFilter}
+                            onChange={e => setSelectedFacultyFilter(e.target.value)}
+                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-black text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer min-w-[200px]"
                           >
-                            <div className="flex items-center gap-2 mb-6">
-                               <div className="h-1.5 w-1.5 rounded-full bg-primary-500" />
-                               <span className="text-[10px] font-black text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest">{c.faculty_name}</span>
-                            </div>
-                            <p className="text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">"{c.comment}"</p>
-                            <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-50 dark:border-slate-800/50 text-[10px] font-black text-slate-600 dark:text-slate-400 dark:text-slate-600 uppercase tracking-widest">
-                              <span className="truncate max-w-[150px]">{c.course_name}</span>
-                              <span>{new Date(c.submitted_at).toLocaleDateString()}</span>
-                            </div>
-                          </motion.div>
-                        ))
-                      )}
+                            <option value="all">All Faculty</option>
+                            {uniqueFaculty.map(fac => (
+                              <option key={fac} value={fac}>{fac}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {filteredComments.length === 0 ? (
+                          <div className="col-span-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center shadow-sm">
+                             <MessageSquare size={48} className="text-[var(--text-main)] dark:text-slate-700 mx-auto mb-6" />
+                             <p className="text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">No feedback narratives received yet.</p>
+                          </div>
+                        ) : (
+                          filteredComments.map((c, i) => (
+                            <motion.div 
+                              key={i} 
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-all"
+                            >
+                              <div className="flex justify-between items-center mb-6">
+                                 <div className="flex items-center gap-2">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-primary-500" />
+                                    <span className="text-[10px] font-black text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest">{c.faculty_name}</span>
+                                 </div>
+                                 <span className="flex items-center gap-1.5 text-[9px] font-black bg-primary-500/10 text-primary-600 dark:text-primary-400 px-3 py-1 rounded-xl border border-primary-500/20 tracking-wider uppercase">
+                                   <Lock size={10} /> {c.anonymous_id || 'ANONYMOUS'}
+                                 </span>
+                              </div>
+                              <p className="text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">"{c.comment}"</p>
+                              <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-50 dark:border-slate-800/50 text-[10px] font-black text-slate-600 dark:text-slate-400 dark:text-slate-600 uppercase tracking-widest">
+                                <span className="truncate max-w-[150px]">{c.course_name}</span>
+                                <span>{new Date(c.submitted_at).toLocaleDateString()}</span>
+                              </div>
+                            </motion.div>
+                          ))
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             )}
           </motion.div>

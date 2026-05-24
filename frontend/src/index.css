@@ -113,6 +113,30 @@
     color: var(--text-main);
     transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 100vh;
+    position: relative;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: url("https://www.invertisuniversity.ac.in/uploads/blogs/4bs_3.jpg");
+    background-size: cover;
+    background-position: center 25%;
+    background-repeat: no-repeat;
+    opacity: 0.50;
+    pointer-events: none;
+    transition: opacity 0.4s ease, filter 0.4s ease;
+  }
+
+  .dark body::before,
+  body.dark::before {
+    opacity: 0.22;
+    filter: brightness(0.4) contrast(1.2);
   }
 
   ::selection {

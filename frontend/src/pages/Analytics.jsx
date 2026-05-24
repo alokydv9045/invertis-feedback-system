@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import api from '../services/api';
@@ -10,7 +11,7 @@ import {
 } from 'recharts';
 import { 
   Award, BarChart2, TrendingUp, BookOpen, MessageSquare, 
-  Star, Filter, LayoutGrid, Users, CheckCircle, Activity 
+  Star, Filter, LayoutGrid, Users, CheckCircle, Activity, Lock
 } from 'lucide-react';
 
 const COLORS = ['#0F2D52', '#1D4E89', '#3B6EA5', '#10B981', '#F59E0B', '#C62828'];
@@ -18,12 +19,21 @@ const COLORS = ['#0F2D52', '#1D4E89', '#3B6EA5', '#10B981', '#F59E0B', '#C62828'
 export default function Analytics() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('faculty');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'faculty';
+  const setActiveTab = (tab) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', tab);
+    setSearchParams(params, { replace: true });
+  };
   const [selectedDeptId, setSelectedDeptId] = useState('all');
   const [teacherTypeFilter, setTeacherTypeFilter] = useState('all');
+  const [selectedTeacherId, setSelectedTeacherId] = useState('all');
+  const [selectedFacultyFilter, setSelectedFacultyFilter] = useState('all');
 
   useEffect(() => {
     setLoading(true);
+    setSelectedFacultyFilter('all');
     const url = selectedDeptId === 'all' ? '/responses/analytics' : `/responses/analytics?department_id=${selectedDeptId}`;
     api.get(url)
       .then(r => setData(r.data))
@@ -31,9 +41,15 @@ export default function Analytics() {
       .finally(() => setLoading(false));
   }, [selectedDeptId]);
 
+  useEffect(() => {
+    setSelectedTeacherId('all');
+  }, [selectedDeptId, teacherTypeFilter]);
+
   const filteredAvgRatingPerFaculty = teacherTypeFilter === 'all'
     ? (data?.avgRatingPerFaculty || [])
     : (data?.avgRatingPerFaculty || []).filter(f => f.teacher_type === teacherTypeFilter);
+
+  const selectedTeacher = filteredAvgRatingPerFaculty.find(f => f.id === selectedTeacherId);
 
   const tabs = [
     { id: 'faculty', label: 'Faculty Rankings', icon: Award },
@@ -51,7 +67,7 @@ export default function Analytics() {
     : 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-main)] text-[var(--text-main)] font-sans selection:bg-primary-500/30">
+    <div className="min-h-screen flex flex-col bg-transparent text-[var(--text-main)] font-sans selection:bg-primary-500/30">
       <Navbar />
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
@@ -170,30 +186,116 @@ export default function Analytics() {
                     {activeTab === 'faculty' && (
                       <div className="flex flex-col gap-6">
                         <div className="card-main p-8">
-                          <h3 className="text-base font-black text-[#1D3557] mb-6 flex items-center gap-2">
-                            <TrendingUp size={18} className="text-primary-400" /> Leaderboard Rankings (out of 7)
-                          </h3>
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                            <h3 className="text-base font-black text-[#1D3557] flex items-center gap-2">
+                              <TrendingUp size={18} className="text-primary-400" />
+                              {selectedTeacherId === 'all' ? 'Faculty Rankings (out of 7)' : `Performance Breakdown: ${selectedTeacher?.name}`}
+                            </h3>
+                            
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                              <span className="text-xs font-bold text-slate-500 uppercase">View:</span>
+                              <select
+                                value={selectedTeacherId}
+                                onChange={e => setSelectedTeacherId(e.target.value)}
+                                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-[var(--text-main)] focus:outline-none cursor-pointer"
+                              >
+                                <option value="all" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-[var(--text-main)]">All Faculty (Overview)</option>
+                                {filteredAvgRatingPerFaculty.map(f => (
+                                  <option key={f.id} value={f.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-[var(--text-main)]">{f.name}</option>
+                                ))}
+                              </select>
+                              
+                              {selectedTeacherId !== 'all' && (
+                                <button
+                                  onClick={() => setSelectedTeacherId('all')}
+                                  className="px-3 py-1.5 text-xs font-bold text-primary-400 hover:text-primary-300 bg-primary-500/10 hover:bg-primary-500/20 rounded-xl border border-primary-500/20 transition-all cursor-pointer"
+                                >
+                                  View All
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
                           {filteredAvgRatingPerFaculty.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-slate-500 dark:text-slate-400">
                               <BarChart2 size={40} className="mb-3 text-slate-700" />
                               <p className="text-sm font-medium">No feedback data yet for this selection.</p>
                             </div>
+                          ) : selectedTeacherId === 'all' ? (
+                            <div className="flex flex-col gap-4">
+                              <p className="text-xs text-slate-400 mb-2">💡 Click on any bar below to view that teacher's personal rating breakdown.</p>
+                              <div style={{ height: Math.max(300, filteredAvgRatingPerFaculty.length * 52) + 'px' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <BarChart data={filteredAvgRatingPerFaculty} layout="vertical" margin={{ left: 10, right: 30 }}>
+                                    <XAxis type="number" domain={[0, 7]} tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                                    <YAxis type="category" dataKey="name" tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} width={160} axisLine={false} tickLine={false} />
+                                    <Tooltip
+                                      cursor={{ fill: '#1e293b', opacity: 0.4 }}
+                                      contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 16, color: '#f8fafc', fontWeight: 600, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}
+                                      formatter={v => [`${v}/7`, 'Avg. Rating']}
+                                    />
+                                    <Bar dataKey="avg_rating" radius={[0, 8, 8, 0]} barSize={28}>
+                                      {filteredAvgRatingPerFaculty.map((entry, i) => (
+                                        <Cell 
+                                          key={i} 
+                                          fill={COLORS[i % COLORS.length]} 
+                                          className="cursor-pointer hover:opacity-80 transition-opacity"
+                                          onClick={() => setSelectedTeacherId(entry.id)}
+                                        />
+                                      ))}
+                                    </Bar>
+                                  </BarChart>
+                                </ResponsiveContainer>
+                              </div>
+                            </div>
                           ) : (
-                            <div style={{ height: Math.max(300, filteredAvgRatingPerFaculty.length * 52) + 'px' }}>
-                              <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={filteredAvgRatingPerFaculty} layout="vertical" margin={{ left: 10, right: 30 }}>
-                                  <XAxis type="number" domain={[0, 7]} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
-                                  <YAxis type="category" dataKey="name" tick={{ fill: '#e2e8f0', fontSize: 12, fontWeight: 600 }} width={160} axisLine={false} tickLine={false} />
-                                  <Tooltip
-                                    cursor={{ fill: '#1e293b', opacity: 0.4 }}
-                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 16, color: '#f8fafc', fontWeight: 600, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}
-                                    formatter={v => [`${v}/7`, 'Avg. Rating']}
-                                  />
-                                  <Bar dataKey="avg_rating" radius={[0, 8, 8, 0]} barSize={28}>
-                                    {filteredAvgRatingPerFaculty.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                                  </Bar>
-                                </BarChart>
-                              </ResponsiveContainer>
+                            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                              {/* Graph */}
+                              <div className="lg:col-span-3 card-main p-6 border border-[#E6E9EE]/10 bg-white/5">
+                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Attribute Performance</h4>
+                                {(!selectedTeacher?.attributes || selectedTeacher.attributes.length === 0) ? (
+                                  <p className="text-sm text-slate-400">No question breakdown available for this teacher.</p>
+                                ) : (
+                                  <div style={{ height: '300px' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                      <BarChart data={selectedTeacher.attributes.map((attr, idx) => ({
+                                        name: `Q${idx + 1}`,
+                                        rating: attr.avg_rating,
+                                        fullText: attr.question_text
+                                      }))} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
+                                        <XAxis dataKey="name" tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                                        <YAxis domain={[0, 7]} tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                                        <Tooltip
+                                          contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 16, color: '#f8fafc', fontWeight: 600 }}
+                                          formatter={(value, name, props) => [`${value}/7`, props.payload.fullText]}
+                                        />
+                                        <Bar dataKey="rating" fill="#3B6EA5" radius={[8, 8, 0, 0]} barSize={40}>
+                                          {selectedTeacher.attributes.map((_, i) => (
+                                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                                          ))}
+                                        </Bar>
+                                      </BarChart>
+                                    </ResponsiveContainer>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Legend/Table of attributes */}
+                              <div className="lg:col-span-2 flex flex-col gap-3">
+                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">Details</h4>
+                                {(selectedTeacher?.attributes || []).map((attr, idx) => (
+                                  <div key={idx} className="card-main p-4 flex flex-col gap-2 border border-[#E6E9EE]/10 bg-white/5">
+                                    <div className="flex justify-between items-start gap-4">
+                                      <span className="text-xs font-black px-2 py-0.5 bg-primary-500/10 text-primary-400 rounded-md">Q{idx + 1}</span>
+                                      <span className="text-sm font-black text-accent-400">{attr.avg_rating} / 7</span>
+                                    </div>
+                                    <p className="text-xs font-bold text-[var(--text-main)] leading-relaxed">{attr.question_text}</p>
+                                    <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden mt-1">
+                                      <div className="h-full bg-accent-400 rounded-full" style={{ width: `${(attr.avg_rating / 7) * 100}%` }} />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -211,7 +313,7 @@ export default function Analytics() {
                             <ResponsiveContainer width="100%" height="100%">
                               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data?.attributeAnalytics || []}>
                                 <PolarGrid stroke="#334155" />
-                                <PolarAngleAxis dataKey="attribute" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} />
+                                <PolarAngleAxis dataKey="attribute" tick={{ fill: '#475569', fontSize: 11, fontWeight: 600 }} />
                                 <PolarRadiusAxis angle={30} domain={[0, 7]} tick={{ fill: '#64748b', fontSize: 10 }} />
                                 <Radar
                                   name="Score"
@@ -299,8 +401,8 @@ export default function Analytics() {
                                   </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                                <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                <XAxis dataKey="date" tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
                                 <Tooltip
                                   contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 12, fontSize: 12 }}
                                 />
@@ -351,44 +453,72 @@ export default function Analytics() {
                     )}
 
                     {/* COMMENTS TAB */}
-                    {activeTab === 'comments' && (
-                      <div className="flex flex-col gap-4">
-                        <div className="bg-primary-500/10 border border-primary-500/20 rounded-2xl p-4 flex items-center gap-3 text-sm text-primary-300 font-medium">
-                          <MessageSquare size={18} className="text-primary-400 flex-shrink-0" />
-                          Student feedback is rigorously anonymized. No identifying details are exposed here.
-                        </div>
-                        {data?.recentComments?.length === 0 ? (
-                          <div className="card-main p-12 text-center text-slate-600 font-medium">No comments submitted yet for this selection.</div>
-                        ) : (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {(data?.recentComments || []).map((c, i) => (
-                              <motion.div 
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: i * 0.05 }}
-                                key={i} 
-                                className="card-main p-6 flex flex-col relative overflow-hidden group"
+                    {activeTab === 'comments' && (() => {
+                      const uniqueFaculty = Array.from(new Set((data?.recentComments || []).map(c => c.faculty_name).filter(Boolean)));
+                      const filteredComments = selectedFacultyFilter === 'all'
+                        ? (data?.recentComments || [])
+                        : (data?.recentComments || []).filter(c => c.faculty_name === selectedFacultyFilter);
+                      
+                      return (
+                        <div className="flex flex-col gap-6">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 card-main p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl">
+                            <div>
+                              <h3 className="text-sm font-black text-slate-800 dark:text-[var(--text-main)] uppercase tracking-wider">Feedback Insights</h3>
+                              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Filter feedback narrative comments by instructor</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-slate-600 dark:text-slate-400 font-black uppercase tracking-wider">Faculty:</span>
+                              <select
+                                value={selectedFacultyFilter}
+                                onChange={e => setSelectedFacultyFilter(e.target.value)}
+                                className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-black text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer min-w-[200px]"
                               >
-                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                  <MessageSquare size={40} className="text-primary-500" />
-                                </div>
-                                <p className="text-base text-[#1D3557] italic leading-relaxed mb-6 flex-1 relative z-10">"{c.comment}"</p>
-                                <div className="pt-4 border-t border-slate-800/60 flex flex-col gap-1.5 relative z-10">
-                                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 font-bold">
-                                    <span className="text-primary-400 font-black">{c.faculty_name}</span>
-                                    <span className="text-slate-700">•</span>
-                                    <span className="text-slate-500 dark:text-slate-400">{c.course_name}</span>
-                                  </div>
-                                  <div className="text-[10px] text-slate-600 font-black uppercase tracking-widest">
-                                    Submitted on {new Date(c.submitted_at).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
-                                  </div>
-                                </div>
-                              </motion.div>
-                            ))}
+                                <option value="all">All Faculty</option>
+                                {uniqueFaculty.map(fac => (
+                                  <option key={fac} value={fac}>{fac}</option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    )}
+
+                          {filteredComments.length === 0 ? (
+                            <div className="card-main p-12 text-center text-slate-600 font-medium">No comments submitted yet for this selection.</div>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {filteredComments.map((c, i) => (
+                                <motion.div 
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: i * 0.05 }}
+                                  key={i} 
+                                  className="card-main p-6 flex flex-col relative overflow-hidden group"
+                                >
+                                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <MessageSquare size={40} className="text-primary-500" />
+                                  </div>
+                                  <div className="flex justify-between items-center mb-4 relative z-10">
+                                    <span className="flex items-center gap-1.5 text-[9px] font-black bg-primary-500/10 text-primary-600 dark:text-primary-400 px-3 py-1 rounded-xl border border-primary-500/20 tracking-wider uppercase">
+                                      <Lock size={10} /> {c.anonymous_id || 'ANONYMOUS'}
+                                    </span>
+                                  </div>
+                                  <p className="text-base text-[#1D3557] italic leading-relaxed mb-6 flex-1 relative z-10">"{c.comment}"</p>
+                                  <div className="pt-4 border-t border-slate-800/60 flex flex-col gap-1.5 relative z-10">
+                                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 font-bold">
+                                      <span className="text-primary-400 font-black">{c.faculty_name}</span>
+                                      <span className="text-slate-700">•</span>
+                                      <span className="text-slate-500 dark:text-slate-400">{c.course_name}</span>
+                                    </div>
+                                    <div className="text-[10px] text-slate-600 font-black uppercase tracking-widest">
+                                      Submitted on {new Date(c.submitted_at).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </motion.div>
                 </AnimatePresence>
               </div>

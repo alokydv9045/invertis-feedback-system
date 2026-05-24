@@ -231,6 +231,14 @@ export const getAnalytics = async (req, res) => {
       include: { department: true }
     });
 
+    const allQuestions = await Question.findMany({
+      select: { id: true, question_text: true }
+    });
+    const questionMap = {};
+    for (const q of allQuestions) {
+      questionMap[q.id] = q.question_text;
+    }
+
     const avgRatingPerFaculty = (await Promise.all(facultyList.map(async (f) => {
       const agg = await Answer.aggregate({
         where: { response: { tlfq: { faculty_id: f.id } } },
@@ -243,13 +251,25 @@ export const getAnalytics = async (req, res) => {
       
       const responseCount = await Response.count({ where: { tlfq: { faculty_id: f.id } } });
 
+      const facultyAnswerGroup = await Answer.groupBy({
+        by: ['question_id'],
+        where: { response: { tlfq: { faculty_id: f.id } } },
+        _avg: { rating: true }
+      });
+
+      const attributes = facultyAnswerGroup.map(ag => ({
+        question_text: questionMap[ag.question_id] || 'Unknown Attribute',
+        avg_rating: ag._avg.rating ? parseFloat(ag._avg.rating.toFixed(2)) : 0
+      }));
+
       return {
         id: f.id,
         name: f.name,
         department_id: f.department_id,
         teacher_type: f.teacher_type,
         total_responses: responseCount,
-        avg_rating: agg._avg.rating ? parseFloat(agg._avg.rating.toFixed(2)) : 0
+        avg_rating: agg._avg.rating ? parseFloat(agg._avg.rating.toFixed(2)) : 0,
+        attributes
       };
     }))).filter(Boolean).filter(f => f.total_responses > 0)
       .sort((a, b) => b.avg_rating - a.avg_rating);
@@ -332,6 +352,7 @@ export const getAnalytics = async (req, res) => {
         tlfq: { faculty: department_id ? { department_id } : {} }
       },
       include: {
+        student: { select: { unique_feedback_id: true } },
         tlfq: {
           include: {
             faculty: { select: { name: true, department_id: true } },
@@ -350,7 +371,8 @@ export const getAnalytics = async (req, res) => {
       faculty_name: r.tlfq.faculty?.name,
       course_name: r.tlfq.course?.name,
       section_name: r.tlfq.section?.name,
-      department_id: r.tlfq.faculty?.department_id
+      department_id: r.tlfq.faculty?.department_id,
+      anonymous_id: r.student?.unique_feedback_id || (r.student_id ? `ANO-${r.student_id.split('-')[0].toUpperCase()}` : 'ANONYMOUS')
     }));
 
     const result = { 
@@ -384,6 +406,7 @@ export const getLeaderboard = async (req, res) => {
       orderBy: { points: 'desc' },
       take: 50,
       select: {
+        name: true,
         unique_feedback_id: true,
         points: true,
         batch: true
@@ -392,6 +415,7 @@ export const getLeaderboard = async (req, res) => {
 
     const result = students.map((s, i) => ({
       rank: i + 1,
+      name: s.name,
       unique_feedback_id: s.unique_feedback_id || 'ANO-?????',
       points: s.points,
       batch: s.batch,

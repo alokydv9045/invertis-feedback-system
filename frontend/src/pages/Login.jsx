@@ -169,10 +169,15 @@ export default function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
                   />
-                  <Button type="submit" disabled={loading} loading={loading} fullWidth>
-                    <UserIcon className="w-4 h-4" />
-                    Sign In
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button type="button" variant="secondary" onClick={resetToStep1} disabled={loading} className="w-1/3">
+                      Back
+                    </Button>
+                    <Button type="submit" disabled={loading} loading={loading} className="flex-1">
+                      <UserIcon className="w-4 h-4" />
+                      Sign In
+                    </Button>
+                  </div>
                 </form>
               )}
 
@@ -200,9 +205,14 @@ export default function Login() {
                     value={regConfirm}
                     onChange={(e) => setRegConfirm(e.target.value)}
                   />
-                  <Button type="submit" disabled={loading} loading={loading} fullWidth variant="danger">
-                    Activate & Login
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button type="button" variant="secondary" onClick={resetToStep1} disabled={loading} className="w-1/3">
+                      Back
+                    </Button>
+                    <Button type="submit" disabled={loading} loading={loading} className="flex-1" variant="danger">
+                      Activate & Login
+                    </Button>
+                  </div>
                 </form>
               )}
 

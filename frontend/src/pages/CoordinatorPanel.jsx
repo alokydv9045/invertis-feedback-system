@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import api from '../services/api';
@@ -7,11 +8,9 @@ import { toast } from 'sonner';
 import { Plus, Trash2, Check, X, Users, BookOpen, GraduationCap, Link2, Building2, ChevronDown, Key, Upload, FileText, Info } from 'lucide-react';
 
 const TABS = [
-  { id: 'departments', label: 'Departments', icon: Building2 },
   { id: 'sections', label: 'Sections', icon: Link2 },
   { id: 'courses', label: 'Courses', icon: BookOpen },
   { id: 'faculty', label: 'Faculty', icon: Users },
-  { id: 'assignments', label: 'Assignments', icon: Link2 },
   { id: 'students', label: 'Students', icon: GraduationCap },
 ];
 
@@ -518,7 +517,13 @@ function StudentsTab({ departments, sections, students, onRefresh }) {
 
 // ── Main CoordinatorPanel ────────────────────────────────────────────────────
 export default function CoordinatorPanel() {
-  const [tab, setTab] = useState('departments');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get('tab') || 'sections';
+  const setTab = (newTab) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', newTab);
+    setSearchParams(params, { replace: true });
+  };
   const [departments, setDepartments] = useState([]);
   const [sections, setSections] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -545,7 +550,7 @@ export default function CoordinatorPanel() {
   useEffect(() => { loadAll(); }, []);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)]">
+    <div className="min-h-screen bg-transparent text-[var(--text-main)]">
       <Navbar />
       <div className="admin-layout">
         <Sidebar />

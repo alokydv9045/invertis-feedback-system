@@ -104,7 +104,7 @@ export default function HODPanel() {
   const statusColor = s => s === 'open' ? 'text-emerald-400 bg-emerald-900/30 border-emerald-800/40' : s === 'expired' ? 'text-slate-500 dark:text-slate-400 bg-slate-800/40 border-slate-700/40' : 'text-amber-400 bg-amber-900/30 border-amber-800/40';
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col">
+    <div className="min-h-screen bg-transparent text-[var(--text-main)] flex flex-col">
       <Navbar />
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />

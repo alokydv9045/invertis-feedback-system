@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 const PageShell = ({ children }) => (
-  <div className="min-h-screen flex flex-col bg-[#F1FAEE] text-[#212529]">
+  <div className="min-h-screen flex flex-col bg-transparent text-[#212529]">
     <Navbar />
     <div className="flex flex-col md:flex-row flex-1 min-h-0">
       <Sidebar />

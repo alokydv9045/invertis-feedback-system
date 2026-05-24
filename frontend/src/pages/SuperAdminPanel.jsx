@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import api from '../services/api';
@@ -27,7 +28,13 @@ function Select({ children, ...props }) {
 }
 
 export default function SuperAdminPanel() {
-  const [tab, setTab] = useState('departments');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get('tab') || 'departments';
+  const setTab = (newTab) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', newTab);
+    setSearchParams(params, { replace: true });
+  };
   const [departments, setDepartments] = useState([]);
   const [staff, setStaff] = useState([]);
   const [students, setStudents] = useState([]);
@@ -233,7 +240,7 @@ export default function SuperAdminPanel() {
     : students;
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col">
+    <div className="min-h-screen bg-transparent text-[var(--text-main)] flex flex-col">
       <Navbar />
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />

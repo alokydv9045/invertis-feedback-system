@@ -10,9 +10,7 @@ function Input({ ...props }) {
   return (
     <input
       {...props}
-      className={`bg-slate-950/80 border border-white/10 rounded-xl px-4 py-3 text-sm text-[var(--text-main)] placeholder-slate-600
-        focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50
-        hover:border-white/20 transition-all duration-300 w-full ${props.className || ''}`}
+      className={`bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm text-slate-800 dark:text-[var(--text-main)] placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all w-full shadow-sm ${props.className || ''}`}
     />
   );
 }
@@ -69,7 +67,7 @@ export default function SupremePanel() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col">
+    <div className="min-h-screen bg-transparent text-[var(--text-main)] flex flex-col">
       <Navbar />
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
@@ -87,15 +85,7 @@ export default function SupremePanel() {
             </div>
           </div>
 
-          {/* Alert Banner */}
-          <div className="flex items-start gap-3 mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl">
-            <Shield size={18} className="text-amber-400 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-amber-300 leading-relaxed">
-              <span className="font-bold">Supreme Authority</span> — This panel allows creation and deletion of Super Admin accounts.
-              Super Admins have institution-wide access. Use with caution.
-              Coordinator tasks (like adding students) cannot be performed here.
-            </p>
-          </div>
+
 
 
           {/* Create Super Admin Form */}

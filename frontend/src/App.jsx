@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { SidebarProvider } from './context/SidebarContext';
 import Login            from './pages/Login';
 import Dashboard        from './pages/Dashboard';
 import CoursePage       from './pages/CoursePage';
@@ -18,6 +19,7 @@ import { Toaster }      from 'sonner';
 export default function App() {
   return (
     <AuthProvider>
+      <SidebarProvider>
       <Toaster position="top-center" richColors expand={false} closeButton />
       <Router>
         <Routes>
@@ -96,6 +98,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>
+      </SidebarProvider>
     </AuthProvider>
   );
 }

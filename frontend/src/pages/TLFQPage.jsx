@@ -102,7 +102,7 @@ export default function TLFQPage() {
   // ── Success screen
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-transparent text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
         <Navbar />
         <div className="flex flex-col md:flex-row flex-1">
           <Sidebar />
@@ -121,12 +121,7 @@ export default function TLFQPage() {
                   Your feedback has been recorded anonymously. Your contribution is vital for our continuous academic improvement.
                 </p>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-6 w-full text-left">
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 mb-2">
-                  <Lock size={12} className="text-emerald-500" /> Security Protocol Active
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-600 font-bold leading-relaxed">Identity hashing completed. Response is now immutable and decoupled from your student profile.</p>
-              </div>
+
               <button
                 onClick={() => navigate('/dashboard')}
                 className="w-full bg-primary-600 hover:bg-primary-700 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-primary-500/20 cursor-pointer flex items-center justify-center gap-3"
@@ -144,7 +139,7 @@ export default function TLFQPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-transparent text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
       <Navbar />
       <div className="flex flex-col md:flex-row flex-1">
         <Sidebar />
@@ -288,10 +283,7 @@ export default function TLFQPage() {
                         <MessageSquare size={40} className="text-slate-600 dark:text-slate-400" />
                      </div>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-950/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800/50">
-                     <Lock size={12} className="text-emerald-500" /> 
-                     System strictly protects narrator anonymity.
-                  </div>
+
                 </div>
 
                 {/* Submit */}

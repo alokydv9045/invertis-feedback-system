@@ -37,7 +37,7 @@ export default function CoursePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-transparent text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
       <Navbar />
 
       <div className="flex flex-col md:flex-row flex-1">
@@ -178,12 +178,7 @@ export default function CoursePage() {
                               </div>
                             </div>
 
-                            <div className="flex items-start gap-4 bg-amber-50 dark:bg-amber-950/20 p-5 rounded-2xl text-[11px] font-bold text-amber-800 dark:text-amber-400 border border-amber-100 dark:border-amber-900/40 leading-relaxed shadow-sm">
-                              <CheckCircle2 className="shrink-0 text-amber-600 dark:text-amber-500" size={18} />
-                              <span>
-                                SYSTEM PROTOCOL: Response data is fully encrypted and decoupled from your identity profile. Subjective narratives are strictly anonymous and accessible only by departmental heads.
-                              </span>
-                            </div>
+
 
                             <div className="flex gap-4 pt-2">
                               <button

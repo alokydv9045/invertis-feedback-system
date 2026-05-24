@@ -57,7 +57,7 @@ export default function IdentityRevealPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col">
+    <div className="min-h-screen bg-transparent text-[var(--text-main)] flex flex-col">
       <Navbar />
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
@@ -90,18 +90,7 @@ export default function IdentityRevealPage() {
               )}
             </div>
 
-            {/* ── Warning Banner ───────────────────────────────────────── */}
-            <div className="flex items-start gap-3 p-4 bg-accent-500/10 border border-accent-500/30 rounded-2xl">
-              <ShieldAlert size={18} className="text-accent-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-xs font-bold text-accent-300 mb-0.5">Restricted — Authorized Personnel Only</p>
-                <p className="text-xs text-accent-400/80 leading-relaxed">
-                  This tool is only to be used in cases of <span className="font-bold">inappropriate behavior</span> or
-                  disciplinary investigation. Revealing a student's identity without cause is a violation of their privacy rights.
-                  All reveals are logged for accountability.
-                </p>
-              </div>
-            </div>
+
 
             {/* ── Search Box ───────────────────────────────────────────── */}
             <div className="card-main p-6">

@@ -181,6 +181,15 @@ export const initDb = async () => {
   try {
     await bootstrapPromotionSchema();
 
+    // ── Skip seeding if already seeded ──────────────────────────
+    const alreadySeeded = await prisma.user.findFirst({ where: { role: 'super_admin' } });
+    if (alreadySeeded) {
+      console.log('Database already seeded — skipping. Server starting...');
+      return;
+    }
+    console.log('First run detected — seeding database...');
+
+
     const { startYear, endYear, name: currentSessionName } = getAcademicYearWindow();
     const currentSession = await withDbRetry(
       () => AcademicSession.upsert({
@@ -378,34 +387,77 @@ export const initDb = async () => {
       create: { name: 'Structural Analysis', code: 'CE101', department_id: depts['BTCE'].id }
     });
 
-    // 8. Create Faculty
-    let f1 = await Faculty.findFirst({ where: { name: 'Dr. R.K. Singh' } });
-    if (!f1) f1 = await Faculty.create({ data: { name: 'Dr. R.K. Singh', department_id: depts['BCS'].id, teacher_type: 'college_faculty' } });
-    
-    let f2 = await Faculty.findFirst({ where: { name: 'Dr. Vikram Chandra' } });
-    if (!f2) f2 = await Faculty.create({ data: { name: 'Dr. Vikram Chandra', department_id: depts['BTAI'].id, teacher_type: 'college_faculty' } });
-    
-    let f3 = await Faculty.findFirst({ where: { name: 'Dr. Amit Dixit' } });
-    if (!f3) f3 = await Faculty.create({ data: { name: 'Dr. Amit Dixit', department_id: depts['BTEC'].id, teacher_type: 'college_faculty' } });
+    // 8. Create Faculty - ensure at least 5 teachers per department
+    console.log('Creating Faculty members (min 5 per department)...');
+    const facultyList = [];
+    for (const [code, dept] of Object.entries(depts)) {
+      for (let i = 1; i <= 5; i++) {
+        const name = `Dr. ${code} Faculty ${i}`;
+        const teacherType = i % 2 === 0 ? 'college_faculty' : 'trainer';
+        const faculty = await Faculty.create({
+          data: {
+            name,
+            department_id: dept.id,
+            teacher_type: teacherType,
+          },
+        });
+        facultyList.push(faculty);
+      }
+    }
 
-    let f4 = await Faculty.findFirst({ where: { name: 'Prof. Manish Gupta' } });
-    if (!f4) f4 = await Faculty.create({ data: { name: 'Prof. Manish Gupta', department_id: depts['BTME'].id, teacher_type: 'college_faculty' } });
+    // Mapping helpers for sections and courses
+    const sectionMap = {
+      BCS: bcs3a,
+      BTAI: btai3a,
+      BTEC: btec3a,
+      BTME: btme3a,
+      BTCE: btce3a,
+    };
+    const courseMap = {
+      BCS: c1,
+      BTAI: c2,
+      BTEC: c3,
+      BTME: c4,
+      BTCE: c5,
+    };
 
-    let f5 = await Faculty.findFirst({ where: { name: 'Er. Sandeep Kumar' } });
-    if (!f5) f5 = await Faculty.create({ data: { name: 'Er. Sandeep Kumar', department_id: depts['BTCE'].id, teacher_type: 'college_faculty' } });
+    // Assign Faculty to Sections
+    for (const faculty of facultyList) {
+      const deptCode = Object.keys(depts).find(key => depts[key].id === faculty.department_id);
+      const section = sectionMap[deptCode];
+      const course = courseMap[deptCode];
+      await SectionFaculty.create({
+        data: {
+          section_id: section.id,
+          faculty_id: faculty.id,
+          course_id: course.id,
+        },
+      });
+    }
 
-    // 9. Assign Faculty to Sections
-    const assignments = [
-      { section_id: bcs3a.id, faculty_id: f1.id, course_id: c1.id },
-      { section_id: btai3a.id, faculty_id: f2.id, course_id: c2.id },
-      { section_id: btec3a.id, faculty_id: f3.id, course_id: c3.id },
-      { section_id: btme3a.id, faculty_id: f4.id, course_id: c4.id },
-      { section_id: btce3a.id, faculty_id: f5.id, course_id: c5.id },
-    ];
-
-    for (const a of assignments) {
-      const exists = await SectionFaculty.findFirst({ where: a });
-      if (!exists) await SectionFaculty.create({ data: a });
+    // Create TLFQ Forms for each Faculty
+    const tlfqIds = [];
+    const coord1 = await User.findFirst({ where: { email: 'coordinator@invertis.edu.in' } });
+    for (const faculty of facultyList) {
+      const deptCode = Object.keys(depts).find(key => depts[key].id === faculty.department_id);
+      const section = sectionMap[deptCode];
+      const course = courseMap[deptCode];
+      const tlfqId = `sample-tlfq-${faculty.id}`;
+      tlfqIds.push(tlfqId);
+      await Tlfq.upsert({
+        where: { id: tlfqId },
+        update: {},
+        create: {
+          id: tlfqId,
+          title: `${faculty.name} Feedback`,
+          section_id: section.id,
+          course_id: course.id,
+          faculty_id: faculty.id,
+          is_active: true,
+          closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          created_by: coord1.id,
+        },
+      });
     }
 
     // 10. Create 25 Students per Section (22 Active, 3 Pending)
@@ -463,84 +515,6 @@ export const initDb = async () => {
       }
     }
 
-    // 11. Create TLFQ Forms
-    console.log('Creating sample TLFQ forms...');
-    const coord1 = await User.findFirst({ where: { email: 'coordinator@invertis.edu.in' } });
-    const t1 = await Tlfq.upsert({
-      where: { id: 'sample-tlfq-1' },
-      update: {},
-      create: {
-        id: 'sample-tlfq-1',
-        title: 'Data Structures Mid-Term Feedback',
-        section_id: bcs3a.id,
-        course_id: c1.id,
-        faculty_id: f1.id,
-        is_active: true,
-        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        created_by: coord1.id
-      }
-    });
-
-    const t2 = await Tlfq.upsert({
-      where: { id: 'sample-tlfq-2' },
-      update: {},
-      create: {
-        id: 'sample-tlfq-2',
-        title: 'AI Concept Evaluation',
-        section_id: btai3a.id,
-        course_id: c2.id,
-        faculty_id: f2.id,
-        is_active: true,
-        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        created_by: coord1.id
-      }
-    });
-
-    const t3 = await Tlfq.upsert({
-      where: { id: 'sample-tlfq-3' },
-      update: {},
-      create: {
-        id: 'sample-tlfq-3',
-        title: 'Basic Electronics Assessment',
-        section_id: btec3a.id,
-        course_id: c3.id,
-        faculty_id: f3.id,
-        is_active: true,
-        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        created_by: coord1.id
-      }
-    });
-
-    const t4 = await Tlfq.upsert({
-      where: { id: 'sample-tlfq-4' },
-      update: {},
-      create: {
-        id: 'sample-tlfq-4',
-        title: 'Thermodynamics Course Evaluation',
-        section_id: btme3a.id,
-        course_id: c4.id,
-        faculty_id: f4.id,
-        is_active: true,
-        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        created_by: coord1.id
-      }
-    });
-
-    const t5 = await Tlfq.upsert({
-      where: { id: 'sample-tlfq-5' },
-      update: {},
-      create: {
-        id: 'sample-tlfq-5',
-        title: 'Structural Analysis Feedback',
-        section_id: btce3a.id,
-        course_id: c5.id,
-        faculty_id: f5.id,
-        is_active: true,
-        closing_time: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        created_by: coord1.id
-      }
-    });
-
     // 12. Add Questions
     const questionsText = [
       'How well does the teacher explain concepts?',
@@ -550,15 +524,15 @@ export const initDb = async () => {
       'Overall satisfaction with the teaching method?'
     ];
 
-    for (const tlfqId of [t1.id, t2.id, t3.id, t4.id, t5.id]) {
+    for (const tlfqId of tlfqIds) {
       for (const qText of questionsText) {
         const exists = await Question.findFirst({ where: { tlfq_id: tlfqId, question_text: qText } });
         if (!exists) await Question.create({ data: { tlfq_id: tlfqId, question_text: qText } });
       }
     }
 
-    // 13. Responses
-    console.log('Generating sample responses...');
+    // 13. Generate responses (including varied ratings and some low scores)
+    console.log('Generating sample responses with varied ratings...');
     const comments = [
       'Excellent teacher! Explains concepts very clearly.',
       'Very punctual, covers the syllabus thoroughly.',
@@ -568,30 +542,35 @@ export const initDb = async () => {
     ];
     for (const student of students) {
       if (student.status !== 'active') continue;
-      
-      let tlfqId;
-      if (student.section_id === bcs3a.id) tlfqId = t1.id;
-      else if (student.section_id === btai3a.id) tlfqId = t2.id;
-      else if (student.section_id === btec3a.id) tlfqId = t3.id;
-      else if (student.section_id === btme3a.id) tlfqId = t4.id;
-      else if (student.section_id === btce3a.id) tlfqId = t5.id;
-
-      const hasResponded = await Response.findFirst({ where: { student_id: student.id, tlfq_id: tlfqId } });
-      if (!hasResponded) {
-        const comment = comments[Math.floor(Math.random() * comments.length)];
-        const resp = await Response.create({
-          data: {
-            student_id: student.id,
-            tlfq_id: tlfqId,
-            submitted_at: new Date().toISOString(),
-            comment
+      // Each student responds to a random subset of TLFQs (up to 3)
+      const shuffled = tlfqIds.sort(() => 0.5 - Math.random()).slice(0, 3);
+      for (const tlfqId of shuffled) {
+        const hasResponded = await Response.findFirst({ where: { student_id: student.id, tlfq_id: tlfqId } });
+        if (!hasResponded) {
+          const comment = comments[Math.floor(Math.random() * comments.length)];
+          // Determine if this TLFQ should have low ratings (20% chance)
+          const lowRating = Math.random() < 0.2;
+          const baseRating = lowRating ? 2 : 5; // low around 2-4, high around 5-7
+          const resp = await Response.create({
+            data: {
+              student_id: student.id,
+              tlfq_id: tlfqId,
+              submitted_at: new Date().toISOString(),
+              comment,
+            }
+          });
+          const qs = await Question.findMany({ where: { tlfq_id: tlfqId } });
+          for (const q of qs) {
+            await Answer.create({
+              data: {
+                response_id: resp.id,
+                question_id: q.id,
+                rating: Math.min(7, Math.max(1, baseRating + Math.floor(Math.random() * 3)))
+              }
+            });
           }
-        });
-        const qs = await Question.findMany({ where: { tlfq_id: tlfqId } });
-        for (const q of qs) {
-          await Answer.create({ data: { response_id: resp.id, question_id: q.id, rating: Math.floor(Math.random() * 3) + 5 } });
+          await User.update({ where: { id: student.id }, data: { points: { increment: REWARD_POINTS } } });
         }
-        await User.update({ where: { id: student.id }, data: { points: { increment: REWARD_POINTS } } });
       }
     }
 
