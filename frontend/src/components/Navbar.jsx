@@ -137,10 +137,6 @@ export default function Navbar() {
               className="h-10 object-contain"
               onError={e => { e.target.style.display = 'none'; }}
             />
-            <div className="hidden sm:block">
-              <div className="text-[#1D3557] font-semibold text-base leading-tight">INVERTIS UNIVERSITY</div>
-              <div className="text-slate-400 text-[9px] font-medium tracking-widest uppercase mt-1">Bareilly, Uttar Pradesh</div>
-            </div>
           </div>
         </div>
 

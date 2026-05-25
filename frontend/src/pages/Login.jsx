@@ -167,11 +167,11 @@ export default function Login() {
       <header className="w-full relative z-20 px-6 py-4 flex items-center justify-between border-b-[3px] border-[#FF5A36] bg-white/95 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <img src="/main logo.png" alt="Invertis" className="h-9 object-contain" />
-          <div className="text-left">
+          {/* <div className="text-left"> */}
             {/* FIXED: Stronger color for header text */}
-            <div className="text-[#1D3557] font-semibold text-sm tracking-wide leading-none">INVERTIS UNIVERSITY</div>
+            {/* <div className="text-[#1D3557] font-semibold text-sm tracking-wide leading-none">INVERTIS UNIVERSITY</div>
             <div className="text-slate-600 text-[8px] font-semibold tracking-widest uppercase mt-1">Feedback Portal</div>
-          </div>
+          </div> */}
         </div>
         <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1D3557]/8 border border-[#1D3557]/15 text-[#1D3557] text-[10px] font-semibold tracking-wider uppercase">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
