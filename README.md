@@ -298,7 +298,7 @@ node prisma/seed.js # Manual re-seed if needed
 
 ---
 
-## 📦 Tech Stack
+## 📦 Tech Stack   
 
 | Layer | Technology |
 |-------|-----------|
