@@ -82,7 +82,11 @@ export default function Login() {
         }
         setStep(2);
       } catch (err) {
-        setError(err.response?.data?.message || 'User ID not found.');
+        if (err.message === 'Network Error' || !err.response) {
+          setError('Cannot connect to server. Please verify the backend is running.');
+        } else {
+          setError(err.response?.data?.message || 'User ID not found.');
+        }
       } finally {
         setLoading(false);
       }
@@ -100,13 +104,17 @@ export default function Login() {
       await login({ identifier: identifier.trim(), password });
       navigate('/dashboard');
     } catch (err) {
-      const msg = err.response?.data?.message;
-      if (msg === 'ACCOUNT_PENDING') {
-        setPendingStudent({ student_id: err.response.data.student_id, name: err.response.data.name });
-        setStep(3);
-        return;
+      if (err.message === 'Network Error' || !err.response) {
+        setError('Cannot connect to server. Please verify the backend is running.');
+      } else {
+        const msg = err.response?.data?.message;
+        if (msg === 'ACCOUNT_PENDING') {
+          setPendingStudent({ student_id: err.response.data.student_id, name: err.response.data.name });
+          setStep(3);
+          return;
+        }
+        setError(msg || 'Login failed. Please verify credentials.');
       }
-      setError(msg || 'Login failed. Please verify credentials.');
     } finally {
       setLoading(false);
     }
