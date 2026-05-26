@@ -327,6 +327,20 @@ cd frontend && npm run build
 
 ---
 
+### 🆕 Recent Frontend Improvements
+
+- Enhanced **Login Page UI** with cleaner layout, improved responsiveness, and refined authentication flow
+- Updated **Navbar Design** across multiple dashboards for a more modern and consistent user experience
+- Improved **Anonymous Leaderboard UI** with better visual hierarchy and smoother interactions
+- Refined dashboard pages including:
+  - Super Admin Panel
+  - Supreme Panel
+  - HOD Dashboard
+  - Identity Reveal Page
+- Improved sidebar navigation and overall frontend consistency
+- Added campus visuals and polished interface elements for a more professional university portal appearance
+- Optimized frontend structure and reusable UI components for better maintainability
+
 ## 📝 License
 
 MIT License — Developed for **Invertis University, Bareilly** by Invertis Innovation & Incubation.
