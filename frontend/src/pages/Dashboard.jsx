@@ -29,11 +29,13 @@ const PageShell = ({ children }) => (
 );
 
 function StatCard({ icon: Icon, label, value, color, glow }) {
+  const hasTextColor = color.includes('text-');
+  const isClassGlow = glow.startsWith('rgba');
   return (
     <motion.div whileHover={{ y: -2 }} className="bg-white rounded-lg shadow border border-[#DEE2E6] hover:shadow-md transition-shadow p-4 sm:p-5 flex items-center gap-4">
       <div className={`h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}
-        style={{ boxShadow: `0 0 20px ${glow}` }}>
-        <Icon size={19} className="text-white" />
+        style={isClassGlow ? { boxShadow: `0 0 20px ${glow}` } : {}}>
+        <Icon size={19} className={hasTextColor ? '' : 'text-white'} />
       </div>
       <div>
         <div className="text-xl sm:text-2xl font-semibold text-[#1D3557] tracking-tight">{value ?? '—'}</div>
@@ -64,19 +66,19 @@ function AdminDashboard() {
   }, []);
 
   const cards = [
-    { icon: Building2,    label: 'Departments',        value: stats?.depts,   color: 'bg-primary-600', glow: 'rgba(29, 78, 137, 0.5)' },
-    { icon: UsersRound,   label: 'Faculty Evaluated',  value: stats?.faculty, color: 'bg-accent-600',  glow: 'rgba(198, 40, 40, 0.5)' },
+    { icon: Building2,    label: 'Departments',        value: stats?.depts,   color: 'bg-blue-50/80 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/30 text-blue-600 dark:text-blue-400', glow: 'rgba(29, 78, 137, 0.05)' },
+    { icon: UsersRound,   label: 'Faculty Evaluated',  value: stats?.faculty, color: 'bg-accent-50/80 dark:bg-accent-950/20 border border-accent-100/50 dark:border-accent-900/30 text-[#FF5A36]', glow: 'rgba(198, 40, 40, 0.05)' },
   ];
 
   const promotionCards = [
-    { icon: ArrowUpCircle, label: 'Current Session', value: promotionOverview?.active_session?.name || '—', color: 'bg-emerald-600', glow: 'rgba(16, 185, 129, 0.45)' },
-    { icon: Activity, label: 'Last Promotion', value: promotionOverview?.recent_logs?.[0] ? `${promotionOverview.recent_logs[0].promoted_count} promoted` : 'No history yet', color: 'bg-teal-600', glow: 'rgba(20, 184, 166, 0.45)' },
+    { icon: ArrowUpCircle, label: 'Current Session', value: promotionOverview?.active_session?.name || '—', color: 'bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400', glow: 'rgba(16, 185, 129, 0.05)' },
+    { icon: Activity, label: 'Last Promotion', value: promotionOverview?.recent_logs?.[0] ? `${promotionOverview.recent_logs[0].promoted_count} promoted` : 'No history yet', color: 'bg-teal-50/80 dark:bg-teal-950/20 border border-teal-100/50 dark:border-teal-900/30 text-teal-600 dark:text-teal-400', glow: 'rgba(20, 184, 166, 0.05)' },
   ];
 
   const actions = [
-    { label: 'User Management',    desc: 'Create HODs & coordinators', path: '/superadmin',  icon: ShieldCheck,  glow: '#0F2D52' },
-    { label: 'Coordinator Panel',  desc: 'Sections, courses, faculty', path: '/coordinator', icon: Layers,       glow: '#1D4E89' },
-    { label: 'Analytics',          desc: 'University-wide insights',   path: '/analytics',   icon: BarChart3,    glow: '#C62828' },
+    { label: 'User Management',    desc: 'Create HODs & coordinators', path: '/superadmin',  icon: ShieldCheck,  glow: '#FF5A36' },
+    { label: 'Coordinator Panel',  desc: 'Sections, courses, faculty', path: '/coordinator', icon: Layers,       glow: '#3B82F6' },
+    { label: 'Analytics',          desc: 'University-wide insights',   path: '/analytics',   icon: BarChart3,    glow: '#10B981' },
   ];
 
   return (
@@ -125,8 +127,8 @@ function HODOverview() {
   const navigate = useNavigate();
 
   const cards = [
-    { label: 'Create Forms',  desc: 'Design & assign evaluation forms', path: '/hod',       icon: ClipboardList, glow: '#1D4E89' },
-    { label: 'Analytics',     desc: 'Department performance insights',   path: '/analytics', icon: BarChart3,     glow: '#C62828' },
+    { label: 'Create Forms',  desc: 'Design & assign evaluation forms', path: '/hod',       icon: ClipboardList, glow: '#3B82F6' },
+    { label: 'Analytics',     desc: 'Department performance insights',   path: '/analytics', icon: BarChart3,     glow: '#FF5A36' },
   ];
 
   return (
@@ -205,9 +207,9 @@ function StudentDashboard() {
       {/* Stats strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
-          { icon: Clock,          label: 'Pending',   value: pendingCount,   color: 'text-amber-400',  bg: 'bg-amber-400/10 border-amber-400/20' },
-          { icon: CheckCircle2,   label: 'Completed', value: completedCount, color: 'text-emerald-400',bg: 'bg-emerald-400/10 border-emerald-400/20' },
-          { icon: TrendingUp,     label: 'Progress',  value: `${progress}%`, color: 'text-primary-400', bg: 'bg-primary-400/10 border-primary-400/20' },
+          { icon: Clock,          label: 'Pending',   value: pendingCount,   color: 'text-amber-600 dark:text-amber-400',  bg: 'bg-amber-50 dark:bg-amber-400/10 border-amber-200 dark:border-amber-400/25' },
+          { icon: CheckCircle2,   label: 'Completed', value: completedCount, color: 'text-emerald-600 dark:text-emerald-400',bg: 'bg-emerald-50 dark:bg-emerald-400/10 border-emerald-200 dark:border-emerald-400/25' },
+          { icon: TrendingUp,     label: 'Progress',  value: `${progress}%`, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-400/10 border-blue-200 dark:border-blue-400/25' },
         ].map(({ icon: Icon, label, value, color, bg }) => (
           <div key={label} className={`card p-4 border ${bg} flex items-center sm:flex-col sm:items-start justify-between sm:justify-normal gap-2`}>
             <div className="flex items-center gap-2 sm:gap-1.5">

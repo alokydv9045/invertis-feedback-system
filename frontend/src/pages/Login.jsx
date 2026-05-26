@@ -24,7 +24,7 @@ const roleHint = (id) => {
 const slideshowImages = [
   '/campus1.png',
   '/campus2.png',
-  '/campus_csed.png',
+  // '/campus_csed.png',
   '/campus4.jpg',
 ];
 
@@ -152,7 +152,7 @@ export default function Login() {
         {slideshowImages.map((src, idx) => (
           <div
             key={src}
-            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-[1200ms] ease-in-out transform ${
+            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-[2500ms] ease-in-out transform ${
               idx === activeIndex
                 ? 'opacity-100 scale-105 filter brightness-100'
                 : 'opacity-0 scale-100'

@@ -110,8 +110,8 @@ export default function HODPanel() {
         <Sidebar />
         <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-5xl overflow-auto">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <LayoutDashboard size={20} className="text-white" />
+            <div className="h-10 w-10 bg-gradient-to-br from-blue-50/80 to-cyan-50 dark:from-slate-900 dark:to-slate-800 border border-blue-100/50 dark:border-slate-800 rounded-xl flex items-center justify-center shadow-sm">
+              <LayoutDashboard size={20} className="text-blue-500 dark:text-blue-400" />
             </div>
             <div>
               <h1 className="text-2xl font-semibold text-[#1D3557]">HOD Panel</h1>

@@ -72,9 +72,8 @@ export default function IdentityRevealPage() {
             {/* ── Header ───────────────────────────────────────────────── */}
             <div className="flex items-center gap-3 sm:gap-4 flex-wrap sm:flex-nowrap justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 bg-gradient-to-br from-accent-500 via-accent-600 to-primary-600
-                  rounded-2xl flex items-center justify-center shadow-xl shadow-accent-500/30 flex-shrink-0">
-                  <Fingerprint size={22} className="text-white" />
+                <div className="h-12 w-12 bg-gradient-to-br from-red-50 to-orange-50 dark:from-slate-900 dark:to-slate-800 border border-red-100/50 dark:border-red-900/30 rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0">
+                  <Fingerprint size={22} className="text-[#FF5A36]" />
                 </div>
                 <div>
                   <h1 className="text-xl sm:text-2xl font-semibold text-[var(--text-main)]">Student Identity Reveal</h1>

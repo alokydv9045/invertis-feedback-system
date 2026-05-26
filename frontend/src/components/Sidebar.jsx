@@ -137,12 +137,12 @@ export default function Sidebar() {
               className="block"
             >
               {({ isActive }) => (
-                <div className={`flex items-center gap-3 px-4 py-3 text-xs font-medium transition-all duration-200 cursor-pointer border-l-3 ${
+                <div className={`group flex items-center gap-3 px-4 py-3 text-xs font-medium transition-all duration-200 cursor-pointer border-l-3 ${
                   isActive
                     ? 'bg-[#FF5A36]/10 text-[#FF5A36] font-semibold border-l-[#FF5A36]'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-l-transparent'
                 }`}>
-                  <Icon size={14} className="shrink-0" />
+                  <Icon size={14} className={`shrink-0 ${isActive ? 'text-[#FF5A36]' : 'text-slate-400 group-hover:text-slate-600 transition-colors'}`} />
                   <span>{label}</span>
                 </div>
               )}
@@ -162,13 +162,13 @@ export default function Sidebar() {
                 <button
                   key={tab}
                   onClick={() => goTab(tab)}
-                  className={`flex items-center gap-3 px-4 py-2.5 text-[11px] font-medium transition-all duration-200 cursor-pointer border-l-3 text-left w-full ${
+                  className={`group flex items-center gap-3 px-4 py-2.5 text-[11px] font-medium transition-all duration-200 cursor-pointer border-l-3 text-left w-full ${
                     isActive
                       ? 'bg-[#FF5A36]/10 text-[#FF5A36] font-semibold border-l-[#FF5A36]'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-l-transparent'
                   }`}
                 >
-                  <Icon size={12} className="shrink-0" />
+                  <Icon size={12} className={`shrink-0 ${isActive ? 'text-[#FF5A36]' : 'text-slate-400 group-hover:text-slate-600 transition-colors'}`} />
                   <span className="truncate">{label}</span>
                   {isActive && <ChevronRight size={11} className="ml-auto shrink-0 opacity-80" />}
                 </button>

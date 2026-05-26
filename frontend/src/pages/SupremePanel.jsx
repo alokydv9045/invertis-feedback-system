@@ -75,9 +75,8 @@ export default function SupremePanel() {
 
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
-            <div className="h-12 w-12 bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500
-              rounded-2xl flex items-center justify-center shadow-xl shadow-amber-500/30">
-              <Crown size={22} className="text-white" />
+            <div className="h-12 w-12 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-900 dark:to-slate-800 border border-amber-100/50 dark:border-orange-900/30 rounded-2xl flex items-center justify-center shadow-sm">
+              <Crown size={22} className="text-amber-500" />
             </div>
             <div>
               <h1 className="text-2xl font-semibold gradient-text">Supreme Authority Panel</h1>

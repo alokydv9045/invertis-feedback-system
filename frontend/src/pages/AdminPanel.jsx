@@ -102,7 +102,7 @@ export default function AdminPanel() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <ClipboardList size={28} className="text-primary-600 dark:text-primary-400" />
+                  <ClipboardList size={28} className="text-[#FF5A36]" />
                   <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Evaluation Forge</h1>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">Design and deploy high-fidelity academic feedback instruments.</p>

@@ -75,7 +75,7 @@ export default function HODDashboard() {
             {/* Header */}
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <BarChart3 size={24} className="text-primary-600 dark:text-primary-400" />
+                <BarChart3 size={24} className="text-[#FF5A36]" />
                 <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Department Portal</h1>
               </div>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">

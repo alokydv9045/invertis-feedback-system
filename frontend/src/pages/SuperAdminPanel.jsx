@@ -250,8 +250,8 @@ export default function SuperAdminPanel() {
             {/* Header */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 w-full">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-gradient-to-br from-accent-500 to-accent-600 rounded-2xl flex items-center justify-center shadow-lg shadow-accent-500/20 flex-shrink-0">
-                    <Shield size={24} className="text-white sm:w-7 sm:h-7" />
+                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-gradient-to-br from-red-50 to-orange-50 dark:from-slate-900 dark:to-slate-800 border border-red-100/50 dark:border-red-900/30 rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0">
+                    <Shield size={24} className="text-[#FF5A36] sm:w-7 sm:h-7" />
                   </div>
                   <div>
                     <h1 className="text-2xl sm:text-3xl font-semibold text-[var(--text-main)]">User Management</h1>
@@ -346,7 +346,7 @@ export default function SuperAdminPanel() {
                               </button>
                             </div>
                             <div className="flex items-center gap-5">
-                              <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-primary-500 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300">
+                              <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary-50/80 dark:group-hover:bg-primary-950/20 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all duration-300">
                                 <Building2 size={28} />
                               </div>
                               <div className="flex-1 min-w-0">
@@ -440,7 +440,7 @@ export default function SuperAdminPanel() {
                                 </button>
                               </div>
                               <div className="flex items-center gap-5">
-                                <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-primary-500 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300">
+                                <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary-50/80 dark:group-hover:bg-primary-950/20 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all duration-300">
                                   <Briefcase size={28} />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -521,7 +521,7 @@ export default function SuperAdminPanel() {
                               </button>
                             </div>
                             <div className="flex items-center gap-5">
-                              <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-primary-500 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300">
+                              <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary-50/80 dark:group-hover:bg-primary-950/20 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all duration-300">
                                 <ClipboardList size={28} />
                               </div>
                               <div className="flex-1 min-w-0">
