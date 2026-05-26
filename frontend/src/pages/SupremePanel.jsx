@@ -4,13 +4,13 @@ import Sidebar from '../components/Sidebar';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { Crown, Shield, Plus, Trash2, Check, X, Eye, EyeOff, Users } from 'lucide-react';
+import { Crown, Shield, Plus, Trash2, Check, X, Eye, EyeOff, UsersRound } from 'lucide-react';
 
 function Input({ ...props }) {
   return (
     <input
       {...props}
-      className={`bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm text-slate-800 dark:text-[var(--text-main)] placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all w-full shadow-sm ${props.className || ''}`}
+      className={`input-base px-5 py-4 text-sm ${props.className || ''}`}
     />
   );
 }
@@ -75,12 +75,11 @@ export default function SupremePanel() {
 
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
-            <div className="h-12 w-12 bg-gradient-to-br from-yellow-400 via-amber-500 to-orange-500
-              rounded-2xl flex items-center justify-center shadow-xl shadow-amber-500/30">
-              <Crown size={22} className="text-white" />
+            <div className="h-12 w-12 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-900 dark:to-slate-800 border border-amber-100/50 dark:border-orange-900/30 rounded-2xl flex items-center justify-center shadow-sm">
+              <Crown size={22} className="text-amber-500" />
             </div>
             <div>
-              <h1 className="text-2xl font-black gradient-text">Supreme Authority Panel</h1>
+              <h1 className="text-2xl font-semibold gradient-text">Supreme Authority Panel</h1>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">Only Supreme Accounts can access this panel.</p>
             </div>
           </div>
@@ -99,7 +98,7 @@ export default function SupremePanel() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Full Name</label>
+                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Full Name</label>
                 <Input
                   value={name}
                   onChange={e => setName(e.target.value)}
@@ -107,7 +106,7 @@ export default function SupremePanel() {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Email Address</label>
+                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Email Address</label>
                 <Input
                   type="email"
                   value={email}
@@ -116,7 +115,7 @@ export default function SupremePanel() {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Password</label>
+                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Password</label>
                 <div className="relative">
                   <Input
                     type={showPass ? 'text' : 'password'}
@@ -150,8 +149,8 @@ export default function SupremePanel() {
           {/* Super Admin List */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Users size={16} className="text-slate-600 dark:text-slate-400" />
-              <h2 className="text-sm font-bold text-slate-700 dark:text-slate-300">Existing Super Admins</h2>
+              <UsersRound size={16} className="text-slate-600 dark:text-slate-400" />
+              <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Existing Super Admins</h2>
               <span className="text-xs bg-white/10 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full">{superAdmins.length}</span>
             </div>
 
@@ -177,11 +176,11 @@ export default function SupremePanel() {
                     className="card-hover rounded-2xl p-4 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-gradient-to-br from-primary-500 to-accent-600 rounded-xl flex items-center justify-center text-white font-black text-sm">
+                      <div className="h-10 w-10 bg-gradient-to-br from-primary-500 to-accent-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm">
                         {admin.name?.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="text-sm font-bold text-[var(--text-main)]">{admin.name}</div>
+                        <div className="text-sm font-semibold text-[var(--text-main)]">{admin.name}</div>
                         <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{admin.email}</div>
                         <span className="badge-role mt-1 inline-flex">Super Admin</span>
                       </div>
