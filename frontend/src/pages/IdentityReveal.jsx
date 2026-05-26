@@ -72,9 +72,11 @@ export default function IdentityRevealPage() {
             {/* ── Header ───────────────────────────────────────────────── */}
             <div className="flex items-center gap-3 sm:gap-4 flex-wrap sm:flex-nowrap justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 bg-gradient-to-br from-accent-500 via-accent-600 to-primary-600
-                  rounded-2xl flex items-center justify-center shadow-xl shadow-accent-500/30 flex-shrink-0">
-                  <Fingerprint size={22} className="text-white" />
+                <div className="user-type-badge group">
+                  <div className="absolute inset-0 bg-rose-500/20 rounded-[1.25rem] blur-md opacity-75 group-hover:opacity-100 transition-opacity" />
+                  <div className="user-type-badge-container">
+                    <Fingerprint size={22} className="text-rose-400 drop-shadow-[0_2px_8px_rgba(244,63,94,0.5)] group-hover:scale-110 transition-transform duration-300" />
+                  </div>
                 </div>
                 <div>
                   <h1 className="text-xl sm:text-2xl font-black text-[var(--text-main)]">Student Identity Reveal</h1>
@@ -232,8 +234,7 @@ export default function IdentityRevealPage() {
 
                     {/* Avatar + name */}
                     <div className="flex items-center gap-4 mb-6 p-4 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/8">
-                      <div className="h-14 w-14 bg-gradient-to-br from-primary-500 to-accent-600
-                        rounded-2xl flex items-center justify-center text-2xl font-black text-white shadow-xl flex-shrink-0">
+                      <div className="h-14 w-14 bg-gradient-to-br from-[#1D3557] to-[#0F2D52] border border-white/10 dark:border-slate-700/50 rounded-2xl flex items-center justify-center text-2xl font-black text-accent-500 dark:text-accent-400 shadow-xl flex-shrink-0">
                         {result.name?.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">

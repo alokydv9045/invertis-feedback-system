@@ -75,8 +75,8 @@ export default function SupremePanel() {
 
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
-            <div className="h-12 w-12 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-900 dark:to-slate-800 border border-amber-100/50 dark:border-orange-900/30 rounded-2xl flex items-center justify-center shadow-sm">
-              <Crown size={22} className="text-amber-500" />
+            <div className="user-type-badge h-12 w-12 rounded-2xl flex items-center justify-center bg-amber-50 dark:bg-amber-950/20 border border-amber-100/50 dark:border-amber-900/30 shadow-sm">
+              <Crown size={22} className="text-amber-500 dark:text-amber-400" />
             </div>
             <div>
               <h1 className="text-2xl font-semibold gradient-text">Supreme Authority Panel</h1>
@@ -176,7 +176,7 @@ export default function SupremePanel() {
                     className="card-hover rounded-2xl p-4 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-gradient-to-br from-primary-500 to-accent-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm">
+                      <div className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-semibold text-sm bg-gradient-to-br from-primary-500 to-accent-600 dark:from-[#1D3557] dark:to-[#0F2D52]">
                         {admin.name?.charAt(0).toUpperCase()}
                       </div>
                       <div>

@@ -235,10 +235,12 @@
 
   /* ── Cards ──────────────────────────────────────────────────────────────── */
   .card-main {
-    background: var(--bg-card);
-    border: 1px solid var(--border-base);
-    border-radius: 1.25rem;
-    box-shadow: 0 4px 20px -4px rgba(15, 45, 82, 0.05);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(29, 53, 87, 0.08);
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px -10px rgba(15, 45, 82, 0.06);
     @apply p-6;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -246,7 +248,7 @@
   .card-main:hover {
     box-shadow: 0 20px 40px -8px rgba(15, 45, 82, 0.12);
     transform: translateY(-4px);
-    border-color: rgba(29, 78, 137, 0.2);
+    border-color: rgba(255, 42, 0, 0.25);
   }
 
   /* Prevent children from overflowing rounded corners and improve focus accessibility */
@@ -261,12 +263,74 @@
   }
 
   .dark .card-main {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    background: rgba(15, 45, 82, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 40px -15px rgba(0, 0, 0, 0.4);
   }
 
   .dark .card-main:hover {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 20px 50px -15px rgba(0, 0, 0, 0.6);
-    border-color: rgba(59, 110, 165, 0.3);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 25px 60px -12px rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 42, 0, 0.35);
+  }
+
+  /* ── Card Hover ─────────────────────────────────────────────────────────── */
+  .card-hover {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(29, 53, 87, 0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .card-hover {
+    background: rgba(15, 45, 82, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 42, 0, 0.25);
+    box-shadow: 0 12px 24px -6px rgba(15, 45, 82, 0.1);
+  }
+
+  .dark .card-hover:hover {
+    background: rgba(15, 45, 82, 0.9);
+    border-color: rgba(255, 42, 0, 0.35);
+    box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.4);
+  }
+
+  /* ── Clean & Minimalistic User Type Badge ─────────────────────────────────── */
+  .user-type-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 3rem;
+    width: 3rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(29, 53, 87, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .user-type-badge {
+    background: rgba(15, 45, 82, 0.65);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .user-type-badge:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 42, 0, 0.3);
+    box-shadow: 0 8px 20px -6px rgba(15, 45, 82, 0.1);
+  }
+
+  .dark .user-type-badge:hover {
+    border-color: rgba(255, 42, 0, 0.4);
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.45);
   }
 
   /* Slim border for hoverable list cards (e.g., super admin rows) */

@@ -250,8 +250,8 @@ export default function SuperAdminPanel() {
             {/* Header */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 w-full">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 bg-gradient-to-br from-accent-500 to-accent-600 rounded-2xl flex items-center justify-center shadow-lg shadow-accent-500/20 flex-shrink-0">
-                    <Shield size={24} className="text-white sm:w-7 sm:h-7" />
+                  <div className="user-type-badge bg-rose-50 dark:bg-rose-950/20 border-rose-200/50 dark:border-rose-900/30">
+                    <Shield size={20} className="text-rose-500 dark:text-rose-400" />
                   </div>
                   <div>
                     <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-main)]">User Management</h1>
@@ -346,8 +346,8 @@ export default function SuperAdminPanel() {
                               </button>
                             </div>
                             <div className="flex items-center gap-5">
-                              <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-primary-500 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300">
-                                <Building2 size={28} />
+                              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1D3557] to-[#0F2D52] border border-white/10 dark:border-slate-700/50 flex items-center justify-center text-accent-500 dark:text-[#FF2A00] group-hover:scale-105 transition-transform duration-300 shadow-md flex-shrink-0">
+                                <Building2 size={26} className="drop-shadow-[0_2px_6px_rgba(255,42,0,0.3)]" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="font-black text-slate-900 dark:text-white text-base truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
@@ -440,8 +440,8 @@ export default function SuperAdminPanel() {
                                 </button>
                               </div>
                               <div className="flex items-center gap-5">
-                                <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-primary-500 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300">
-                                  <Users size={28} />
+                                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1D3557] to-[#0F2D52] border border-white/10 dark:border-slate-700/50 flex items-center justify-center text-amber-500 dark:text-amber-400 group-hover:scale-105 transition-transform duration-300 shadow-md flex-shrink-0">
+                                  <Users size={26} className="drop-shadow-[0_2px_6px_rgba(245,158,11,0.3)]" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <h3 className="font-black text-slate-900 dark:text-white text-base truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
@@ -521,8 +521,8 @@ export default function SuperAdminPanel() {
                               </button>
                             </div>
                             <div className="flex items-center gap-5">
-                              <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-primary-500 group-hover:bg-primary-600 group-hover:text-white transition-all duration-300">
-                                <Users size={28} />
+                              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1D3557] to-[#0F2D52] border border-white/10 dark:border-slate-700/50 flex items-center justify-center text-blue-500 dark:text-blue-400 group-hover:scale-105 transition-transform duration-300 shadow-md flex-shrink-0">
+                                <Users size={26} className="drop-shadow-[0_2px_6px_rgba(59,130,246,0.3)]" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="font-black text-slate-900 dark:text-white text-base truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">

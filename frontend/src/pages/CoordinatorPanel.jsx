@@ -5,7 +5,7 @@ import Sidebar from '../components/Sidebar';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { Plus, Trash2, Check, X, Users, BookOpen, GraduationCap, Link2, Building2, ChevronDown, Key, Upload, FileText, Info } from 'lucide-react';
+import { Plus, Trash2, Check, X, Users, BookOpen, GraduationCap, Link2, Building2, ChevronDown, Key, Upload, FileText, Info, Layers } from 'lucide-react';
 
 const TABS = [
   { id: 'sections', label: 'Sections', icon: Link2 },
@@ -555,9 +555,14 @@ export default function CoordinatorPanel() {
       <div className="admin-layout">
         <Sidebar />
         <main className="admin-content">
-          <header className="mb-8">
-            <h1 className="text-2xl font-black gradient-text mb-1">Coordinator Hub</h1>
-            <p className="text-xs text-[var(--text-muted)] font-medium">Manage Invertis University feedback infrastructure</p>
+          <header className="mb-8 flex items-center gap-4">
+            <div className="user-type-badge bg-blue-50 dark:bg-blue-950/20 border-blue-200/50 dark:border-blue-900/30">
+              <Layers size={20} className="text-blue-500 dark:text-blue-400" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black gradient-text mb-1">Coordinator Hub</h1>
+              <p className="text-xs text-[var(--text-muted)] font-medium">Manage Invertis University feedback infrastructure</p>
+            </div>
           </header>
 
           <div className="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-2 border-b border-[var(--border-base)]">

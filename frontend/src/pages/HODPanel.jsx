@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { LayoutDashboard, Plus, ToggleLeft, ToggleRight, Clock, FileText, BarChart2, Check, X } from 'lucide-react';
+import { LayoutDashboard, Plus, ToggleLeft, ToggleRight, Clock, FileText, BarChart2, Check, X, Users, BookOpen, GraduationCap, Link2 } from 'lucide-react';
 
 const STD_QUESTIONS = [
   'The instructor explains course material clearly and effectively.',
@@ -109,9 +109,9 @@ export default function HODPanel() {
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-5xl overflow-auto">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <LayoutDashboard size={20} className="text-white" />
+          <div className="flex items-center gap-4 mb-6">
+            <div className="user-type-badge bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200/50 dark:border-emerald-900/30">
+              <LayoutDashboard size={20} className="text-emerald-500 dark:text-emerald-400" />
             </div>
             <div>
               <h1 className="text-2xl font-black text-[#1D3557]">HOD Panel</h1>
@@ -139,18 +139,20 @@ export default function HODPanel() {
                   {stats && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                       {[
-                        { label: 'Sections', val: stats.sections, color: 'from-blue-500 to-cyan-600' },
-                        { label: 'Faculty', val: stats.faculty, color: 'from-violet-500 to-primary-600' },
-                        { label: 'Courses', val: stats.courses, color: 'from-primary-500 to-blue-600' },
-                        { label: 'Students', val: stats.students, color: 'from-emerald-500 to-teal-600' },
-                        { label: 'My Forms', val: stats.myForms, color: 'from-amber-500 to-orange-600' },
-                        { label: 'Open Forms', val: stats.openForms, color: 'from-accent-500 to-pink-600' },
-                      ].map(({ label, val, color }) => (
-                        <div key={label} className="card-main rounded-2xl p-5 flex items-center justify-between sm:block">
-                          <div className="text-sm font-bold text-slate-600 dark:text-slate-400 sm:hidden">{label}</div>
-                          <div className="text-right sm:text-left">
-                            <div className="text-2xl font-black text-[#1D3557]">{val ?? '—'}</div>
-                            <div className="hidden sm:block text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">{label}</div>
+                        { label: 'Sections', val: stats.sections, icon: Link2, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/30' },
+                        { label: 'Faculty', val: stats.faculty, icon: Users, color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/20 border-violet-100/50 dark:border-violet-900/30' },
+                        { label: 'Courses', val: stats.courses, icon: BookOpen, color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-950/20 border-sky-100/50 dark:border-sky-900/30' },
+                        { label: 'Students', val: stats.students, icon: GraduationCap, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100/50 dark:border-emerald-900/30' },
+                        { label: 'My Forms', val: stats.myForms, icon: FileText, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/20 border-amber-100/50 dark:border-amber-900/30' },
+                        { label: 'Open Forms', val: stats.openForms, icon: Clock, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/20 border-rose-100/50 dark:border-rose-900/30' },
+                      ].map(({ label, val, icon: Icon, color, bg }) => (
+                        <div key={label} className="card-main rounded-2xl p-5 flex items-center gap-4 transition-all">
+                          <div className={`h-10 w-10 rounded-xl flex items-center justify-center border ${bg} flex-shrink-0`}>
+                            <Icon size={18} className={color} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-2xl font-black text-[#1D3557] truncate">{val ?? '—'}</div>
+                            <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider truncate mt-0.5">{label}</div>
                           </div>
                         </div>
                       ))}

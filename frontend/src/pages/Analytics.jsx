@@ -82,8 +82,8 @@ export default function Analytics() {
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 card-main">
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="h-10 w-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
-                    <BarChart2 size={20} className="text-white" />
+                  <div className="user-type-badge bg-cyan-50 dark:bg-cyan-950/20 border-cyan-200/50 dark:border-cyan-900/30">
+                    <BarChart2 size={20} className="text-cyan-500 dark:text-cyan-400" />
                   </div>
                   <h1 className="text-2xl md:text-3xl font-black text-[#1D3557]">
                   System Intelligence
@@ -124,10 +124,10 @@ export default function Analytics() {
             {/* Quick Insight Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { label: 'Total Responses', value: totalSubmissions, icon: MessageSquare, color: 'text-primary-400', bg: 'bg-primary-500/10' },
-                { label: 'Avg Rating', value: avgSystemRating, icon: Star, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-                { label: 'Active Courses', value: data?.submissionRates?.length || 0, icon: BookOpen, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-                { label: 'Engagement', value: (data?.submissionRates?.length || 0) > 0 ? ((data.submissionRates || []).reduce((s, c) => s + (c.rate || 0), 0) / (data?.submissionRates?.length || 1)).toFixed(0) + '%' : '0%', icon: TrendingUp, color: 'text-primary-400', bg: 'bg-primary-500/10' },
+                { label: 'Total Responses', value: totalSubmissions, icon: MessageSquare, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/30' },
+                { label: 'Avg Rating', value: avgSystemRating, icon: Star, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/20 border-amber-100/50 dark:border-amber-900/30' },
+                { label: 'Active Courses', value: data?.submissionRates?.length || 0, icon: BookOpen, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100/50 dark:border-emerald-900/30' },
+                { label: 'Engagement', value: (data?.submissionRates?.length || 0) > 0 ? ((data.submissionRates || []).reduce((s, c) => s + (c.rate || 0), 0) / (data?.submissionRates?.length || 1)).toFixed(0) + '%' : '0%', icon: TrendingUp, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100/50 dark:border-indigo-900/30' },
               ].map((stat, i) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
@@ -137,7 +137,7 @@ export default function Analytics() {
                   key={stat.label} 
                   className="card-main p-6 flex items-center gap-4 shadow transition-colors cursor-default"
                 >
-                  <div className={`h-12 w-12 ${stat.bg} rounded-2xl flex items-center justify-center shadow-inner flex-shrink-0`}>
+                  <div className={`h-12 w-12 rounded-2xl flex items-center justify-center border ${stat.bg} flex-shrink-0`}>
                     <stat.icon size={20} className={stat.color} />
                   </div>
                   <div className="min-w-0 flex-1">

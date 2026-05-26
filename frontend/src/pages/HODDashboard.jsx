@@ -73,14 +73,16 @@ export default function HODDashboard() {
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-7xl mx-auto w-full">
 
             {/* Header */}
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <BarChart2 size={24} className="text-primary-600 dark:text-primary-400" />
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Department Portal</h1>
+            <div className="flex items-center gap-4">
+              <div className="user-type-badge bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200/50 dark:border-indigo-900/30">
+                <Building2 size={20} className="text-indigo-500 dark:text-indigo-400" />
               </div>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                Feedback insights for your department — all data is strictly anonymous.
-              </p>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Department Portal</h1>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
+                  Feedback insights for your department — all data is strictly anonymous.
+                </p>
+              </div>
             </div>
 
             {/* Tabs */}
@@ -136,16 +138,18 @@ export default function HODDashboard() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 relative z-10">
                           {[
-                            { icon: BookOpen, label: 'Course Modules', value: dept.course_count, color: 'text-blue-500' },
-                            { icon: Award, label: 'Faculty Records', value: dept.faculty_count, color: 'text-primary-500' },
-                            { icon: Users, label: 'Enrolled Students', value: dept.student_count, color: 'text-emerald-500' },
-                          ].map(({ icon: Icon, label, value, color }) => (
-                            <div key={label} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-5 sm:p-6 group-hover:border-primary-500/20 transition-all flex items-center sm:flex-col justify-between sm:justify-normal text-left sm:text-center">
-                              <div className="flex items-center gap-3 sm:flex-col sm:gap-2">
-                                <Icon size={20} className={`${color}`} />
-                                <div className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest sm:mt-1">{label}</div>
+                            { icon: BookOpen, label: 'Course Modules', value: dept.course_count, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/30' },
+                            { icon: Award, label: 'Faculty Records', value: dept.faculty_count, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/20 border-rose-100/50 dark:border-rose-900/30' },
+                            { icon: Users, label: 'Enrolled Students', value: dept.student_count, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100/50 dark:border-emerald-900/30' },
+                          ].map(({ icon: Icon, label, value, color, bg }) => (
+                            <div key={label} className="card-hover rounded-2xl p-5 sm:p-6 transition-all flex items-center sm:flex-col justify-between sm:justify-normal text-left sm:text-center gap-3">
+                              <div className={`h-10 w-10 rounded-xl flex items-center justify-center border ${bg} flex-shrink-0 sm:mx-auto`}>
+                                <Icon size={18} className={color} />
                               </div>
-                              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-[var(--text-main)]">{value}</div>
+                              <div>
+                                <div className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest sm:mt-1">{label}</div>
+                                <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-[var(--text-main)] mt-1">{value}</div>
+                              </div>
                             </div>
                           ))}
                         </div>

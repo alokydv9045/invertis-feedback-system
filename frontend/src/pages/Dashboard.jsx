@@ -28,16 +28,15 @@ const PageShell = ({ children }) => (
   </div>
 );
 
-function StatCard({ icon: Icon, label, value, color, glow }) {
+function StatCard({ icon: Icon, label, value }) {
   return (
-    <motion.div whileHover={{ y: -2 }} className="bg-white rounded-lg shadow border border-[#DEE2E6] hover:shadow-md transition-shadow p-4 sm:p-5 flex items-center gap-4">
-      <div className={`h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}
-        style={{ boxShadow: `0 0 20px ${glow}` }}>
-        <Icon size={19} className="text-white" />
+    <motion.div whileHover={{ y: -3 }} className="card-hover p-4 sm:p-5 flex items-center gap-4 rounded-2xl">
+      <div className="h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/30">
+        <Icon size={19} className="text-blue-600 dark:text-blue-400" />
       </div>
       <div>
         <div className="text-xl sm:text-2xl font-black text-[#1D3557] tracking-tight">{value ?? '—'}</div>
-        <div className="text-[11px] text-slate-500 font-medium mt-0.5">{label}</div>
+        <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">{label}</div>
       </div>
     </motion.div>
   );
@@ -98,19 +97,18 @@ function AdminDashboard() {
       <div>
         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {actions.map(({ label, desc, path, icon: Icon, glow }) => (
-            <motion.button key={path} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+          {actions.map(({ label, desc, path, icon: Icon }) => (
+            <motion.button key={path} whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}
               onClick={() => navigate(path)}
-              className="bg-white rounded-lg shadow border border-[#DEE2E6] hover:shadow-md transition-shadow p-4 text-left flex flex-col gap-3 cursor-pointer group">
-              <div className="h-9 w-9 rounded-xl flex items-center justify-center"
-                style={{ background: `${glow}22`, border: `1px solid ${glow}44` }}>
-                <Icon size={17} style={{ color: glow }} />
+              className="card-hover p-4 text-left flex flex-col gap-3 cursor-pointer group rounded-2xl w-full">
+              <div className="h-9 w-9 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/30">
+                <Icon size={17} className="text-blue-600 dark:text-blue-400" />
               </div>
               <div>
                 <div className="text-sm font-bold text-[#1D3557] transition-colors">{label}</div>
                 <div className="text-[11px] text-slate-500 mt-0.5">{desc}</div>
               </div>
-              <ArrowRight size={14} className="text-slate-600 group-hover:text-slate-600 transition-colors mt-auto" />
+              <ArrowRight size={14} className="text-slate-500 group-hover:text-accent-500 transition-colors mt-auto" />
             </motion.button>
           ))}
         </div>
@@ -141,19 +139,18 @@ function HODOverview() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {cards.map(({ label, desc, path, icon: Icon, glow }) => (
-          <motion.button key={path} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+        {cards.map(({ label, desc, path, icon: Icon }) => (
+          <motion.button key={path} whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}
             onClick={() => navigate(path)}
-            className="bg-white rounded-lg shadow border border-[#DEE2E6] hover:shadow-md transition-shadow p-5 text-left flex flex-col gap-4 cursor-pointer group">
-            <div className="h-10 w-10 rounded-xl flex items-center justify-center"
-              style={{ background: `${glow}20`, border: `1px solid ${glow}40` }}>
-              <Icon size={18} style={{ color: glow }} />
+            className="card-hover p-5 text-left flex flex-col gap-4 cursor-pointer group rounded-2xl w-full">
+            <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/30">
+              <Icon size={18} className="text-blue-600 dark:text-blue-400" />
             </div>
               <div>
                 <div className="text-sm font-bold text-[#1D3557]">{label}</div>
                 <div className="text-[11px] text-slate-500 mt-0.5">{desc}</div>
               </div>
-            <ArrowRight size={14} className="text-slate-600 group-hover:text-slate-700 transition-colors" />
+            <ArrowRight size={14} className="text-slate-500 group-hover:text-accent-500 transition-colors" />
           </motion.button>
         ))}
       </div>
@@ -205,18 +202,20 @@ function StudentDashboard() {
       {/* Stats strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
-          { icon: Clock,          label: 'Pending',   value: pendingCount,   color: 'text-amber-400',  bg: 'bg-amber-400/10 border-amber-400/20' },
-          { icon: CheckCircle2,   label: 'Completed', value: completedCount, color: 'text-emerald-400',bg: 'bg-emerald-400/10 border-emerald-400/20' },
-          { icon: TrendingUp,     label: 'Progress',  value: `${progress}%`, color: 'text-primary-400', bg: 'bg-primary-400/10 border-primary-400/20' },
+          { icon: Clock,          label: 'Pending',   value: pendingCount,   color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/20 border-amber-100/50 dark:border-amber-900/30' },
+          { icon: CheckCircle2,   label: 'Completed', value: completedCount, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100/50 dark:border-emerald-900/30' },
+          { icon: TrendingUp,     label: 'Progress',  value: `${progress}%`, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/30' },
         ].map(({ icon: Icon, label, value, color, bg }) => (
-          <div key={label} className={`card p-4 border ${bg} flex items-center sm:flex-col sm:items-start justify-between sm:justify-normal gap-2`}>
+          <div key={label} className="card-hover p-4 rounded-2xl flex items-center sm:flex-col sm:items-start justify-between sm:justify-normal gap-2 w-full border border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2 sm:gap-1.5">
-              <Icon size={16} className={color} />
-              <div className="text-xs font-bold text-slate-600 sm:hidden">{label}</div>
+              <div className={`h-8 w-8 rounded-xl flex items-center justify-center border ${bg}`}>
+                <Icon size={14} className={color} />
+              </div>
+              <div className="text-xs font-bold text-slate-500 sm:hidden uppercase tracking-wider">{label}</div>
             </div>
             <div className="text-right sm:text-left">
               <div className={`text-xl sm:text-2xl font-black ${color}`}>{value}</div>
-              <div className="hidden sm:block text-[10px] text-slate-500 font-medium">{label}</div>
+              <div className="hidden sm:block text-[10px] text-slate-500 font-bold uppercase tracking-wider">{label}</div>
             </div>
           </div>
         ))}
@@ -252,7 +251,7 @@ function StudentDashboard() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {courses.map(course => (
-            <motion.div key={course.id} whileHover={{ y: -2 }} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow p-4 sm:p-5 flex flex-col gap-4">
+            <motion.div key={course.id} whileHover={{ y: -4 }} className="card-main p-4 sm:p-5 flex flex-col gap-4">
               {/* Course header */}
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">

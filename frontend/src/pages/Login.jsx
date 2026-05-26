@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import {
-  User as UserIcon, AlertCircle, ShieldCheck
+  User as UserIcon, AlertCircle, ShieldCheck, Lock, Mail, ArrowLeft
 } from 'lucide-react';
 import { Button, Input, Alert } from '../components/ui';
 import api from '../services/api';
@@ -21,6 +21,13 @@ const roleHint = (id) => {
   return null;
 };
 
+const slides = [
+  '/ib2.jpg',
+  'https://www.invertisuniversity.ac.in/images/home-university.webp'
+  
+
+];
+
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -37,6 +44,15 @@ export default function Login() {
   const [regEmail, setRegEmail] = useState('');
   const [regPass, setRegPass] = useState('');
   const [regConfirm, setRegConfirm] = useState('');
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   const hint = roleHint(identifier);
 
@@ -113,133 +129,233 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F1FAEE]">
+    <div className="min-h-screen flex flex-col bg-[#F1FAEE] font-sans">
       {/* Header */}
-      <div className="w-full bg-white px-6 py-4 flex items-center gap-4">
-        <img src="/main logo.png" alt="Invertis University Logo" className="w-[116px] h-12 object-contain" />
-
+      <div className="w-full bg-white px-4 sm:px-6 py-3.5 flex items-center justify-between border-b-[3px] border-[#FF2A00] shadow-sm z-20">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <img src="/main logo.png" alt="Invertis University Logo" className="h-10 sm:h-12 object-contain" />
+          <div className="h-8 w-[1px] bg-slate-200 hidden sm:block" />
+          <div>
+            <h1 className="text-xs sm:text-sm font-black text-[#1D3557] tracking-wider uppercase leading-tight">Invertis University</h1>
+            <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 tracking-wider uppercase leading-none mt-0.5">Feedback Portal</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 border border-slate-200 rounded-full px-3 py-1.5 bg-slate-50/50 shadow-sm">
+          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[9px] font-bold text-slate-700 uppercase tracking-widest">ERP Secure Access</span>
+        </div>
       </div>
-      <div className="w-full h-1 bg-[#FF2A00]" />
 
       {/* Main content area */}
-      <div className="flex-1 flex items-center justify-center p-4 relative">
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90" style={{
-          backgroundImage: "url('/ib2.jpg')"
-        }} />
+      <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Slideshow background */}
+        {slides.map((slide, index) => (
+          <div
+            key={slide}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out"
+            style={{
+              backgroundImage: `url(${slide})`,
+              opacity: index === currentSlide ? 1 : 0
+            }}
+          />
+        ))}
+        {/* Soft overlay */}
+        <div className="absolute inset-0 bg-black/10" />
 
-        <div className="w-full max-w-md relative z-10">
-          <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-[#DEE2E6]">
-            <div className="bg-[#FF2A00] px-6 py-4 text-center relative text-white">
-              <h2 className="text-xl font-semibold">
-                {step === 1 && 'Sign in to your account'}
-                {step === 2 && 'Enter Password'}
+        <div className="w-full max-w-lg relative z-10 p-2 sm:p-4">
+          <div className="bg-white rounded-[2rem] shadow-2xl border-t-[5px] border-t-[#FF2A00] border-x border-b border-slate-100/50 overflow-hidden px-6 sm:px-8 py-8 space-y-6">
+            
+            {/* Title / Subtitle */}
+            <div className="text-center">
+              <h2 className="text-2xl font-black text-[#1D3557] tracking-tight">
+                {step === 1 && 'Authentication'}
+                {step === 2 && 'Security Verification'}
                 {step === 3 && 'Complete Registration'}
               </h2>
+              <p className="text-[11px] text-slate-500 font-bold mt-1.5 tracking-wider uppercase">
+                {step === 3 ? `Registration for ${pendingStudent?.name}` : 'Teaching-Learning Feedback System'}
+              </p>
             </div>
 
-            <div className="px-8 py-8 space-y-5">
-              {error && <Alert variant="error" closeable onClose={() => setError('')}>{error}</Alert>}
+            {error && <Alert variant="error" closeable onClose={() => setError('')}>{error}</Alert>}
 
-              {step === 1 && (
-                <form onSubmit={handleNext} className="space-y-5">
+            {/* Step 1: Username / ID */}
+            {step === 1 && (
+              <form onSubmit={handleNext} className="space-y-5">
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Username or Student ID
+                  </label>
                   <Input
                     type="text"
-                    placeholder="Username or ID"
+                    placeholder="e.g. admin@invertis.edu.in or BCS2025_01"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     disabled={loading}
+                    leadingIcon={UserIcon}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
                     hint={hint?.label}
                   />
-                  <Button type="submit" disabled={loading} loading={loading} fullWidth>
-                    Next
-                  </Button>
-                </form>
-              )}
+                </div>
+                <Button
+                  type="submit"
+                  variant="ghost"
+                  disabled={loading}
+                  loading={loading}
+                  fullWidth
+                  className="!rounded-full !py-3.5 bg-[#1D3557] hover:bg-[#152741] text-white font-bold"
+                >
+                  Proceed
+                </Button>
+              </form>
+            )}
 
-              {step === 2 && (
-                <form onSubmit={handleLogin} className="space-y-5">
-                  <div className="space-y-1.5 bg-gray-50 p-3 rounded border border-gray-200 mb-4">
-                    <p className="text-xs text-gray-500 uppercase font-bold">Signing in as</p>
-                    <p className="text-sm font-medium text-[#1D3557] truncate">{identifier}</p>
-                  </div>
+            {/* Step 2: Password */}
+            {step === 2 && (
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div className="space-y-1.5 bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-4 text-left">
+                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-wider">Signing in as</p>
+                  <p className="text-sm font-bold text-[#1D3557] truncate">{identifier}</p>
+                </div>
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Password
+                  </label>
                   <Input
                     type="password"
-                    placeholder="Password"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
+                    leadingIcon={Lock}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
                   />
-                  <div className="flex gap-3">
-                    <Button type="button" variant="secondary" onClick={resetToStep1} disabled={loading} className="w-1/3">
-                      Back
-                    </Button>
-                    <Button type="submit" disabled={loading} loading={loading} className="flex-1">
-                      <UserIcon className="w-4 h-4" />
-                      Sign In
-                    </Button>
-                  </div>
-                </form>
-              )}
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={resetToStep1}
+                    disabled={loading}
+                    className="w-full sm:w-1/3 !rounded-full !py-3.5 !border-slate-300 !text-slate-700 hover:!bg-slate-50"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    disabled={loading}
+                    loading={loading}
+                    className="flex-1 !rounded-full !py-3.5 bg-[#1D3557] hover:bg-[#152741] text-white"
+                  >
+                    Sign In
+                  </Button>
+                </div>
+              </form>
+            )}
 
-              {step === 3 && (
-                <form onSubmit={handleRegister} className="space-y-4">
-                  <div className="space-y-1.5 bg-green-50 p-3 rounded border border-green-200 mb-2">
-                    <p className="text-xs text-green-700 uppercase font-bold">Welcome,</p>
-                    <p className="text-sm font-medium text-green-900 truncate">{pendingStudent?.name} ({pendingStudent?.student_id})</p>
-                  </div>
+            {/* Step 3: Registration */}
+            {step === 3 && (
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="space-y-1.5 bg-emerald-50 p-4 rounded-2xl border border-emerald-100 mb-2 text-left">
+                  <p className="text-[10px] text-emerald-700 uppercase font-black tracking-wider">Welcome,</p>
+                  <p className="text-sm font-bold text-emerald-900 truncate">{pendingStudent?.name} ({pendingStudent?.student_id})</p>
+                </div>
+                
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Email Address
+                  </label>
                   <Input
                     type="email"
                     placeholder="Your current email"
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
+                    leadingIcon={Mail}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
                   />
+                </div>
+
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Password
+                  </label>
                   <Input
                     type="password"
                     placeholder="Min 8 chars"
                     value={regPass}
                     onChange={(e) => setRegPass(e.target.value)}
+                    leadingIcon={Lock}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
                   />
+                </div>
+
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Confirm Password
+                  </label>
                   <Input
                     type="password"
                     placeholder="Confirm password"
                     value={regConfirm}
                     onChange={(e) => setRegConfirm(e.target.value)}
+                    leadingIcon={Lock}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
                   />
-                  <div className="flex gap-3">
-                    <Button type="button" variant="secondary" onClick={resetToStep1} disabled={loading} className="w-1/3">
-                      Back
-                    </Button>
-                    <Button type="submit" disabled={loading} loading={loading} className="flex-1" variant="danger">
-                      Activate & Login
-                    </Button>
-                  </div>
-                </form>
-              )}
-
-              {step === 1 && (
-                <div className="pt-4 border-t border-[#DEE2E6] space-y-2">
-                  <div className="flex items-start gap-2">
-                    <ShieldCheck className="w-4 h-4 text-[#457B9D] mt-0.5 shrink-0" />
-                    <p className="text-xs text-[#6C757D]">Your feedback is anonymous to faculty. Responses cannot be traced back to individual students.</p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <ShieldCheck className="w-4 h-4 text-[#457B9D] mt-0.5 shrink-0" />
-                    <p className="text-xs text-[#6C757D]">Admin audit access applies. Only authorized administrators can view detailed analytics.</p>
-                  </div>
                 </div>
-              )}
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={resetToStep1}
+                    disabled={loading}
+                    className="w-full sm:w-1/3 !rounded-full !py-3.5 !border-slate-300 !text-slate-700 hover:!bg-slate-50"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    disabled={loading}
+                    loading={loading}
+                    className="flex-1 !rounded-full !py-3.5 bg-[#1D3557] hover:bg-[#152741] text-white"
+                  >
+                    Activate & Login
+                  </Button>
+                </div>
+              </form>
+            )}
+
+            {/* Bottom info messages */}
+            <div className="pt-6 border-t border-slate-100 space-y-3.5 text-left">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="w-4 h-4 text-[#FF2A00] mt-0.5 shrink-0" />
+                <p className="text-[11px] text-slate-500 leading-normal font-semibold">
+                  Your responses are strictly anonymous to faculty members. Individual submissions cannot be traced back to you.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="w-4 h-4 text-[#FF2A00] mt-0.5 shrink-0" />
+                <p className="text-[11px] text-slate-500 leading-normal font-semibold">
+                  System audit controls apply. Global configuration is managed by authorized university officers.
+                </p>
+              </div>
             </div>
+
           </div>
-          <div className="text-center mt-4">
-            <p className="text-xs text-[#6C757D]">Faculty Feedback & Analytics Portal v2.0</p>
+
+          {/* Bottom small text overlay */}
+          <div className="text-center mt-6">
+            <p className="text-[10px] font-black text-white/90 uppercase tracking-widest drop-shadow-md">
+              INVERTIS TLFQ SYSTEM V2.0
+            </p>
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="w-full bg-[#1D3557] py-4 text-center text-white border-t-4 border-[#FF2A00]">
-        <p className="text-xs">© 2026 Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.</p>
-      </footer>
     </div>
   );
 }
+
