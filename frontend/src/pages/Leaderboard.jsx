@@ -36,13 +36,6 @@ export default function Leaderboard() {
               </p>
             </div>
 
-            {/* Leaderboard notice */}
-            <div className="flex items-start gap-3 p-3.5 bg-primary-500/10 border border-primary-500/25 rounded-2xl">
-              <Medal size={16} className="text-primary-400 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-primary-300 leading-relaxed">
-                <span className="font-bold">Top Contributors Leaderboard</span> — Recognition for students who have actively submitted feedback to help improve the teaching-learning quality.
-              </p>
-            </div>
 
             {loading ? (
               <div className="card-main rounded-3xl p-12 flex justify-center">
@@ -55,19 +48,15 @@ export default function Leaderboard() {
                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Submit feedback to appear on the leaderboard!</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="card-main rounded-3xl p-4 sm:p-6">
+                <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
                  {students.map((s, idx) => (
                    <motion.div
                      key={s.unique_feedback_id}
                      initial={{ opacity: 0, x: -20 }}
                      animate={{ opacity: 1, x: 0 }}
                      transition={{ delay: idx * 0.04 }}
-                     className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border transition-all ${
-                       idx === 0 ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30 shadow-lg scale-[1.02]' :
-                       idx === 1 ? 'card-main border-slate-300 dark:border-slate-700' :
-                       idx === 2 ? 'card-main border-slate-200 dark:border-slate-800' :
-                       'card-main hover:border-primary-500/20'
-                     }`}
+                     className={`flex items-center gap-3 sm:gap-4 py-3 sm:py-4 transition-all`}
                    >
                      {/* Rank badge */}
                      <div className={`h-12 w-12 flex-shrink-0 flex items-center justify-center rounded-xl font-black text-lg shadow-inner ${
@@ -104,6 +93,7 @@ export default function Leaderboard() {
                      </div>
                    </motion.div>
                  ))}
+                </div>
               </div>
             )}
           </motion.div>
