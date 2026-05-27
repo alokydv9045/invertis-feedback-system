@@ -167,7 +167,7 @@ export default function StudentRegister() {
           </AnimatePresence>
 
           <div className="mt-6 pt-5 border-t border-white/6 text-center">
-            <Link to="/login" className="text-[11px] text-slate-600 hover:text-slate-700 dark:text-slate-300 transition-colors">← Back to Staff Login</Link>
+            <Link to="/login" className="text-[11px] text-slate-600 hover:text-slate-700 dark:text-slate-300 transition-colors">← Back to Login</Link>
           </div>
         </div>
       </motion.div>

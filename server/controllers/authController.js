@@ -42,13 +42,12 @@ export const checkStudentId = async (req, res) => {
 
     const user = await User.findFirst({ 
       where: { 
-        student_id: student_id.trim().toUpperCase(),
-        role: 'student'
+        student_id: student_id.trim().toUpperCase()
       } 
     });
     
     if (!user) {
-      return res.status(404).json({ message: 'Student ID not found. Please contact your coordinator.' });
+      return res.status(404).json({ message: 'User ID / Student ID not found.' });
     }
 
     return res.status(200).json({
@@ -114,29 +113,19 @@ export const completeRegistration = async (req, res) => {
   }
 };
 
-// ── Normal login (email or student_id + password) ──────────────────────────
+// ── Normal login (student_id / Login ID + password) ──────────────────────────
 export const login = async (req, res) => {
   try {
     const { identifier, password } = req.body;
     if (!identifier || !password) return res.status(400).json({ message: 'Identifier and password are required.' });
 
-    const isEmail = identifier.includes('@');
-    let user;
+    // Login exclusively from IDs (student_id column)
+    const user = await User.findFirst({ 
+      where: { student_id: identifier.trim().toUpperCase() } 
+    });
 
-    if (isEmail) {
-      user = await User.findFirst({ 
-        where: { email: identifier.trim().toLowerCase() } 
-      });
-      if (!user) return res.status(401).json({ message: 'No account found with this email.' });
-    } else {
-      // Student ID login
-      user = await User.findFirst({ 
-        where: { student_id: identifier.trim().toUpperCase() } 
-      });
-      if (!user) return res.status(404).json({ message: 'Student ID not found. Contact your coordinator.' });
-      if (user.status === 'pending') {
-        return res.status(403).json({ message: 'ACCOUNT_PENDING', student_id: user.student_id, name: user.name });
-      }
+    if (!user) {
+      return res.status(404).json({ message: 'User ID / Login ID not found.' });
     }
 
     if (user.status === 'pending') {

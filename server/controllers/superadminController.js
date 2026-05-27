@@ -4,9 +4,9 @@ import bcrypt from 'bcryptjs';
 // ── Create Super Admin (only Supreme Authority can do this) ──────────────
 export const createSuperAdmin = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'name, email, password required' });
+    const { name, email, password, login_id } = req.body;
+    if (!name || !email || !password || !login_id) {
+      return res.status(400).json({ message: 'name, email, password, login_id required' });
     }
     if (password.length < 8) return res.status(400).json({ message: 'Password must be at least 8 characters.' });
     
@@ -17,13 +17,16 @@ export const createSuperAdmin = async (req, res) => {
         email: email.toLowerCase(),
         password: hashed,
         role: 'super_admin',
+        student_id: login_id.trim().toUpperCase(),
         status: 'active'
       }
     });
     
-    return res.status(201).json({ id: admin.id, name: admin.name, email: admin.email, role: 'super_admin' });
+    return res.status(201).json({ id: admin.id, name: admin.name, email: admin.email, role: 'super_admin', student_id: admin.student_id });
   } catch (err) {
-    if (err.code === 'P2002') return res.status(400).json({ message: 'Email already in use.' });
+    if (err.code === 'P2002') {
+      return res.status(400).json({ message: 'Email or Login ID already in use.' });
+    }
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
@@ -32,9 +35,9 @@ export const createSuperAdmin = async (req, res) => {
 // ── Create HOD ─────────────────────────────────────────────────────────────
 export const createHod = async (req, res) => {
   try {
-    const { name, email, password, department_id } = req.body;
-    if (!name || !email || !password || !department_id) {
-      return res.status(400).json({ message: 'name, email, password, department_id required' });
+    const { name, email, password, department_id, login_id } = req.body;
+    if (!name || !email || !password || !department_id || !login_id) {
+      return res.status(400).json({ message: 'name, email, password, department_id, login_id required' });
     }
     
     const hashed = await bcrypt.hash(password, 10);
@@ -45,13 +48,16 @@ export const createHod = async (req, res) => {
         password: hashed,
         role: 'hod',
         department_id,
+        student_id: login_id.trim().toUpperCase(),
         status: 'active'
       }
     });
     
-    return res.status(201).json({ id: hod.id, name: hod.name, email: hod.email, role: 'hod' });
+    return res.status(201).json({ id: hod.id, name: hod.name, email: hod.email, role: 'hod', student_id: hod.student_id });
   } catch (err) {
-    if (err.code === 'P2002') return res.status(400).json({ message: 'Email already in use.' });
+    if (err.code === 'P2002') {
+      return res.status(400).json({ message: 'Email or Login ID already in use.' });
+    }
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
@@ -60,9 +66,9 @@ export const createHod = async (req, res) => {
 // ── Create Coordinator ─────────────────────────────────────────────────────
 export const createCoordinator = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'name, email, password required' });
+    const { name, email, password, login_id } = req.body;
+    if (!name || !email || !password || !login_id) {
+      return res.status(400).json({ message: 'name, email, password, login_id required' });
     }
     
     const hashed = await bcrypt.hash(password, 10);
@@ -72,13 +78,16 @@ export const createCoordinator = async (req, res) => {
         email: email.toLowerCase(),
         password: hashed,
         role: 'coordinator',
+        student_id: login_id.trim().toUpperCase(),
         status: 'active'
       }
     });
     
-    return res.status(201).json({ id: coord.id, name: coord.name, email: coord.email, role: 'coordinator' });
+    return res.status(201).json({ id: coord.id, name: coord.name, email: coord.email, role: 'coordinator', student_id: coord.student_id });
   } catch (err) {
-    if (err.code === 'P2002') return res.status(400).json({ message: 'Email already in use.' });
+    if (err.code === 'P2002') {
+      return res.status(400).json({ message: 'Email or Login ID already in use.' });
+    }
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
@@ -98,7 +107,8 @@ export const getStaff = async (req, res) => {
       name: s.name,
       email: s.email,
       role: s.role,
-      department_id: s.department_id
+      department_id: s.department_id,
+      student_id: s.student_id
     })));
   } catch (err) {
     console.error(err);
@@ -124,6 +134,14 @@ export const revealStudentByAnonId = async (req, res) => {
     
     if (!student) return res.status(404).json({ message: 'No student found with that Anonymous ID.' });
     
+    // Restrict HODs to their own department
+    if (req.user?.role === 'hod') {
+      const studentDeptId = student.department_id || student.section?.department_id;
+      if (!req.user.department_id || studentDeptId !== req.user.department_id) {
+        return res.status(403).json({ message: 'Access denied: You can only reveal identities of students in your department.' });
+      }
+    }
+
     return res.json({
       id:                 student.id,
       name:               student.name,

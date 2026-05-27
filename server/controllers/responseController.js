@@ -110,8 +110,8 @@ export const submitResponse = async (req, res) => {
 
     // Validate ratings are within bounds
     for (const a of answers) {
-      if (!a.question_id || !a.rating || a.rating < 1 || a.rating > 7) {
-        return res.status(400).json({ message: 'Each answer must have question_id and rating (1-7).' });
+      if (!a.question_id || !a.rating || a.rating < 1 || a.rating > 10) {
+        return res.status(400).json({ message: 'Each answer must have question_id and rating (1-10).' });
       }
     }
 

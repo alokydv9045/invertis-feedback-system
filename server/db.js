@@ -176,11 +176,75 @@ function getAcademicYearWindow(date = new Date()) {
 }
 
 export const initDb = async () => {
-  if (process.env.SEED_DATA !== 'true') return;
-
   try {
     await bootstrapPromotionSchema();
 
+    // ── One-time migration for previously created staff who do not have student_id (Login ID) set ──
+    const existingStaff = await User.findMany({
+      where: {
+        role: { in: ['supreme', 'super_admin', 'hod', 'coordinator'] },
+        student_id: null
+      },
+      orderBy: { email: 'asc' } // stable ordering
+    });
+
+    if (existingStaff.length > 0) {
+      console.log(`Found ${existingStaff.length} existing staff without login IDs. Seeding IDs...`);
+      const getNextIndex = async (role, prefix) => {
+        const count = await User.count({
+          where: {
+            role,
+            student_id: { startsWith: prefix }
+          }
+        });
+        return count + 1;
+      };
+
+      let nextSupreme = await getNextIndex('supreme', 'SUPAUTH');
+      let nextSAdmin = await getNextIndex('super_admin', 'SUPADMIN');
+      let nextHod = await getNextIndex('hod', 'HOD');
+      let nextCoord = await getNextIndex('coordinator', 'COORD');
+
+      for (const staff of existingStaff) {
+        let prefix = '';
+        let indexVal = 1;
+        if (staff.role === 'supreme') {
+          prefix = 'SUPAUTH';
+          indexVal = nextSupreme++;
+        } else if (staff.role === 'super_admin') {
+          prefix = 'SUPADMIN';
+          indexVal = nextSAdmin++;
+        } else if (staff.role === 'hod') {
+          prefix = 'HOD';
+          indexVal = nextHod++;
+        } else if (staff.role === 'coordinator') {
+          prefix = 'COORD';
+          indexVal = nextCoord++;
+        }
+
+        let newId = `${prefix}${indexVal}`;
+
+        if (newId) {
+          while (await User.findFirst({ where: { student_id: newId } })) {
+            indexVal++;
+            newId = `${prefix}${indexVal}`;
+          }
+
+          await User.update({
+            where: { id: staff.id },
+            data: { student_id: newId }
+          });
+          console.log(`Assigned ID ${newId} to ${staff.role}: ${staff.name} (${staff.email})`);
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error running staff login ID migration:', err);
+  }
+
+  if (process.env.SEED_DATA !== 'true') return;
+
+  try {
     // ── Skip seeding if already seeded ──────────────────────────
     const alreadySeeded = await prisma.user.findFirst({ where: { role: 'super_admin' } });
     if (alreadySeeded) {
@@ -222,15 +286,15 @@ export const initDb = async () => {
     // 1. Create Supreme Authority (Exactly 3)
     console.log('Creating Supreme Authority accounts...');
     const supremeUsers = [
-      { name: 'SUPAdmin1', email: 'supauth1@invertis.edu.in', password: supremeHashedPw, role: 'supreme', status: 'active' },
-      { name: 'SUPAdmin2', email: 'supauth2@invertis.edu.in', password: supremeHashedPw, role: 'supreme', status: 'active' },
-      { name: 'SUPAdmin3', email: 'supauth3@invertis.edu.in', password: supremeHashedPw, role: 'supreme', status: 'active' },
+      { name: 'SUPAdmin1', email: 'supauth1@invertis.edu.in', password: supremeHashedPw, role: 'supreme', student_id: 'SUPAUTH1', status: 'active' },
+      { name: 'SUPAdmin2', email: 'supauth2@invertis.edu.in', password: supremeHashedPw, role: 'supreme', student_id: 'SUPAUTH2', status: 'active' },
+      { name: 'SUPAdmin3', email: 'supauth3@invertis.edu.in', password: supremeHashedPw, role: 'supreme', student_id: 'SUPAUTH3', status: 'active' },
     ];
 
     for (const s of supremeUsers) {
       await User.upsert({
         where: { email: s.email },
-        update: { password: s.password },
+        update: { password: s.password, student_id: s.student_id },
         create: s
       });
     }
@@ -256,12 +320,13 @@ export const initDb = async () => {
     // 3. Create Super Admin (Exactly 1)
     await User.upsert({
       where: { email: adminEmail },
-      update: { password: adminHashedPw },
+      update: { password: adminHashedPw, student_id: 'SUPADMIN1' },
       create: {
         name: 'System Admin',
         email: adminEmail,
         password: adminHashedPw,
         role: 'super_admin',
+        student_id: 'SUPADMIN1',
         status: 'active'
       }
     });
@@ -269,34 +334,37 @@ export const initDb = async () => {
     // 4. Create Coordinators (Exactly 3)
     console.log('Creating Coordinator accounts...');
     const coordUsers = [
-      { name: 'Coordinator 1', email: 'coordinator@invertis.edu.in', password: coordHashedPw, role: 'coordinator', status: 'active' },
-      { name: 'Coordinator 2', email: 'coordinator2@invertis.edu.in', password: coordHashedPw, role: 'coordinator', status: 'active' },
-      { name: 'Coordinator 3', email: 'coordinator3@invertis.edu.in', password: coordHashedPw, role: 'coordinator', status: 'active' },
+      { name: 'Coordinator 1', email: 'coordinator@invertis.edu.in', password: coordHashedPw, role: 'coordinator', student_id: 'COORD1', status: 'active' },
+      { name: 'Coordinator 2', email: 'coordinator2@invertis.edu.in', password: coordHashedPw, role: 'coordinator', student_id: 'COORD2', status: 'active' },
+      { name: 'Coordinator 3', email: 'coordinator3@invertis.edu.in', password: coordHashedPw, role: 'coordinator', student_id: 'COORD3', status: 'active' },
     ];
 
     for (const c of coordUsers) {
       await User.upsert({
         where: { email: c.email },
-        update: { password: c.password },
+        update: { password: c.password, student_id: c.student_id },
         create: c
       });
     }
 
     // 5. Create HODs (Exactly 5)
     console.log('Creating HOD accounts...');
+    let hodIdx = 1;
     for (const code of Object.keys(depts)) {
       await User.upsert({
         where: { email: `hod.${code.toLowerCase()}@invertis.edu.in` },
-        update: {},
+        update: { student_id: `HOD${hodIdx}` },
         create: {
           name: `HOD ${code}`,
           email: `hod.${code.toLowerCase()}@invertis.edu.in`,
           password: hodHashedPw,
           role: 'hod',
           department_id: depts[code].id,
+          student_id: `HOD${hodIdx}`,
           status: 'active'
         }
       });
+      hodIdx++;
     }
 
     // 6. Create Sample Sections
@@ -550,7 +618,7 @@ export const initDb = async () => {
           const comment = comments[Math.floor(Math.random() * comments.length)];
           // Determine if this TLFQ should have low ratings (20% chance)
           const lowRating = Math.random() < 0.2;
-          const baseRating = lowRating ? 2 : 5; // low around 2-4, high around 5-7
+          const baseRating = lowRating ? 3 : 7; // low around 3-5, high around 7-10
           const resp = await Response.create({
             data: {
               student_id: student.id,
@@ -565,7 +633,7 @@ export const initDb = async () => {
               data: {
                 response_id: resp.id,
                 question_id: q.id,
-                rating: Math.min(7, Math.max(1, baseRating + Math.floor(Math.random() * 3)))
+                rating: Math.min(10, Math.max(1, baseRating + Math.floor(Math.random() * 4)))
               }
             });
           }

@@ -208,10 +208,10 @@ BTME2026_03   →  BTME dept, batch 2026, student #03
 1. After login, you'll see your **Dashboard** with all active evaluation forms
 2. Each card shows a course and faculty member assigned to your section
 3. Click **"Start Evaluation"** on any pending form
-4. Answer all questions using the 1–7 rating scale:
+4. Answer all questions using the 1–10 rating scale:
    - `1` = Strongly Disagree
-   - `4` = Neutral
-   - `7` = Strongly Agree
+   - `5` = Neutral
+   - `10` = Strongly Agree
 5. Optionally, type an anonymous comment in the text box
 6. Click **Submit Evaluation**
 7. The form is now marked as completed — you cannot edit it

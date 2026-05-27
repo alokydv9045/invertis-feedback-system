@@ -189,7 +189,7 @@ export default function Analytics() {
                           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                             <h3 className="text-base font-black text-[#1D3557] flex items-center gap-2">
                               <TrendingUp size={18} className="text-primary-400" />
-                              {selectedTeacherId === 'all' ? 'Faculty Rankings (out of 7)' : `Performance Breakdown: ${selectedTeacher?.name}`}
+                              {selectedTeacherId === 'all' ? 'Faculty Rankings (out of 10)' : `Performance Breakdown: ${selectedTeacher?.name}`}
                             </h3>
                             
                             <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -227,12 +227,12 @@ export default function Analytics() {
                               <div style={{ height: Math.max(300, filteredAvgRatingPerFaculty.length * 52) + 'px' }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                   <BarChart data={filteredAvgRatingPerFaculty} layout="vertical" margin={{ left: 10, right: 30 }}>
-                                    <XAxis type="number" domain={[0, 7]} tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                                    <XAxis type="number" domain={[0, 10]} tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
                                     <YAxis type="category" dataKey="name" tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} width={160} axisLine={false} tickLine={false} />
                                     <Tooltip
                                       cursor={{ fill: '#1e293b', opacity: 0.4 }}
                                       contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 16, color: '#f8fafc', fontWeight: 600, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}
-                                      formatter={v => [`${v}/7`, 'Avg. Rating']}
+                                      formatter={v => [`${v}/10`, 'Avg. Rating']}
                                     />
                                     <Bar dataKey="avg_rating" radius={[0, 8, 8, 0]} barSize={28}>
                                       {filteredAvgRatingPerFaculty.map((entry, i) => (
@@ -264,10 +264,10 @@ export default function Analytics() {
                                         fullText: attr.question_text
                                       }))} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
                                         <XAxis dataKey="name" tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
-                                        <YAxis domain={[0, 7]} tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                                        <YAxis domain={[0, 10]} tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
                                         <Tooltip
                                           contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 16, color: '#f8fafc', fontWeight: 600 }}
-                                          formatter={(value, name, props) => [`${value}/7`, props.payload.fullText]}
+                                          formatter={(value, name, props) => [`${value}/10`, props.payload.fullText]}
                                         />
                                         <Bar dataKey="rating" fill="#3B6EA5" radius={[8, 8, 0, 0]} barSize={40}>
                                           {selectedTeacher.attributes.map((_, i) => (
@@ -287,11 +287,11 @@ export default function Analytics() {
                                   <div key={idx} className="card-main p-4 flex flex-col gap-2 border border-[#E6E9EE]/10 bg-white/5">
                                     <div className="flex justify-between items-start gap-4">
                                       <span className="text-xs font-black px-2 py-0.5 bg-primary-500/10 text-primary-400 rounded-md">Q{idx + 1}</span>
-                                      <span className="text-sm font-black text-accent-400">{attr.avg_rating} / 7</span>
+                                      <span className="text-sm font-black text-accent-400">{attr.avg_rating} / 10</span>
                                     </div>
                                     <p className="text-xs font-bold text-[var(--text-main)] leading-relaxed">{attr.question_text}</p>
                                     <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden mt-1">
-                                      <div className="h-full bg-accent-400 rounded-full" style={{ width: `${(attr.avg_rating / 7) * 100}%` }} />
+                                      <div className="h-full bg-accent-400 rounded-full" style={{ width: `${(attr.avg_rating / 10) * 100}%` }} />
                                     </div>
                                   </div>
                                 ))}
@@ -314,7 +314,7 @@ export default function Analytics() {
                               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data?.attributeAnalytics || []}>
                                 <PolarGrid stroke="#334155" />
                                 <PolarAngleAxis dataKey="attribute" tick={{ fill: '#475569', fontSize: 11, fontWeight: 600 }} />
-                                <PolarRadiusAxis angle={30} domain={[0, 7]} tick={{ fill: '#64748b', fontSize: 10 }} />
+                                <PolarRadiusAxis angle={30} domain={[0, 10]} tick={{ fill: '#64748b', fontSize: 10 }} />
                                 <Radar
                                   name="Score"
                                   dataKey="score"
@@ -335,7 +335,7 @@ export default function Analytics() {
                               <span className="text-sm font-bold text-[#1D3557]">{attr.full_text}</span>
                               <div className="flex items-center gap-2">
                                 <div className="h-1.5 w-16 bg-slate-800 rounded-full overflow-hidden">
-                                  <div className="h-full bg-primary-500 rounded-full" style={{ width: `${(attr.score / 7) * 100}%` }} />
+                                  <div className="h-full bg-primary-500 rounded-full" style={{ width: `${(attr.score / 10) * 100}%` }} />
                                 </div>
                                 <span className="text-sm font-black text-[#1D3557]">{attr.score}</span>
                               </div>

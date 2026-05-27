@@ -3,13 +3,16 @@ import { motion } from 'framer-motion';
 export default function RatingScale({ value, onChange }) {
   const getRatingLabel = (num) => {
     switch (num) {
-      case 1: return 'Very Poor';
-      case 2: return 'Poor';
-      case 3: return 'Below Avg';
-      case 4: return 'Neutral';
-      case 5: return 'Above Avg';
-      case 6: return 'Very Good';
-      case 7: return 'Excellent';
+      case 1: return 'Extremely Poor';
+      case 2: return 'Very Poor';
+      case 3: return 'Poor';
+      case 4: return 'Below Average';
+      case 5: return 'Average';
+      case 6: return 'Above Average';
+      case 7: return 'Good';
+      case 8: return 'Very Good';
+      case 9: return 'Excellent';
+      case 10: return 'Outstanding';
       default: return '';
     }
   };
@@ -17,7 +20,7 @@ export default function RatingScale({ value, onChange }) {
   return (
     <div className="flex flex-col gap-2 select-none">
       <div className="flex flex-wrap gap-2.5 items-center">
-        {[1, 2, 3, 4, 5, 6, 7].map((num) => {
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
           const isSelected = value === num;
 
           return (

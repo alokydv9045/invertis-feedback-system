@@ -35,60 +35,60 @@ async function main() {
 
   // ── 1. Supreme Authority ───────────────────────────────────────
   const supremeAccounts = [
-    { name: 'SUPAdmin1', email: 'supauth1@invertis.edu.in' },
-    { name: 'SUPAdmin2', email: 'supauth2@invertis.edu.in' },
-    { name: 'SUPAdmin3', email: 'supauth3@invertis.edu.in' },
+    { name: 'SUPAdmin1', email: 'supauth1@invertis.edu.in', student_id: 'SUPAUTH1' },
+    { name: 'SUPAdmin2', email: 'supauth2@invertis.edu.in', student_id: 'SUPAUTH2' },
+    { name: 'SUPAdmin3', email: 'supauth3@invertis.edu.in', student_id: 'SUPAUTH3' },
   ];
   for (const acc of supremeAccounts) {
     await prisma.user.upsert({
       where:  { email: acc.email },
-      update: { password: hSupreme, status: 'active', role: 'supreme' },
+      update: { password: hSupreme, status: 'active', role: 'supreme', student_id: acc.student_id },
       create: { ...acc, password: hSupreme, role: 'supreme', status: 'active' },
     });
-    console.log(`  ✅ Supreme  ${acc.email}`);
+    console.log(`  ✅ Supreme  ${acc.email} (ID: ${acc.student_id})`);
   }
 
   // ── 2. Super Admin ─────────────────────────────────────────────
   await prisma.user.upsert({
     where:  { email: 'admin@invertis.edu.in' },
-    update: { password: hAdmin, status: 'active', role: 'super_admin', name: 'Vikram Chandra' },
-    create: { name: 'Vikram Chandra', email: 'admin@invertis.edu.in', password: hAdmin, role: 'super_admin', status: 'active' },
+    update: { password: hAdmin, status: 'active', role: 'super_admin', name: 'Vikram Chandra', student_id: 'SUPADMIN1' },
+    create: { name: 'Vikram Chandra', email: 'admin@invertis.edu.in', password: hAdmin, role: 'super_admin', student_id: 'SUPADMIN1', status: 'active' },
   });
-  console.log('  ✅ Super Admin  admin@invertis.edu.in');
+  console.log('  ✅ Super Admin  admin@invertis.edu.in (ID: SUPADMIN1)');
 
   // ── 3. Coordinators ────────────────────────────────────────────
   const coordinators = [
-    { name: 'Academic Coordinator', email: 'coordinator@invertis.edu.in' },
-    { name: 'Coordinator 2',        email: 'coordinator2@invertis.edu.in' },
-    { name: 'Coordinator 3',        email: 'coordinator3@invertis.edu.in' },
+    { name: 'Academic Coordinator', email: 'coordinator@invertis.edu.in', student_id: 'COORD1' },
+    { name: 'Coordinator 2',        email: 'coordinator2@invertis.edu.in', student_id: 'COORD2' },
+    { name: 'Coordinator 3',        email: 'coordinator3@invertis.edu.in', student_id: 'COORD3' },
   ];
   for (const acc of coordinators) {
     await prisma.user.upsert({
       where:  { email: acc.email },
-      update: { password: hCoord, status: 'active', role: 'coordinator' },
+      update: { password: hCoord, status: 'active', role: 'coordinator', student_id: acc.student_id },
       create: { ...acc, password: hCoord, role: 'coordinator', status: 'active' },
     });
-    console.log(`  ✅ Coordinator  ${acc.email}`);
+    console.log(`  ✅ Coordinator  ${acc.email} (ID: ${acc.student_id})`);
   }
 
   // ── 4. HODs ────────────────────────────────────────────────────
-  const hodEmails = [
-    'hod.btai@invertis.edu.in',
-    'hod.bcs@invertis.edu.in',
-    'hod.btec@invertis.edu.in',
-    'hod.btme@invertis.edu.in',
-    'hod.btce@invertis.edu.in',
+  const hodAccounts = [
+    { email: 'hod.bcs@invertis.edu.in', student_id: 'HOD1' },
+    { email: 'hod.btai@invertis.edu.in', student_id: 'HOD2' },
+    { email: 'hod.btce@invertis.edu.in', student_id: 'HOD3' },
+    { email: 'hod.btec@invertis.edu.in', student_id: 'HOD4' },
+    { email: 'hod.btme@invertis.edu.in', student_id: 'HOD5' },
   ];
-  for (const email of hodEmails) {
-    const existing = await prisma.user.findUnique({ where: { email } });
+  for (const acc of hodAccounts) {
+    const existing = await prisma.user.findUnique({ where: { email: acc.email } });
     if (existing) {
       await prisma.user.update({
-        where:  { email },
-        data:   { password: hHod, status: 'active' },
+        where:  { email: acc.email },
+        data:   { password: hHod, status: 'active', student_id: acc.student_id },
       });
-      console.log(`  ✅ HOD (updated)  ${email}`);
+      console.log(`  ✅ HOD (updated)  ${acc.email} (ID: ${acc.student_id})`);
     } else {
-      console.log(`  ⚠️  HOD not found (skipped — needs dept_id):  ${email}`);
+      console.log(`  ⚠️  HOD not found (skipped — needs dept_id):  ${acc.email}`);
     }
   }
 

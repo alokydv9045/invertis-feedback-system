@@ -58,6 +58,7 @@ export default function SuperAdminPanel() {
   // HOD form
   const [hodName, setHodName] = useState('');
   const [hodEmail, setHodEmail] = useState('');
+  const [hodLoginId, setHodLoginId] = useState('');
   const [hodPass, setHodPass] = useState('');
   const [hodDept, setHodDept] = useState('');
   const [showHodPass, setShowHodPass] = useState(false);
@@ -65,6 +66,7 @@ export default function SuperAdminPanel() {
   // Coordinator form
   const [coordName, setCoordName] = useState('');
   const [coordEmail, setCoordEmail] = useState('');
+  const [coordLoginId, setCoordLoginId] = useState('');
   const [coordPass, setCoordPass] = useState('');
   const [showCoordPass, setShowCoordPass] = useState(false);
 
@@ -182,17 +184,19 @@ export default function SuperAdminPanel() {
   };
 
   const createHod = async () => {
+    if (!hodName || !hodEmail || !hodPass || !hodDept || !hodLoginId) return toast.error('All fields are required.');
     try {
-      await api.post('/superadmin/hods', { name: hodName, email: hodEmail, password: hodPass, department_id: hodDept });
-      setHodName(''); setHodEmail(''); setHodPass(''); setHodDept('');
+      await api.post('/superadmin/hods', { name: hodName, email: hodEmail, password: hodPass, department_id: hodDept, login_id: hodLoginId });
+      setHodName(''); setHodEmail(''); setHodPass(''); setHodDept(''); setHodLoginId('');
       loadAll(); toast.success('HOD created successfully.');
     } catch (e) { toast.error(e.response?.data?.message || 'Failed.'); }
   };
 
   const createCoord = async () => {
+    if (!coordName || !coordEmail || !coordPass || !coordLoginId) return toast.error('All fields are required.');
     try {
-      await api.post('/superadmin/coordinators', { name: coordName, email: coordEmail, password: coordPass });
-      setCoordName(''); setCoordEmail(''); setCoordPass('');
+      await api.post('/superadmin/coordinators', { name: coordName, email: coordEmail, password: coordPass, login_id: coordLoginId });
+      setCoordName(''); setCoordEmail(''); setCoordPass(''); setCoordLoginId('');
       loadAll(); toast.success('Coordinator created successfully.');
     } catch (e) { toast.error(e.response?.data?.message || 'Failed.'); }
   };
@@ -346,8 +350,8 @@ export default function SuperAdminPanel() {
                               </button>
                             </div>
                             <div className="flex items-center gap-5">
-                              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1D3557] to-[#0F2D52] border border-white/10 dark:border-slate-700/50 flex items-center justify-center text-accent-500 dark:text-[#FF2A00] group-hover:scale-105 transition-transform duration-300 shadow-md flex-shrink-0">
-                                <Building2 size={26} className="drop-shadow-[0_2px_6px_rgba(255,42,0,0.3)]" />
+                              <div className="h-14 w-14 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform duration-300 shadow-sm flex-shrink-0">
+                                <Building2 size={26} />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="font-black text-slate-900 dark:text-white text-base truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
@@ -378,7 +382,7 @@ export default function SuperAdminPanel() {
                       <h3 className="font-black text-slate-900 dark:text-[var(--text-main)] flex items-center gap-2 text-sm uppercase tracking-wider">
                         <Plus size={18} className="text-primary-500" /> New HOD
                       </h3>
-                      <form onSubmit={(e) => { e.preventDefault(); createHod(); }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <form onSubmit={(e) => { e.preventDefault(); createHod(); }} className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="flex flex-col gap-2">
                           <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Full Name</label>
                           <Input type="text" placeholder="Dr. Rajesh Kumar" value={hodName} onChange={e => setHodName(e.target.value)} />
@@ -386,6 +390,10 @@ export default function SuperAdminPanel() {
                         <div className="flex flex-col gap-2">
                           <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Email</label>
                           <Input type="email" placeholder="hod.bcs@invertis.edu.in" value={hodEmail} onChange={e => setHodEmail(e.target.value)} />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Login ID</label>
+                          <Input type="text" placeholder="e.g. HOD1" value={hodLoginId} onChange={e => setHodLoginId(e.target.value)} />
                         </div>
                         <div className="flex flex-col gap-2">
                           <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Department</label>
@@ -440,14 +448,14 @@ export default function SuperAdminPanel() {
                                 </button>
                               </div>
                               <div className="flex items-center gap-5">
-                                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1D3557] to-[#0F2D52] border border-white/10 dark:border-slate-700/50 flex items-center justify-center text-amber-500 dark:text-amber-400 group-hover:scale-105 transition-transform duration-300 shadow-md flex-shrink-0">
-                                  <Users size={26} className="drop-shadow-[0_2px_6px_rgba(245,158,11,0.3)]" />
+                                <div className="h-14 w-14 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform duration-300 shadow-sm flex-shrink-0">
+                                  <Users size={26} />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <h3 className="font-black text-slate-900 dark:text-white text-base truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                     {h.name}
                                   </h3>
-                                  <div className="text-[10px] text-slate-600 dark:text-slate-400 font-medium mt-1">{h.email}</div>
+                                  <div className="text-[10px] text-slate-600 dark:text-slate-400 font-medium mt-1">{h.email} {h.student_id ? `• ID: ${h.student_id}` : ''}</div>
                                   <div className="text-[10px] text-primary-600 dark:text-primary-400 font-bold mt-1.5">{dept?.name || '—'}</div>
                                 </div>
                               </div>
@@ -468,7 +476,7 @@ export default function SuperAdminPanel() {
                         <Plus size={18} className="text-primary-500" /> New Coordinator
                       </h3>
                       <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">Coordinators have university-wide access to manage all departments and resources.</p>
-                      <form onSubmit={(e) => { e.preventDefault(); createCoord(); }} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <form onSubmit={(e) => { e.preventDefault(); createCoord(); }} className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="flex flex-col gap-2">
                           <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Full Name</label>
                           <Input type="text" placeholder="Academic Coordinator" value={coordName} onChange={e => setCoordName(e.target.value)} />
@@ -476,6 +484,10 @@ export default function SuperAdminPanel() {
                         <div className="flex flex-col gap-2">
                           <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Email</label>
                           <Input type="email" placeholder="coordinator@invertis.edu.in" value={coordEmail} onChange={e => setCoordEmail(e.target.value)} />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Login ID</label>
+                          <Input type="text" placeholder="e.g. COORD1" value={coordLoginId} onChange={e => setCoordLoginId(e.target.value)} />
                         </div>
                         <div className="flex flex-col gap-2">
                           <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Password</label>
@@ -486,7 +498,7 @@ export default function SuperAdminPanel() {
                             </button>
                           </div>
                         </div>
-                        <div className="flex items-end md:col-span-3">
+                        <div className="flex items-end md:col-span-4">
                           <button type="submit" className="w-full bg-primary-600 hover:bg-primary-500 text-white py-4 font-black rounded-2xl text-xs uppercase tracking-widest transition-all shadow-lg shadow-primary-500/20 cursor-pointer active:scale-95">
                             + Create Coordinator
                           </button>
@@ -517,18 +529,18 @@ export default function SuperAdminPanel() {
                                 onClick={() => deleteUser(c.id)}
                                 className="p-3 bg-white dark:bg-slate-800 hover:bg-accent-600 text-accent-500 hover:text-white rounded-2xl transition-all cursor-pointer shadow-lg border border-slate-100 dark:border-slate-700 hover:border-accent-500"
                               >
-                                <Trash2 size={16} />
+                                  <Trash2 size={16} />
                               </button>
                             </div>
                             <div className="flex items-center gap-5">
-                              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#1D3557] to-[#0F2D52] border border-white/10 dark:border-slate-700/50 flex items-center justify-center text-blue-500 dark:text-blue-400 group-hover:scale-105 transition-transform duration-300 shadow-md flex-shrink-0">
-                                <Users size={26} className="drop-shadow-[0_2px_6px_rgba(59,130,246,0.3)]" />
+                              <div className="h-14 w-14 rounded-2xl bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform duration-300 shadow-sm flex-shrink-0">
+                                <Users size={26} />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="font-black text-slate-900 dark:text-white text-base truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                   {c.name}
                                 </h3>
-                                <div className="text-[10px] text-slate-600 dark:text-slate-400 font-medium mt-1">{c.email}</div>
+                                <div className="text-[10px] text-slate-600 dark:text-slate-400 font-medium mt-1">{c.email} {c.student_id ? `• ID: ${c.student_id}` : ''}</div>
                                 <div className="text-[10px] text-primary-600 dark:text-primary-400 font-bold mt-1.5">University-wide Access</div>
                               </div>
                             </div>

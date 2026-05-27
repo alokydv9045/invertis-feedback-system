@@ -83,9 +83,9 @@ export default function App() {
             </ProtectedRoute>
           } />
 
-          {/* Identity Reveal — Super Admin + Supreme only */}
+          {/* Identity Reveal — Super Admin, HOD, and Supreme */}
           <Route path="/reveal" element={
-            <ProtectedRoute allowedRoles={['super_admin', 'supreme']}>
+            <ProtectedRoute allowedRoles={['super_admin', 'hod', 'supreme']}>
               <IdentityReveal />
             </ProtectedRoute>
           } />

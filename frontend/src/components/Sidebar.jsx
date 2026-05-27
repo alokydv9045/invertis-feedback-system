@@ -15,6 +15,7 @@ const PAGE_NAV = {
   ],
   hod: [
     { to: '/hod',         icon: LayoutDashboard, label: 'Dashboard',   end: true },
+    { to: '/reveal',      icon: Fingerprint,      label: 'Identity Reveal' },
     { to: '/analytics',   icon: BarChart2,       label: 'Analytics' },
     { to: '/leaderboard', icon: Trophy,           label: 'Leaderboard' },
   ],

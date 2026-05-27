@@ -16,7 +16,7 @@ import {
 
 const COLORS = ['#0F2D52', '#1D4E89', '#10B981', '#F59E0B', '#C62828', '#3B6EA5'];
 
-function RatingBadge({ value, max = 7 }) {
+function RatingBadge({ value, max = 10 }) {
   const pct = (value / max) * 100;
   const color = pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-accent-400';
   return <span className={`text-lg font-black ${color}`}>{value.toFixed(1)}<span className="text-xs text-slate-500 dark:text-slate-400 font-normal">/{max}</span></span>;
@@ -177,7 +177,7 @@ export default function HODDashboard() {
                         <div className="h-80">
                           <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data.avgRatingPerFaculty} layout="vertical" margin={{ left: 10, right: 30 }}>
-                              <XAxis type="number" domain={[0, 7]} tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }} stroke="#cbd5e1" />
+                              <XAxis type="number" domain={[0, 10]} tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }} stroke="#cbd5e1" />
                               <YAxis type="category" dataKey="name" tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }} width={140} stroke="#cbd5e1" />
                               <Tooltip
                                 contentStyle={{ 
@@ -188,7 +188,7 @@ export default function HODDashboard() {
                                   boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
                                 }}
                                 itemStyle={{ color: '#818cf8', fontWeight: 'bold' }}
-                                formatter={(v) => [`${v}/7`, 'Avg. Rating']}
+                                formatter={(v) => [`${v}/10`, 'Avg. Rating']}
                               />
                               <Bar dataKey="avg_rating" radius={[0, 10, 10, 0]} barSize={24}>
                                 {(data.avgRatingPerFaculty || []).map((_, i) => (
@@ -226,7 +226,7 @@ export default function HODDashboard() {
                           <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
                              <div className="flex items-center gap-1.5">
                                 <Star size={18} className="text-amber-400 fill-amber-400" />
-                                <span className={`text-2xl font-black ${f.avg_rating >= 5 ? 'text-emerald-500' : f.avg_rating >= 3.5 ? 'text-amber-500' : 'text-accent-500'}`}>
+                                <span className={`text-2xl font-black ${f.avg_rating >= 7.0 ? 'text-emerald-500' : f.avg_rating >= 5.0 ? 'text-amber-500' : 'text-accent-500'}`}>
                                   {f.avg_rating.toFixed(1)}
                                 </span>
                                 <span className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase">Rating</span>

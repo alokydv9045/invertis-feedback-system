@@ -9,13 +9,12 @@ import api from '../services/api';
 
 const roleHint = (id) => {
   if (!id) return null;
-  if (id.includes('@')) {
-    if (id.includes('admin')) return { label: 'Super Admin' };
-    if (id.includes('coordinator')) return { label: 'Coordinator' };
-    if (id.includes('hod')) return { label: 'Head of Department' };
-    return { label: 'Staff Account' };
-  }
-  if (/^[A-Z]{2,4}\d{4}_\d+$/.test(id.toUpperCase())) {
+  const upperId = id.toUpperCase();
+  if (upperId.startsWith('SUPAUTH')) return { label: 'Management' };
+  if (upperId.startsWith('SUPADMIN')) return { label: 'Super Admin' };
+  if (upperId.startsWith('COORD')) return { label: 'Coordinator' };
+  if (upperId.startsWith('HOD')) return { label: 'Head of Department' };
+  if (/^[A-Z]{2,4}\d{4}_\d+$/.test(upperId)) {
     return { label: 'Student Account' };
   }
   return null;
@@ -60,25 +59,21 @@ export default function Login() {
     e.preventDefault();
     setError('');
     const id = identifier.trim();
-    if (!id) { setError('Please enter your User Name / Student ID.'); return; }
+    if (!id) { setError('Please enter your ID.'); return; }
 
-    if (!id.includes('@')) {
-      setLoading(true);
-      try {
-        const res = await api.post('/auth/check-student', { student_id: id.toUpperCase() });
-        if (res.data.status === 'pending') {
-          setPendingStudent({ student_id: id.toUpperCase(), name: res.data.name });
-          setStep(3);
-          return;
-        }
-        setStep(2);
-      } catch (err) {
-        setError(err.response?.data?.message || 'User ID not found.');
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/check-student', { student_id: id.toUpperCase() });
+      if (res.data.status === 'pending') {
+        setPendingStudent({ student_id: id.toUpperCase(), name: res.data.name });
+        setStep(3);
+        return;
       }
-    } else {
       setStep(2);
+    } catch (err) {
+      setError(err.response?.data?.message || 'User ID not found.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,13 +127,8 @@ export default function Login() {
     <div className="min-h-screen flex flex-col bg-[#F1FAEE] font-sans">
       {/* Header */}
       <div className="w-full bg-white px-4 sm:px-6 py-3.5 flex items-center justify-between border-b-[3px] border-[#FF2A00] shadow-sm z-20">
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center">
           <img src="/main logo.png" alt="Invertis University Logo" className="h-10 sm:h-12 object-contain" />
-          <div className="h-8 w-[1px] bg-slate-200 hidden sm:block" />
-          <div>
-            <h1 className="text-xs sm:text-sm font-black text-[#1D3557] tracking-wider uppercase leading-tight">Invertis University</h1>
-            <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 tracking-wider uppercase leading-none mt-0.5">Feedback Portal</p>
-          </div>
         </div>
         <div className="flex items-center gap-1.5 border border-slate-200 rounded-full px-3 py-1.5 bg-slate-50/50 shadow-sm">
           <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -166,7 +156,11 @@ export default function Login() {
           <div className="bg-white rounded-[2rem] shadow-2xl border-t-[5px] border-t-[#FF2A00] border-x border-b border-slate-100/50 overflow-hidden px-6 sm:px-8 py-8 space-y-6">
             
             {/* Title / Subtitle */}
-            <div className="text-center">
+            <div className="text-center flex flex-col items-center">
+              <div className="flex flex-col items-center gap-1 mb-4">
+                <h1 className="text-xs sm:text-sm font-black text-[#1D3557] tracking-wider uppercase leading-tight">Invertis University</h1>
+                <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 tracking-wider uppercase leading-none mt-0.5">Feedback Portal</p>
+              </div>
               <h2 className="text-2xl font-black text-[#1D3557] tracking-tight">
                 {step === 1 && 'Authentication'}
                 {step === 2 && 'Security Verification'}
@@ -184,11 +178,11 @@ export default function Login() {
               <form onSubmit={handleNext} className="space-y-5">
                 <div className="space-y-1.5 text-left">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
-                    Username or Student ID
+                    Login ID
                   </label>
                   <Input
                     type="text"
-                    placeholder="e.g. admin@invertis.edu.in or BCS2025_01"
+                    placeholder="Enter you ID"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     disabled={loading}

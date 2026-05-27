@@ -234,7 +234,7 @@ export default function IdentityRevealPage() {
 
                     {/* Avatar + name */}
                     <div className="flex items-center gap-4 mb-6 p-4 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/8">
-                      <div className="h-14 w-14 bg-gradient-to-br from-[#1D3557] to-[#0F2D52] border border-white/10 dark:border-slate-700/50 rounded-2xl flex items-center justify-center text-2xl font-black text-accent-500 dark:text-accent-400 shadow-xl flex-shrink-0">
+                      <div className="h-14 w-14 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl flex items-center justify-center text-2xl font-black text-emerald-600 dark:text-emerald-400 shadow-sm flex-shrink-0">
                         {result.name?.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">

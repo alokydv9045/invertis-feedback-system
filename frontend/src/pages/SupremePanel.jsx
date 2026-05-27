@@ -23,6 +23,7 @@ export default function SupremePanel() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loginId, setLoginId] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [creating, setCreating] = useState(false);
 
@@ -40,12 +41,12 @@ export default function SupremePanel() {
   useEffect(() => { loadAdmins(); }, []);
 
   const createAdmin = async () => {
-    if (!name || !email || !password) return toast.error('All fields are required.');
+    if (!name || !email || !password || !loginId) return toast.error('All fields are required.');
     if (password.length < 8) return toast.error('Password must be at least 8 characters.');
     setCreating(true);
     try {
-      await api.post('/superadmin/superadmins', { name, email, password });
-      setName(''); setEmail(''); setPassword('');
+      await api.post('/superadmin/superadmins', { name, email, password, login_id: loginId });
+      setName(''); setEmail(''); setPassword(''); setLoginId('');
       loadAdmins();
       toast.success('Super Admin account created successfully.');
     } catch (e) {
@@ -96,7 +97,7 @@ export default function SupremePanel() {
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">
               Super Admins can manage HODs, Coordinators, view all analytics, and assign teaching staff.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Full Name</label>
                 <Input
@@ -112,6 +113,14 @@ export default function SupremePanel() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="admin@invertis.edu.in"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Login ID</label>
+                <Input
+                  value={loginId}
+                  onChange={e => setLoginId(e.target.value)}
+                  placeholder="e.g. SUPADMIN1"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -176,12 +185,12 @@ export default function SupremePanel() {
                     className="card-hover rounded-2xl p-4 flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl flex items-center justify-center text-white font-semibold text-sm bg-gradient-to-br from-primary-500 to-accent-600 dark:from-[#1D3557] dark:to-[#0F2D52]">
+                      <div className="h-10 w-10 rounded-xl flex items-center justify-center font-bold text-sm bg-primary-50 dark:bg-primary-950/20 text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-900/30">
                         {admin.name?.charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <div className="text-sm font-semibold text-[var(--text-main)]">{admin.name}</div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{admin.email}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{admin.email} {admin.student_id ? `• ID: ${admin.student_id}` : ''}</div>
                         <span className="badge-role mt-1 inline-flex">Super Admin</span>
                       </div>
                     </div>
