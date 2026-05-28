@@ -1,534 +1,240 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
+import { useState, useEffect, useMemo } from 'react';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  AreaChart, Area, CartesianGrid
-} from 'recharts';
-import { 
-  Award, BarChart2, TrendingUp, BookOpen, MessageSquare, 
-  Star, Filter, LayoutGrid, Users, CheckCircle, Activity, Lock
-} from 'lucide-react';
+import { Card, CardBody } from '../components/ui/Card';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Tabs } from '../components/ui/Tabs';
+import { Skeleton } from '../components/ui/Skeleton';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { Award, BarChart2, TrendingUp, BookOpen, MessageSquare, Star, Filter } from 'lucide-react';
 
-const COLORS = ['#0F2D52', '#1D4E89', '#3B6EA5', '#10B981', '#F59E0B', '#C62828'];
+const COLORS = ['#1E3A8A', '#F97316', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899'];
 
 export default function Analytics() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'faculty';
-  const setActiveTab = (tab) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('tab', tab);
-    setSearchParams(params, { replace: true });
-  };
+  const [activeTab, setActiveTab] = useState('faculty');
   const [selectedDeptId, setSelectedDeptId] = useState('all');
   const [teacherTypeFilter, setTeacherTypeFilter] = useState('all');
-  const [selectedTeacherId, setSelectedTeacherId] = useState('all');
-  const [selectedFacultyFilter, setSelectedFacultyFilter] = useState('all');
 
-  useEffect(() => {
-    setLoading(true);
-    setSelectedFacultyFilter('all');
-    const url = selectedDeptId === 'all' ? '/responses/analytics' : `/responses/analytics?department_id=${selectedDeptId}`;
-    api.get(url)
-      .then(r => setData(r.data))
-      .catch(() => { })
-      .finally(() => setLoading(false));
-  }, [selectedDeptId]);
+  useEffect(() => { api.get('/responses/analytics').then(r => setData(r.data)).catch(() => {}).finally(() => setLoading(false)); }, []);
 
-  useEffect(() => {
-    setSelectedTeacherId('all');
-  }, [selectedDeptId, teacherTypeFilter]);
+  const filteredFaculty = useMemo(() => {
+    let list = data?.avgRatingPerFaculty || [];
+    if (selectedDeptId !== 'all') list = list.filter(f => f.department_id === selectedDeptId);
+    if (teacherTypeFilter !== 'all') list = list.filter(f => f.teacher_type === teacherTypeFilter);
+    return list;
+  }, [data, selectedDeptId, teacherTypeFilter]);
 
-  const filteredAvgRatingPerFaculty = teacherTypeFilter === 'all'
-    ? (data?.avgRatingPerFaculty || [])
-    : (data?.avgRatingPerFaculty || []).filter(f => f.teacher_type === teacherTypeFilter);
+  const filteredSubmission = useMemo(() => {
+    if (selectedDeptId === 'all') return [];
+    return (data?.submissionRates || []).filter(c => c.department_id === selectedDeptId);
+  }, [data, selectedDeptId]);
 
-  const selectedTeacher = filteredAvgRatingPerFaculty.find(f => f.id === selectedTeacherId);
+  const filteredComments = useMemo(() => {
+    if (selectedDeptId === 'all') return data?.recentComments || [];
+    return (data?.recentComments || []).filter(c => c.department_id === selectedDeptId);
+  }, [data, selectedDeptId]);
 
   const tabs = [
     { id: 'faculty', label: 'Faculty Rankings', icon: Award },
-    { id: 'performance', label: 'Attribute Analysis', icon: Activity },
-    { id: 'engagement', label: 'Department Overview', icon: Users },
-    { id: 'trends', label: 'Submission Trends', icon: TrendingUp },
     { id: 'courses', label: 'Course Reports', icon: BookOpen },
     { id: 'comments', label: 'Feedback Insights', icon: MessageSquare },
   ];
 
-  // Quick Stats
-  const totalSubmissions = data?.avgRatingPerFaculty?.reduce((s, f) => s + f.total_responses, 0) || 0;
-  const avgSystemRating = data?.avgRatingPerFaculty?.length > 0 
-    ? (data.avgRatingPerFaculty.reduce((s, f) => s + f.avg_rating, 0) / data.avgRatingPerFaculty.length).toFixed(1)
-    : 0;
-
   return (
-    <div className="min-h-screen flex flex-col bg-transparent text-[var(--text-main)] font-sans selection:bg-primary-500/30">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1 min-h-0">
-        <Sidebar />
-        <main className="flex-1 p-4 sm:p-5 md:p-7 overflow-auto">
-
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] pointer-events-none" />
-
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 relative z-10 max-w-7xl mx-auto w-full">
-
-            {/* Header Area */}
-            <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 card-main">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="user-type-badge bg-cyan-50 dark:bg-cyan-950/20 border-cyan-200/50 dark:border-cyan-900/30">
-                    <BarChart2 size={20} className="text-cyan-500 dark:text-cyan-400" />
-                  </div>
-                  <h1 className="text-2xl md:text-3xl font-black text-[#1D3557]">
-                  System Intelligence
-                  </h1>
-                </div>
-                <p className="text-sm text-slate-600 font-medium ml-1">Advanced multi-dimensional feedback analytics.</p>
+    <div className="animate-fade-in max-w-6xl mx-auto relative">
+      <div className="absolute -inset-6 overflow-hidden pointer-events-none select-none">
+        <img src="/campus/hemburgure-image.webp" alt="" className="w-full h-full object-cover opacity-15" />
+      </div>
+      <div className="relative z-10">
+      {/* Header */}
+      <Card className="mb-6">
+        <CardBody>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-invertis-blue/10 flex items-center justify-center">
+                <BarChart2 size={20} className="text-invertis-blue" />
               </div>
-
-              <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-                <div className="flex items-center gap-3 p-1.5 rounded-2xl border border-[#E6E9EE] w-full md:w-auto">
-                  <div className="pl-3 text-slate-500"><Filter size={16} /></div>
-                  <select
-                    value={selectedDeptId}
-                    onChange={e => setSelectedDeptId(e.target.value)}
-                    className="bg-transparent pl-1 pr-10 py-2.5 text-sm font-bold text-[var(--text-main)] focus:outline-none cursor-pointer appearance-none w-full md:w-52"
-                    style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '16px' }}
-                  >
-                    <option value="all" className="bg-white dark:bg-slate-900">All Departments</option>
-                    {data?.deptOverview?.map(d => (
-                      <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900">{d.name}</option>
-                    ))}
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Targeted Analytics</h1>
+                <p className="text-sm text-gray-500">Analyze performance and feedback by department.</p>
+              </div>
+            </div>
+            {data?.deptOverview?.length > 0 && (
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-lg border border-gray-200">
+                  <Filter size={14} className="text-gray-400 ml-2" />
+                  <select value={selectedDeptId} onChange={e => setSelectedDeptId(e.target.value)}
+                    className="bg-transparent pr-6 py-2 text-sm font-semibold text-gray-700 focus:outline-none cursor-pointer">
+                    <option value="all">All Departments</option>
+                    {data.deptOverview.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                   </select>
                 </div>
-                <div className="flex items-center gap-1 p-1.5 rounded-2xl border border-[#E6E9EE] flex-wrap w-full md:w-auto">
-                  {[['all', 'All'], ['college_faculty', 'Faculty'], ['trainer', 'Trainer']].map(([val, lbl]) => (
+                <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg border border-gray-200">
+                  {[['all','All'],['college_faculty','Faculty'],['trainer','Trainer']].map(([val, lbl]) => (
                     <button key={val} onClick={() => setTeacherTypeFilter(val)}
-                      className={`px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex-1 md:flex-initial text-center ${teacherTypeFilter === val
-                          ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20'
-                          : 'text-slate-600 hover:text-[var(--text-main)] hover:bg-black/5'
-                        }`}> 
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${teacherTypeFilter === val ? 'bg-invertis-blue text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
                       {lbl}
                     </button>
                   ))}
                 </div>
               </div>
-            </div>
+            )}
+          </div>
+        </CardBody>
+      </Card>
 
-            {/* Quick Insight Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { label: 'Total Responses', value: totalSubmissions, icon: MessageSquare, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/30' },
-                { label: 'Avg Rating', value: avgSystemRating, icon: Star, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/20 border-amber-100/50 dark:border-amber-900/30' },
-                { label: 'Active Courses', value: data?.submissionRates?.length || 0, icon: BookOpen, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100/50 dark:border-emerald-900/30' },
-                { label: 'Engagement', value: (data?.submissionRates?.length || 0) > 0 ? ((data.submissionRates || []).reduce((s, c) => s + (c.rate || 0), 0) / (data?.submissionRates?.length || 1)).toFixed(0) + '%' : '0%', icon: TrendingUp, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100/50 dark:border-indigo-900/30' },
-              ].map((stat, i) => (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ scale: 1.02, y: -5, borderColor: 'rgba(99, 102, 241, 0.4)' }}
-                  transition={{ delay: i * 0.1, duration: 0.2 }}
-                  key={stat.label} 
-                  className="card-main p-6 flex items-center gap-4 shadow transition-colors cursor-default"
-                >
-                  <div className={`h-12 w-12 rounded-2xl flex items-center justify-center border ${stat.bg} flex-shrink-0`}>
-                    <stat.icon size={20} className={stat.color} />
+      {loading ? (
+        <div className="space-y-6">
+          <div className="flex gap-2">
+            {[1,2,3].map(n => <Skeleton key={n} className="h-10 w-36" rounded="rounded-lg" />)}
+          </div>
+          <Card>
+            <CardBody>
+              <Skeleton className="h-6 w-48 mb-6" />
+              <div className="space-y-3">
+                {[1,2,3,4,5].map(n => (
+                  <div key={n} className="flex items-center gap-4">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-7 flex-1" rounded="rounded-r-lg" />
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider truncate">{stat.label}</div>
-                    <div className="text-2xl font-black text-[#1D3557] truncate">{stat.value}</div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {loading ? (
-              <div className="card-main p-16 flex justify-center">
-                <div className="h-12 w-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin shadow-primary-500/20" />
+                ))}
               </div>
-            ) : !data ? (
-              <div className="card-main p-16 text-center text-slate-600 font-medium">No analytics data available.</div>
-            ) : (
-              <div className="flex flex-col gap-6">
-                {/* Tabs */}
-                <div className="flex flex-nowrap overflow-x-auto no-scrollbar gap-2 p-1 rounded-2xl w-full sm:w-fit bg-transparent pb-2">
-                  {tabs.map(({ id, label, icon: Icon }) => (
-                    <motion.button
-                      key={id}
-                      onClick={() => setActiveTab(id)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${activeTab === id
-                          ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
-                          : 'text-slate-600 hover:text-[var(--text-main)] hover:bg-black/5'
-                        }`}
-                    >
-                      <Icon size={16} /> {label}
-                    </motion.button>
+            </CardBody>
+          </Card>
+        </div>
+      ) : !data ? (
+        <Card><EmptyState icon={BarChart2} title="No data" message="No analytics data available." /></Card>
+      ) : (
+        <div className="space-y-6">
+          {/* Tabs */}
+          <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+
+          <AnimatePresence mode="wait">
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+
+              {activeTab === 'faculty' && (
+                <div className="space-y-6">
+                  <Card>
+                    <CardBody>
+                      <h3 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <TrendingUp size={18} className="text-invertis-blue" /> Faculty Average Ratings (out of 7)
+                      </h3>
+                      {filteredFaculty.length === 0 ? (
+                        <EmptyState icon={BarChart2} title="No data" message="No feedback data for this selection." />
+                      ) : (
+                        <div style={{ height: Math.max(200, filteredFaculty.length * 52) }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={filteredFaculty} layout="vertical" margin={{ left: 10, right: 30 }}>
+                              <XAxis type="number" domain={[0, 7]} tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} />
+                              <YAxis type="category" dataKey="name" tick={{ fill: '#111827', fontSize: 12, fontWeight: 600 }} width={160} axisLine={false} tickLine={false} />
+                              <Tooltip cursor={{ fill: '#f3f4f6' }}
+                                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                                formatter={v => [`${v}/7`, 'Avg. Rating']} />
+                              <Bar dataKey="avg_rating" radius={[0, 8, 8, 0]} barSize={28}>
+                                {filteredFaculty.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      )}
+                    </CardBody>
+                  </Card>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredFaculty.map((f, i) => (
+                      <motion.div key={f.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+                        <Card hover>
+                          <CardBody className="py-4">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-white ${i === 0 ? 'bg-amber-400' : i === 1 ? 'bg-gray-400' : i === 2 ? 'bg-orange-600' : 'bg-gray-200 text-gray-600'}`}>#{i + 1}</div>
+                              <div className="flex-1">
+                                <p className="text-sm font-bold text-gray-900">{f.name}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${f.teacher_type === 'trainer' ? 'text-cyan-600 bg-cyan-50' : 'text-purple-600 bg-purple-50'}`}>
+                                    {f.teacher_type === 'trainer' ? 'Trainer' : 'Faculty'}
+                                  </span>
+                                  <span className="text-xs text-gray-400">{f.total_responses} responses</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                                <Star size={14} className="text-amber-400 fill-amber-400" />
+                                <span className={`text-lg font-bold ${f.avg_rating >= 5 ? 'text-emerald-500' : f.avg_rating >= 3.5 ? 'text-amber-500' : 'text-red-500'}`}>
+                                  {f.avg_rating.toFixed(1)}<span className="text-xs text-gray-400 ml-0.5">/7</span>
+                                </span>
+                              </div>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'courses' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredSubmission.length === 0 ? (
+                    <div className="col-span-full"><Card><EmptyState icon={BookOpen} title="Select a department" message="Choose a department to view course reports." /></Card></div>
+                  ) : filteredSubmission.map((c, idx) => (
+                    <motion.div key={c.course_id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}>
+                      <Card>
+                        <CardBody>
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <span className="text-xs font-mono font-semibold text-invertis-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{c.course_code}</span>
+                              <h4 className="text-sm font-bold text-gray-900 mt-1">{c.course_name}</h4>
+                            </div>
+                            <span className={`text-xl font-bold ${c.rate >= 70 ? 'text-emerald-500' : c.rate >= 40 ? 'text-amber-500' : 'text-red-500'}`}>{c.rate}%</span>
+                          </div>
+                          <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
+                            <motion.div initial={{ width: 0 }} animate={{ width: `${c.rate}%` }} transition={{ duration: 1 }}
+                              className={`h-full rounded-full ${c.rate >= 70 ? 'bg-emerald-400' : c.rate >= 40 ? 'bg-amber-400' : 'bg-red-400'}`} />
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
+                            <div><span className="text-xs text-gray-400">Enrolled</span><p className="font-semibold text-gray-700">{c.enrolled}</p></div>
+                            <div className="w-px h-6 bg-gray-200" />
+                            <div><span className="text-xs text-gray-400">Submitted</span><p className="font-semibold text-gray-700">{c.submitted}</p></div>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    </motion.div>
                   ))}
                 </div>
+              )}
 
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {/* FACULTY TAB */}
-                    {activeTab === 'faculty' && (
-                      <div className="flex flex-col gap-6">
-                        <div className="card-main p-8">
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                            <h3 className="text-base font-black text-[#1D3557] flex items-center gap-2">
-                              <TrendingUp size={18} className="text-primary-400" />
-                              {selectedTeacherId === 'all' ? 'Faculty Rankings (out of 10)' : `Performance Breakdown: ${selectedTeacher?.name}`}
-                            </h3>
-                            
-                            <div className="flex items-center gap-3 w-full sm:w-auto">
-                              <span className="text-xs font-bold text-slate-500 uppercase">View:</span>
-                              <select
-                                value={selectedTeacherId}
-                                onChange={e => setSelectedTeacherId(e.target.value)}
-                                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-[var(--text-main)] focus:outline-none cursor-pointer"
-                              >
-                                <option value="all" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-[var(--text-main)]">All Faculty (Overview)</option>
-                                {filteredAvgRatingPerFaculty.map(f => (
-                                  <option key={f.id} value={f.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-[var(--text-main)]">{f.name}</option>
-                                ))}
-                              </select>
-                              
-                              {selectedTeacherId !== 'all' && (
-                                <button
-                                  onClick={() => setSelectedTeacherId('all')}
-                                  className="px-3 py-1.5 text-xs font-bold text-primary-400 hover:text-primary-300 bg-primary-500/10 hover:bg-primary-500/20 rounded-xl border border-primary-500/20 transition-all cursor-pointer"
-                                >
-                                  View All
-                                </button>
-                              )}
+              {activeTab === 'comments' && (
+                <div className="space-y-4">
+                  <Card className="border-blue-200 bg-blue-50/30"><CardBody className="py-3">
+                    <div className="flex items-center gap-3 text-sm text-invertis-blue">
+                      <MessageSquare size={16} /> Student feedback is rigorously anonymized.
+                    </div>
+                  </CardBody></Card>
+                  {filteredComments.length === 0 ? (
+                    <Card><EmptyState icon={MessageSquare} title="No comments" message="No comments submitted for this department." /></Card>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {filteredComments.map((c, i) => (
+                        <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
+                          <Card><CardBody>
+                            <p className="text-sm text-gray-700 italic leading-relaxed mb-4">"{c.comment}"</p>
+                            <div className="pt-3 border-t border-gray-100">
+                              <p className="text-sm font-semibold"><span className="text-invertis-blue">{c.faculty_name}</span> · {c.course_name}</p>
+                              <p className="text-xs text-gray-400 mt-1">{new Date(c.submitted_at).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                             </div>
-                          </div>
-
-                          {filteredAvgRatingPerFaculty.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-16 text-slate-500 dark:text-slate-400">
-                              <BarChart2 size={40} className="mb-3 text-slate-700" />
-                              <p className="text-sm font-medium">No feedback data yet for this selection.</p>
-                            </div>
-                          ) : selectedTeacherId === 'all' ? (
-                            <div className="flex flex-col gap-4">
-                              <p className="text-xs text-slate-400 mb-2">💡 Click on any bar below to view that teacher's personal rating breakdown.</p>
-                              <div style={{ height: Math.max(300, filteredAvgRatingPerFaculty.length * 52) + 'px' }}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                  <BarChart data={filteredAvgRatingPerFaculty} layout="vertical" margin={{ left: 10, right: 30 }}>
-                                    <XAxis type="number" domain={[0, 10]} tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
-                                    <YAxis type="category" dataKey="name" tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} width={160} axisLine={false} tickLine={false} />
-                                    <Tooltip
-                                      cursor={{ fill: '#1e293b', opacity: 0.4 }}
-                                      contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 16, color: '#f8fafc', fontWeight: 600, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}
-                                      formatter={v => [`${v}/10`, 'Avg. Rating']}
-                                    />
-                                    <Bar dataKey="avg_rating" radius={[0, 8, 8, 0]} barSize={28}>
-                                      {filteredAvgRatingPerFaculty.map((entry, i) => (
-                                        <Cell 
-                                          key={i} 
-                                          fill={COLORS[i % COLORS.length]} 
-                                          className="cursor-pointer hover:opacity-80 transition-opacity"
-                                          onClick={() => setSelectedTeacherId(entry.id)}
-                                        />
-                                      ))}
-                                    </Bar>
-                                  </BarChart>
-                                </ResponsiveContainer>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                              {/* Graph */}
-                              <div className="lg:col-span-3 card-main p-6 border border-[#E6E9EE]/10 bg-white/5">
-                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Attribute Performance</h4>
-                                {(!selectedTeacher?.attributes || selectedTeacher.attributes.length === 0) ? (
-                                  <p className="text-sm text-slate-400">No question breakdown available for this teacher.</p>
-                                ) : (
-                                  <div style={{ height: '300px' }}>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                      <BarChart data={selectedTeacher.attributes.map((attr, idx) => ({
-                                        name: `Q${idx + 1}`,
-                                        rating: attr.avg_rating,
-                                        fullText: attr.question_text
-                                      }))} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
-                                        <XAxis dataKey="name" tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
-                                        <YAxis domain={[0, 10]} tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
-                                        <Tooltip
-                                          contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 16, color: '#f8fafc', fontWeight: 600 }}
-                                          formatter={(value, name, props) => [`${value}/10`, props.payload.fullText]}
-                                        />
-                                        <Bar dataKey="rating" fill="#3B6EA5" radius={[8, 8, 0, 0]} barSize={40}>
-                                          {selectedTeacher.attributes.map((_, i) => (
-                                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                                          ))}
-                                        </Bar>
-                                      </BarChart>
-                                    </ResponsiveContainer>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Legend/Table of attributes */}
-                              <div className="lg:col-span-2 flex flex-col gap-3">
-                                <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">Details</h4>
-                                {(selectedTeacher?.attributes || []).map((attr, idx) => (
-                                  <div key={idx} className="card-main p-4 flex flex-col gap-2 border border-[#E6E9EE]/10 bg-white/5">
-                                    <div className="flex justify-between items-start gap-4">
-                                      <span className="text-xs font-black px-2 py-0.5 bg-primary-500/10 text-primary-400 rounded-md">Q{idx + 1}</span>
-                                      <span className="text-sm font-black text-accent-400">{attr.avg_rating} / 10</span>
-                                    </div>
-                                    <p className="text-xs font-bold text-[var(--text-main)] leading-relaxed">{attr.question_text}</p>
-                                    <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden mt-1">
-                                      <div className="h-full bg-accent-400 rounded-full" style={{ width: `${(attr.avg_rating / 10) * 100}%` }} />
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* ATTRIBUTE ANALYSIS TAB */}
-                    {activeTab === 'performance' && (
-                      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                        <div className="lg:col-span-3 card-main p-8">
-                          <h3 className="text-base font-black text-[#1D3557] mb-6 flex items-center gap-2">
-                            <Activity size={18} className="text-primary-400" /> Attribute Breakdown
-                          </h3>
-                          <div style={{ height: '400px' }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data?.attributeAnalytics || []}>
-                                <PolarGrid stroke="#334155" />
-                                <PolarAngleAxis dataKey="attribute" tick={{ fill: '#475569', fontSize: 11, fontWeight: 600 }} />
-                                <PolarRadiusAxis angle={30} domain={[0, 10]} tick={{ fill: '#64748b', fontSize: 10 }} />
-                                <Radar
-                                  name="Score"
-                                  dataKey="score"
-                                  stroke="#0F2D52"
-                                  fill="#1D4E89"
-                                  fillOpacity={0.5}
-                                />
-                                <Tooltip
-                                  contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 12, fontSize: 12 }}
-                                />
-                              </RadarChart>
-                            </ResponsiveContainer>
-                          </div>
-                        </div>
-                        <div className="lg:col-span-2 flex flex-col gap-4">
-                          {(data?.attributeAnalytics || []).map((attr, i) => (
-                            <div key={i} className="card-main p-4 flex justify-between items-center">
-                              <span className="text-sm font-bold text-[#1D3557]">{attr.full_text}</span>
-                              <div className="flex items-center gap-2">
-                                <div className="h-1.5 w-16 bg-slate-800 rounded-full overflow-hidden">
-                                  <div className="h-full bg-primary-500 rounded-full" style={{ width: `${(attr.score / 10) * 100}%` }} />
-                                </div>
-                                <span className="text-sm font-black text-[#1D3557]">{attr.score}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* DEPARTMENT OVERVIEW TAB */}
-                    {activeTab === 'engagement' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {(data?.deptOverview || []).map((d, i) => (
-                          <div key={d.id} className="card-main p-6 flex flex-col gap-4">
-                            <div className="flex justify-between items-start">
-                              <div className="h-12 w-12 bg-slate-950/50 rounded-2xl flex items-center justify-center border border-slate-800">
-                                <LayoutGrid size={20} className={COLORS[i % COLORS.length]} />
-                              </div>
-                              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${d.portal_open ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-accent-500/10 text-accent-400 border border-accent-500/20'}`}>
-                                {d.portal_open ? 'Portal Open' : 'Portal Closed'}
-                              </span>
-                            </div>
-                            <div>
-                              <h4 className="text-xl font-black text-[#1D3557]">{d.name}</h4>
-                              <p className="text-xs text-slate-500 font-bold uppercase mt-1 tracking-widest">{d.code}</p>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 mt-2 p-4 rounded-2xl border border-[#E6E9EE] bg-white/5">
-                              <div>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black mb-1">Avg Rating</p>
-                                <p className="text-lg font-black text-[#1D3557] flex items-center gap-1.5">
-                                  <Star size={14} className="text-amber-400 fill-amber-400" /> {d.avg_rating}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black mb-1">Faculty</p>
-                                <p className="text-lg font-black text-[#1D3557]">{d.faculty_count}</p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* TRENDS TAB */}
-                    {activeTab === 'trends' && (
-                      <div className="card-main p-8">
-                        <h3 className="text-base font-black text-[#1D3557] mb-6 flex items-center gap-2">
-                          <Activity size={18} className="text-primary-400" /> Submission Volume Trends
-                        </h3>
-                        {data?.timelineData?.length === 0 ? (
-                           <div className="flex flex-col items-center justify-center py-16 text-slate-500 dark:text-slate-400 text-center">
-                            <Activity size={40} className="mb-3 text-slate-700" />
-                            <p className="text-sm font-medium">Not enough historical data to show trends.</p>
-                          </div>
-                        ) : (
-                          <div style={{ height: '350px' }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                              <AreaChart data={data?.timelineData || []}>
-                                <defs>
-                                  <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#1D4E89" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#1D4E89" stopOpacity={0}/>
-                                  </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                                <XAxis dataKey="date" tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                <YAxis tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                <Tooltip
-                                  contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 12, fontSize: 12 }}
-                                />
-                                <Area type="monotone" dataKey="count" stroke="#1D4E89" fillOpacity={1} fill="url(#colorCount)" strokeWidth={3} />
-                              </AreaChart>
-                            </ResponsiveContainer>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* COURSES TAB */}
-                    {activeTab === 'courses' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {(data?.submissionRates || []).map(c => (
-                          <div key={c.course_id} className="card-main p-6 flex flex-col justify-between hover:border-primary-500/30 transition-all group">
-                            <div>
-                              <div className="flex items-start justify-between mb-4">
-                                <div className="pr-4">
-                                  <span className="inline-block text-[10px] font-black bg-primary-500/10 text-primary-400 px-2 py-0.5 rounded-md border border-primary-500/20 mb-2 tracking-widest uppercase">{c.course_code}</span>
-                                  <h4 className="text-base font-black text-[#1D3557] leading-tight group-hover:text-primary-300 transition-colors">{c.course_name}</h4>
-                                </div>
-                                <span className={`text-xl font-black ${c.rate >= 70 ? 'text-emerald-400' : c.rate >= 40 ? 'text-amber-400' : 'text-accent-400'}`}>{c.rate}%</span>
-                              </div>
-                              <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden mb-4 shadow-inner">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${c.rate}%` }}
-                                  transition={{ duration: 1, ease: 'easeOut' }}
-                                  className={`h-full rounded-full ${c.rate >= 70 ? 'bg-gradient-to-r from-emerald-500 to-emerald-400' : c.rate >= 40 ? 'bg-gradient-to-r from-amber-500 to-amber-400' : 'bg-gradient-to-r from-accent-500 to-accent-400'}`}
-                                />
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-4 text-xs font-black text-slate-600 bg-white/5 p-3 rounded-2xl border border-[#E6E9EE]">
-                              <div className="flex flex-col">
-                                <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest mb-0.5">Enrolled</span>
-                                <span className="text-[#1D3557]">{c.enrolled}</span>
-                              </div>
-                              <div className="w-px h-6 bg-slate-700" />
-                              <div className="flex flex-col">
-                                <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest mb-0.5">Responses</span>
-                                <span className="text-[#1D3557]">{c.submitted}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* COMMENTS TAB */}
-                    {activeTab === 'comments' && (() => {
-                      const uniqueFaculty = Array.from(new Set((data?.recentComments || []).map(c => c.faculty_name).filter(Boolean)));
-                      const filteredComments = selectedFacultyFilter === 'all'
-                        ? (data?.recentComments || [])
-                        : (data?.recentComments || []).filter(c => c.faculty_name === selectedFacultyFilter);
-                      
-                      return (
-                        <div className="flex flex-col gap-6">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 card-main p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl">
-                            <div>
-                              <h3 className="text-sm font-black text-slate-800 dark:text-[var(--text-main)] uppercase tracking-wider">Feedback Insights</h3>
-                              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Filter feedback narrative comments by instructor</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-slate-600 dark:text-slate-400 font-black uppercase tracking-wider">Faculty:</span>
-                              <select
-                                value={selectedFacultyFilter}
-                                onChange={e => setSelectedFacultyFilter(e.target.value)}
-                                className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-black text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer min-w-[200px]"
-                              >
-                                <option value="all">All Faculty</option>
-                                {uniqueFaculty.map(fac => (
-                                  <option key={fac} value={fac}>{fac}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-
-                          {filteredComments.length === 0 ? (
-                            <div className="card-main p-12 text-center text-slate-600 font-medium">No comments submitted yet for this selection.</div>
-                          ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {filteredComments.map((c, i) => (
-                                <motion.div 
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: i * 0.05 }}
-                                  key={i} 
-                                  className="card-main p-6 flex flex-col relative overflow-hidden group"
-                                >
-                                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <MessageSquare size={40} className="text-primary-500" />
-                                  </div>
-                                  <div className="flex justify-between items-center mb-4 relative z-10">
-                                    <span className="flex items-center gap-1.5 text-[9px] font-black bg-primary-500/10 text-primary-600 dark:text-primary-400 px-3 py-1 rounded-xl border border-primary-500/20 tracking-wider uppercase">
-                                      <Lock size={10} /> {c.anonymous_id || 'ANONYMOUS'}
-                                    </span>
-                                  </div>
-                                  <p className="text-base text-[#1D3557] italic leading-relaxed mb-6 flex-1 relative z-10">"{c.comment}"</p>
-                                  <div className="pt-4 border-t border-slate-800/60 flex flex-col gap-1.5 relative z-10">
-                                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 font-bold">
-                                      <span className="text-primary-400 font-black">{c.faculty_name}</span>
-                                      <span className="text-slate-700">•</span>
-                                      <span className="text-slate-500 dark:text-slate-400">{c.course_name}</span>
-                                    </div>
-                                    <div className="text-[10px] text-slate-600 font-black uppercase tracking-widest">
-                                      Submitted on {new Date(c.submitted_at).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
-                                    </div>
-                                  </div>
-                                </motion.div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            )}
-          </motion.div>
-                  <footer className="mt-8 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-slate-500 w-full">
-            <p className="text-xs">© 2026 Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.</p>
-          </footer>
-        </main>
-      </div>
+                          </CardBody></Card>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      )}
+      </div>{/* close z-10 */}
     </div>
   );
 }

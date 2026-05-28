@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import api from '../services/api';
@@ -102,15 +103,16 @@ function DepartmentsTab({ departments, onRefresh }) {
 }
 
 // ── Sections Tab ──────────────────────────────────────────────────────────────
-function SectionsTab({ departments, sections, onRefresh }) {
+function SectionsTab({ departments, sections, onRefresh, currentUserId, currentUserRole }) {
   const [deptId, setDeptId] = useState(''); const [sem, setSem] = useState('3'); const [label, setLabel] = useState('A');
+  const isAdmin = currentUserRole === 'super_admin' || currentUserRole === 'supreme';
   const create = async () => {
     try { await api.post('/coordinator/sections', { department_id: deptId, semester: sem, label }); onRefresh(); toast.success('Section created.'); }
     catch (e) { toast.error(e.response?.data?.message || 'Failed to create section.'); }
   };
   const del = async (id) => {
     try { await api.delete(`/coordinator/sections/${id}`); onRefresh(); toast.success('Section deleted.'); }
-    catch (e) { toast.error('Failed to delete section.'); }
+    catch (e) { toast.error(e.response?.data?.message || 'Failed to delete section.'); }
   };
   return (
     <div className="flex flex-col gap-4">
@@ -137,15 +139,22 @@ function SectionsTab({ departments, sections, onRefresh }) {
         </div>
       </Card>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {sections.map(s => (
-          <Card key={s.id} className="flex items-center justify-between">
-            <div>
-              <div className="text-sm font-bold text-[var(--text-main)]">{s.name}</div>
-              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{s.department_name} • Semester {s.semester}</div>
-            </div>
-            <Btn variant="danger" onClick={() => del(s.id)}><Trash2 size={14} /></Btn>
-          </Card>
-        ))}
+        {sections.map(s => {
+          const canDelete = isAdmin || (s.created_by && s.created_by === currentUserId);
+          return (
+            <Card key={s.id} className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-bold text-[var(--text-main)]">{s.name}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{s.department_name} • Semester {s.semester}</div>
+              </div>
+              {canDelete ? (
+                <Btn variant="danger" onClick={() => del(s.id)}><Trash2 size={14} /></Btn>
+              ) : (
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1 bg-slate-100 rounded-lg">System</span>
+              )}
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
@@ -517,6 +526,7 @@ function StudentsTab({ departments, sections, students, onRefresh }) {
 
 // ── Main CoordinatorPanel ────────────────────────────────────────────────────
 export default function CoordinatorPanel() {
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get('tab') || 'sections';
   const setTab = (newTab) => {
@@ -593,7 +603,7 @@ export default function CoordinatorPanel() {
               transition={{ duration: 0.2 }}
             >
               {tab === 'departments' && <DepartmentsTab departments={departments} onRefresh={loadAll} />}
-              {tab === 'sections' && <SectionsTab departments={departments} sections={sections} onRefresh={loadAll} />}
+              {tab === 'sections' && <SectionsTab departments={departments} sections={sections} onRefresh={loadAll} currentUserId={user?.id} currentUserRole={user?.role} />}
               {tab === 'courses' && <CoursesTab departments={departments} courses={courses} onRefresh={loadAll} />}
               {tab === 'faculty' && <FacultyTab departments={departments} faculty={faculty} onRefresh={loadAll} />}
               {tab === 'assignments' && <AssignmentsTab departments={departments} sections={sections} faculty={faculty} courses={courses} onRefresh={loadAll} />}

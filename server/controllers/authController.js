@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User, Section, FEEDBACK_ID_PREFIX } from '../db.js';
+import { User, Section, Department, Course, Faculty, Tlfq, Response, Enrollment, SectionFaculty, FEEDBACK_ID_PREFIX } from '../db.js';
 import crypto from 'crypto';
 
 const SECRET = process.env.JWT_SECRET;
@@ -152,10 +152,20 @@ export const login = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     const user = await User.findUnique({ 
-      where: { id: req.user.id } 
+      where: { id: req.user.id },
+      include: {
+        department: { select: { name: true, code: true } },
+        section: { select: { name: true, code: true, semester: true, label: true } },
+      }
     });
     if (!user) return res.status(404).json({ message: 'User not found' });
-    return res.status(200).json({ user: safeUser(user) });
+    return res.status(200).json({ user: {
+      ...safeUser(user),
+      department_name: user.department?.name || null,
+      department_code: user.department?.code || null,
+      section_name: user.section?.name || null,
+      section_code: user.section?.code || null,
+    }});
   } catch (err) {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
@@ -188,6 +198,111 @@ export const changePassword = async (req, res) => {
     return res.json({ message: 'Password changed successfully.' });
   } catch (err) {
     console.error(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+// ── Profile Stats (role-specific aggregated data) ──────────────────────────
+export const getProfileStats = async (req, res) => {
+  try {
+    const { id, role, department_id } = req.user;
+
+    // ── Student stats ─────────────────────────────────────────────────────
+    if (role === 'student') {
+      const student = await User.findUnique({ where: { id } });
+      if (!student) return res.status(404).json({ message: 'User not found' });
+
+      const [totalSubmissions, enrolledCourses, availableForms, rank] = await Promise.all([
+        Response.count({ where: { student_id: id } }),
+        Enrollment.findMany({
+          where: { student_id: id },
+          include: { course: { select: { name: true, code: true } } }
+        }),
+        Tlfq.count({
+          where: {
+            section_id: student.section_id || undefined,
+            is_active: true,
+            closing_time: { gt: new Date() }
+          }
+        }),
+        User.count({
+          where: {
+            role: 'student',
+            points: { gt: student.points || 0 }
+          }
+        })
+      ]);
+
+      return res.json({
+        role: 'student',
+        totalSubmissions,
+        points: student.points || 0,
+        leaderboardRank: rank + 1,
+        enrolledCourses: enrolledCourses.map(e => ({
+          name: e.course?.name,
+          code: e.course?.code
+        })),
+        availableForms,
+        completedForms: totalSubmissions,
+        completionRate: availableForms > 0 ? Math.round((totalSubmissions / availableForms) * 100) : 0
+      });
+    }
+
+    // ── HOD stats ──────────────────────────────────────────────────────────
+    if (role === 'hod') {
+      const now = new Date();
+      const [sections, faculty, students, totalForms, openForms, dept] = await Promise.all([
+        Section.count({ where: { department_id } }),
+        Faculty.count({ where: { department_id } }),
+        User.count({ where: { role: 'student', department_id } }),
+        Tlfq.count({ where: { created_by: id } }),
+        Tlfq.count({ where: { created_by: id, is_active: true, closing_time: { gt: now } } }),
+        Department.findUnique({ where: { id: department_id } })
+      ]);
+
+      return res.json({
+        role: 'hod',
+        sections, faculty, students, totalForms, openForms,
+        portalOpen: dept?.portal_open ?? true,
+        departmentName: dept?.name || 'Unknown'
+      });
+    }
+
+    // ── Super Admin / Supreme stats ────────────────────────────────────────
+    if (role === 'super_admin' || role === 'supreme') {
+      const [departments, students, staff, totalForms, totalResponses] = await Promise.all([
+        Department.count(),
+        User.count({ where: { role: 'student' } }),
+        User.count({ where: { role: { in: ['super_admin', 'hod', 'coordinator'] } } }),
+        Tlfq.count(),
+        Response.count()
+      ]);
+
+      return res.json({
+        role,
+        departments, students, staff, totalForms, totalResponses
+      });
+    }
+
+    // ── Coordinator stats ──────────────────────────────────────────────────
+    if (role === 'coordinator') {
+      const [sections, faculty, students, courses, assignments] = await Promise.all([
+        Section.count(),
+        Faculty.count(),
+        User.count({ where: { role: 'student' } }),
+        Course.count(),
+        SectionFaculty.count()
+      ]);
+
+      return res.json({
+        role: 'coordinator',
+        sections, faculty, students, courses, assignments
+      });
+    }
+
+    return res.json({ role });
+  } catch (err) {
+    console.error('getProfileStats error:', err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };

@@ -7,23 +7,19 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "vite preview --host 0.0.0.0 --port $PORT"
+    "preview": "vite preview"
   },
   "dependencies": {
     "autoprefixer": "^10.5.0",
     "axios": "^1.15.2",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
-    "papaparse": "^5.5.3",
     "postcss": "^8.5.13",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
     "recharts": "^3.8.1",
-    "sonner": "^2.0.7",
-    "tailwindcss": "^3.4.19",
-    "xlsx": "^0.18.5"
+    "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

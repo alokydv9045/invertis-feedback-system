@@ -44,7 +44,9 @@ export const deleteDepartment = async (req, res) => {
 export const getSections = async (req, res) => {
   try {
     const { department_id } = req.query;
-    const where = department_id ? { department_id } : {};
+    // HODs automatically see only their department's sections
+    const effectiveDeptId = req.user.role === 'hod' ? req.user.department_id : department_id;
+    const where = effectiveDeptId ? { department_id: effectiveDeptId } : {};
     
     const sections = await Section.findMany({
       where,
@@ -62,6 +64,7 @@ export const getSections = async (req, res) => {
     const result = sections.map(sec => ({
       ...sec,
       department_name: sec.department?.name,
+      created_by: sec.created_by || null,
       assignments: sec.sectionFaculty.map(sf => ({
         id: sf.id,
         faculty_name: sf.faculty?.name,
@@ -99,7 +102,8 @@ export const createSection = async (req, res) => {
         code,
         semester: Number(semester),
         label: label.toUpperCase(),
-        department_id
+        department_id,
+        created_by: req.user.id
       },
       include: {
         department: true,
@@ -126,6 +130,23 @@ export const createSection = async (req, res) => {
 export const deleteSection = async (req, res) => {
   try {
     const id = req.params.id;
+    const section = await Section.findUnique({ where: { id } });
+    if (!section) return res.status(404).json({ message: 'Section not found.' });
+
+    // Coordinators can only delete sections they themselves created
+    if (req.user.role === 'coordinator') {
+      if (!section.created_by || section.created_by !== req.user.id) {
+        return res.status(403).json({ message: 'You can only delete sections you created.' });
+      }
+    }
+
+    // HODs can only delete sections within their own department
+    if (req.user.role === 'hod') {
+      if (section.department_id !== req.user.department_id) {
+        return res.status(403).json({ message: 'You can only delete sections in your department.' });
+      }
+    }
+
     await Tlfq.updateMany({ where: { section_id: id }, data: { is_active: false } });
     await Enrollment.deleteMany({ where: { section_id: id } });
     await User.updateMany({ where: { section_id: id }, data: { section_id: null } });

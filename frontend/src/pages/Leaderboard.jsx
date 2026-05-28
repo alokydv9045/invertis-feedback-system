@@ -1,107 +1,151 @@
 import { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
 import api from '../services/api';
 import { motion } from 'framer-motion';
-import { toast } from 'sonner';
+import { Card, CardBody } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton';
 import { Trophy, Star, Medal, Users, ShieldAlert } from 'lucide-react';
+
+const medals = ['🥇', '🥈', '🥉'];
+const podiumColors = ['bg-yellow-100 border-yellow-300', 'bg-gray-100 border-gray-300', 'bg-orange-100 border-orange-300'];
+const podiumHeights = ['h-36', 'h-28', 'h-24'];
+const rankBg = ['bg-amber-400', 'bg-gray-400', 'bg-orange-600'];
 
 export default function Leaderboard() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/student/leaderboard')
-      .then(res => setStudents(res.data))
-      .catch(() => toast.error('Failed to load leaderboard.'))
-      .finally(() => setLoading(false));
+    api.get('/student/leaderboard').then(r => setStudents(r.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
+  // Reorder top 3 for podium: [2nd, 1st, 3rd]
+  const podiumOrder = [1, 0, 2];
+
   return (
-    <div className="min-h-screen bg-transparent text-[var(--text-main)] flex flex-col">
-      <Navbar />
-      <div className="flex flex-col md:flex-row flex-1 min-h-0">
-        <Sidebar />
-        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-auto">
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6 max-w-4xl mx-auto">
-
-            {/* Header */}
-            <div className="text-center mb-2">
-              <div className="inline-flex h-16 w-16 bg-gradient-to-br from-accent-400 to-accent-600 rounded-3xl items-center justify-center shadow-xl shadow-accent-600/30 mb-4">
-                <Trophy size={32} className="text-white" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-main)]">Top Contributors</h1>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2">
-                Earn points by submitting feedback and improving teaching quality.
-              </p>
-            </div>
-
-
-            {loading ? (
-              <div className="card-main rounded-3xl p-12 flex justify-center">
-                <div className="h-10 w-10 border-4 border-accent-500 border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : students.length === 0 ? (
-              <div className="card-main rounded-3xl p-12 text-center flex flex-col items-center">
-                <Users size={40} className="text-slate-600 mb-4" />
-                <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">No data available yet</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Submit feedback to appear on the leaderboard!</p>
-              </div>
-            ) : (
-              <div className="card-main rounded-3xl p-4 sm:p-6">
-                <div className="flex flex-col divide-y divide-slate-200 dark:divide-slate-800">
-                 {students.map((s, idx) => (
-                   <motion.div
-                     key={s.unique_feedback_id}
-                     initial={{ opacity: 0, x: -20 }}
-                     animate={{ opacity: 1, x: 0 }}
-                     transition={{ delay: idx * 0.04 }}
-                     className={`flex items-center gap-3 sm:gap-4 py-3 sm:py-4 transition-all`}
-                   >
-                     {/* Rank badge */}
-                     <div className={`h-12 w-12 flex-shrink-0 flex items-center justify-center rounded-xl font-black text-lg shadow-inner ${
-                       idx === 0 ? 'bg-gradient-to-br from-amber-300 to-amber-600 text-white' :
-                       idx === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-white' :
-                       idx === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-700 text-white' :
-                       'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                     }`}>
-                       #{s.rank}
-                     </div>
-
-                     {/* Student Name */}
-                     <div className="flex-1 min-w-0">
-                       <div className="flex items-center gap-2 flex-wrap">
-                         <span className="font-bold text-[var(--text-main)] text-lg">
-                           {s.name || 'Anonymous Student'}
-                         </span>
-                         {idx === 0 && <Medal size={16} className="text-amber-500 flex-shrink-0" />}
-                         {idx === 1 && <Medal size={16} className="text-slate-400 flex-shrink-0" />}
-                         {idx === 2 && <Medal size={16} className="text-orange-500 flex-shrink-0" />}
-                       </div>
-                       <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
-                         Participant · Batch: {s.batch || '2025'}
-                       </div>
-                     </div>
-
-                     {/* Points */}
-                     <div className="flex flex-col items-end flex-shrink-0">
-                       <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                         <Star size={14} className="text-accent-400 fill-accent-400" />
-                         <span className="font-black text-accent-400 text-sm">{s.points}</span>
-                         <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">PTS</span>
-                       </div>
-                     </div>
-                   </motion.div>
-                 ))}
-                </div>
-              </div>
-            )}
-          </motion.div>
-                  <footer className="mt-8 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-slate-500 w-full">
-            <p className="text-xs">© 2026 Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.</p>
-          </footer>
-        </main>
+    <div className="animate-fade-in max-w-4xl mx-auto relative">
+      <div className="absolute -inset-6 overflow-hidden pointer-events-none select-none">
+        <img src="/campus/academic-block-2.jpg" alt="" className="w-full h-full object-cover opacity-15" />
       </div>
+      <div className="relative z-10">
+      <div className="text-center mb-6">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 12 }}
+          className="inline-flex w-14 h-14 bg-amber-50 rounded-2xl items-center justify-center mb-3"
+        >
+          <Trophy size={28} className="text-amber-500" />
+        </motion.div>
+        <h1 className="text-2xl font-bold text-gray-900">Top Contributors</h1>
+        <p className="text-sm text-gray-500 mt-1">Earn points by submitting feedback.</p>
+      </div>
+
+      <Card className="mb-6">
+        <CardBody className="py-3">
+          <div className="flex items-start gap-3">
+            <ShieldAlert size={16} className="text-invertis-blue mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-gray-500"><span className="font-semibold text-gray-700">Anonymous Leaderboard</span> — Only system-generated anonymous IDs are displayed. Real identities are visible only to Super Admin or Supreme Authority.</p>
+          </div>
+        </CardBody>
+      </Card>
+
+      {loading ? (
+        <div className="space-y-3">
+          {/* Podium skeleton */}
+          <div className="flex items-end justify-center gap-4 mb-6">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="flex flex-col items-center">
+                <Skeleton className={`w-20 ${['h-28', 'h-36', 'h-24'][i]} mb-2`} rounded="rounded-t-2xl" />
+              </div>
+            ))}
+          </div>
+          {/* List skeleton */}
+          {[1, 2, 3, 4, 5].map(n => (
+            <Card key={n}>
+              <CardBody className="py-3">
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-10 w-10" rounded="rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <Skeleton className="h-8 w-20" rounded="rounded-lg" />
+                </div>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      ) : students.length === 0 ? (
+        <Card><EmptyState icon={Users} title="No data yet" message="Submit feedback to appear on the leaderboard!" /></Card>
+      ) : (
+        <div className="space-y-3">
+          {/* Enhanced Podium: 2nd - 1st - 3rd */}
+          {students.length >= 3 && (
+            <div className="flex items-end justify-center gap-4 mb-8">
+              {podiumOrder.map((actualIdx, displayIdx) => {
+                const student = students[actualIdx];
+                if (!student) return null;
+
+                return (
+                  <motion.div
+                    key={student.unique_feedback_id}
+                    initial={{ scale: 0, y: 30 }}
+                    animate={{ scale: 1, y: 0 }}
+                    transition={{ delay: displayIdx * 0.15, type: 'spring', stiffness: 150, damping: 12 }}
+                    className="flex flex-col items-center"
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: displayIdx * 0.15 + 0.3 }}
+                      className="text-2xl mb-2"
+                    >
+                      {medals[actualIdx]}
+                    </motion.div>
+                    <div className={`w-24 ${podiumHeights[actualIdx]} ${podiumColors[actualIdx]} rounded-t-2xl border-2 border-b-0 flex flex-col items-center justify-end pb-3 shadow-lg`}>
+                      <span className="font-mono text-[10px] font-bold text-gray-700 truncate max-w-[85%]">{student.unique_feedback_id}</span>
+                      <div className="flex items-center gap-0.5 mt-1">
+                        <Star size={12} className="text-amber-400 fill-amber-400" />
+                        <span className="text-sm font-bold text-gray-900">{student.points}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Full list */}
+          {students.map((s, idx) => (
+            <motion.div key={s.unique_feedback_id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.03 }}>
+              <Card className={idx < 3 ? 'border-amber-200' : ''}>
+                <CardBody className="py-3">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl font-bold text-sm ${
+                      idx < 3 ? `${rankBg[idx]} text-white` : 'bg-gray-100 text-gray-500'
+                    }`}>#{s.rank}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-gray-900">{s.unique_feedback_id}</span>
+                        {idx < 3 && <Medal size={14} className={idx === 0 ? 'text-amber-400' : idx === 1 ? 'text-gray-400' : 'text-orange-600'} />}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">Anonymous · Batch: {s.batch || '2025'}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                      <Star size={14} className="text-amber-400 fill-amber-400" />
+                      <span className="font-bold text-amber-500 text-sm">{s.points}</span>
+                      <span className="text-xs text-gray-400">PTS</span>
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      )}
+      </div>{/* close z-10 */}
     </div>
   );
 }

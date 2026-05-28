@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
@@ -7,33 +6,26 @@ import api from '../services/api';
 import { motion } from 'framer-motion';
 import {
   BarChart2, Star, Users, BookOpen, Building2,
-  MessageSquare, TrendingUp, Award, ChevronDown, Lock
+  MessageSquare, TrendingUp, Award, ChevronDown
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   RadarChart, PolarGrid, PolarAngleAxis, Radar, Cell
 } from 'recharts';
 
-const COLORS = ['#0F2D52', '#1D4E89', '#10B981', '#F59E0B', '#C62828', '#3B6EA5'];
+const COLORS = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
 
-function RatingBadge({ value, max = 10 }) {
+function RatingBadge({ value, max = 7 }) {
   const pct = (value / max) * 100;
-  const color = pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-accent-400';
-  return <span className={`text-lg font-black ${color}`}>{value.toFixed(1)}<span className="text-xs text-slate-500 dark:text-slate-400 font-normal">/{max}</span></span>;
+  const color = pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-rose-400';
+  return <span className={`text-lg font-black ${color}`}>{value.toFixed(1)}<span className="text-xs text-slate-500 font-normal">/{max}</span></span>;
 }
 
 export default function HODDashboard() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedFacultyFilter, setSelectedFacultyFilter] = useState('all');
-  const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'overview';
-  const setActiveTab = (tab) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('tab', tab);
-    setSearchParams(params, { replace: true });
-  };
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     api.get('/responses/analytics')
@@ -65,36 +57,34 @@ export default function HODDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-500">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1 min-h-0">
+      <div className="flex flex-col md:flex-row flex-1">
         <Sidebar />
-        <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-auto">
+        <main className="flex-1 p-6 md:p-10">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8 max-w-7xl mx-auto w-full">
 
             {/* Header */}
-            <div className="flex items-center gap-4">
-              <div className="user-type-badge bg-indigo-50 dark:bg-indigo-950/20 border-indigo-200/50 dark:border-indigo-900/30">
-                <Building2 size={20} className="text-indigo-500 dark:text-indigo-400" />
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <BarChart2 size={24} className="text-indigo-600 dark:text-indigo-400" />
+                <h1 className="text-3xl font-black tracking-tight">Department Portal</h1>
               </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Department Portal</h1>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                  Feedback insights for your department — all data is strictly anonymous.
-                </p>
-              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                Feedback insights for your department — all data is strictly anonymous.
+              </p>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 sm:gap-4 border-b border-slate-200 dark:border-slate-800 flex-nowrap overflow-x-auto no-scrollbar pb-1">
+            <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800 flex-wrap overflow-x-auto no-scrollbar">
               {tabs.map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className={`flex items-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-black border-b-2 transition -mb-[5px] cursor-pointer uppercase tracking-widest whitespace-nowrap flex-shrink-0 ${
+                  className={`flex items-center gap-2.5 px-6 py-4 text-sm font-black border-b-2 transition -mb-px cursor-pointer uppercase tracking-widest ${
                     activeTab === id
-                      ? 'border-primary-600 text-primary-600 dark:text-primary-400'
-                      : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-[var(--text-main)]'
+                      ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                      : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                   }`}
                 >
                   <Icon size={16} /> {label}
@@ -107,49 +97,45 @@ export default function HODDashboard() {
                 {[1, 2, 3, 4].map(n => <div key={n} className="h-44 bg-white dark:bg-slate-900/50 animate-pulse rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm" />)}
               </div>
             ) : !data ? (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-12 sm:p-20 text-center text-slate-500 dark:text-slate-400 font-bold shadow-sm">No analytics available for this department.</div>
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center text-slate-500 dark:text-slate-400 font-bold shadow-sm">No analytics available for this department.</div>
             ) : (
               <div className="flex flex-col gap-8">
                 {/* OVERVIEW TAB */}
                 {activeTab === 'overview' && (
                   <div className="flex flex-col gap-8">
                     {(data.deptOverview || []).map(dept => (
-                      <div key={dept.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-10 shadow-sm group relative overflow-hidden">
+                      <div key={dept.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-10 shadow-sm group relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
                            <Building2 size={120} />
                         </div>
-                        <div className="flex items-start justify-between mb-8 sm:mb-10 relative z-10">
+                        <div className="flex items-start justify-between mb-10 relative z-10">
                           <div>
-                            <div className="flex items-center gap-3 flex-wrap">
-                              <h3 className="text-lg sm:text-xl font-bold text-[var(--text-main)]">{dept.name}</h3>
+                            <div className="flex items-center gap-3">
+                              <h3 className="text-lg font-bold text-slate-100">{dept.name}</h3>
                               <button
                                 onClick={() => handleTogglePortal(dept.id, dept.portal_open)}
-                                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                                className={`px-2 py-0.5 rounded text-xs font-bold transition-all cursor-pointer ${
                                   dept.portal_open
                                     ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-                                    : 'bg-accent-500/20 text-accent-400 border border-accent-500/30 hover:bg-accent-500/30'
+                                    : 'bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30'
                                 }`}
                               >
                                 {dept.portal_open ? '● Forms Open' : '○ Forms Closed'}
                               </button>
                             </div>
-                            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1 block">{dept.code}</span>
+                            <span className="text-xs text-slate-500 font-mono">{dept.code}</span>
                           </div>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 relative z-10">
+                        <div className="grid grid-cols-3 gap-6 relative z-10">
                           {[
-                            { icon: BookOpen, label: 'Course Modules', value: dept.course_count, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/30' },
-                            { icon: Award, label: 'Faculty Records', value: dept.faculty_count, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/20 border-rose-100/50 dark:border-rose-900/30' },
-                            { icon: Users, label: 'Enrolled Students', value: dept.student_count, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100/50 dark:border-emerald-900/30' },
-                          ].map(({ icon: Icon, label, value, color, bg }) => (
-                            <div key={label} className="card-hover rounded-2xl p-5 sm:p-6 transition-all flex items-center sm:flex-col justify-between sm:justify-normal text-left sm:text-center gap-3">
-                              <div className={`h-10 w-10 rounded-xl flex items-center justify-center border ${bg} flex-shrink-0 sm:mx-auto`}>
-                                <Icon size={18} className={color} />
-                              </div>
-                              <div>
-                                <div className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest sm:mt-1">{label}</div>
-                                <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-[var(--text-main)] mt-1">{value}</div>
-                              </div>
+                            { icon: BookOpen, label: 'Course Modules', value: dept.course_count, color: 'text-blue-500' },
+                            { icon: Award, label: 'Faculty Records', value: dept.faculty_count, color: 'text-purple-500' },
+                            { icon: Users, label: 'Enrolled Students', value: dept.student_count, color: 'text-emerald-500' },
+                          ].map(({ icon: Icon, label, value, color }) => (
+                            <div key={label} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-[1.5rem] p-6 group-hover:border-indigo-500/20 transition-all text-center">
+                              <Icon size={18} className={`${color} mx-auto mb-2`} />
+                              <div className="text-2xl font-black text-slate-900 dark:text-slate-100">{value}</div>
+                              <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">{label}</div>
                             </div>
                           ))}
                         </div>
@@ -157,8 +143,8 @@ export default function HODDashboard() {
                     ))}
                     {(data.deptOverview || []).length === 0 && (
                       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center">
-                        <Building2 size={48} className="text-[var(--text-main)] dark:text-slate-700 mx-auto mb-6" />
-                        <p className="text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">No active departmental records.</p>
+                        <Building2 size={48} className="text-slate-200 dark:text-slate-700 mx-auto mb-6" />
+                        <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">No active departmental records.</p>
                       </div>
                     )}
                   </div>
@@ -168,17 +154,17 @@ export default function HODDashboard() {
                 {activeTab === 'faculty' && (
                   <div className="flex flex-col gap-8">
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-sm">
-                      <h3 className="text-sm font-black text-slate-900 dark:text-[var(--text-main)] mb-8 flex items-center gap-3 uppercase tracking-wider">
-                        <TrendingUp size={18} className="text-primary-600 dark:text-primary-400" /> Faculty Performance Ranking
+                      <h3 className="text-sm font-black text-slate-900 dark:text-slate-200 mb-8 flex items-center gap-3 uppercase tracking-wider">
+                        <TrendingUp size={18} className="text-indigo-600 dark:text-indigo-400" /> Faculty Performance Ranking
                       </h3>
                       {(data.avgRatingPerFaculty || []).length === 0 ? (
-                        <div className="p-12 text-center text-slate-600 dark:text-slate-400 font-bold uppercase text-xs tracking-widest">No evaluation data recorded for faculty.</div>
+                        <div className="p-12 text-center text-slate-400 font-bold uppercase text-xs tracking-widest">No evaluation data recorded for faculty.</div>
                       ) : (
                         <div className="h-80">
                           <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data.avgRatingPerFaculty} layout="vertical" margin={{ left: 10, right: 30 }}>
-                              <XAxis type="number" domain={[0, 10]} tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }} stroke="#cbd5e1" />
-                              <YAxis type="category" dataKey="name" tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }} width={140} stroke="#cbd5e1" />
+                              <XAxis type="number" domain={[0, 7]} tick={{ fill: '#64748b', fontSize: 11, fontWeight: 'bold' }} stroke="#cbd5e1" />
+                              <YAxis type="category" dataKey="name" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 'bold' }} width={140} stroke="#cbd5e1" />
                               <Tooltip
                                 contentStyle={{ 
                                   backgroundColor: '#1e293b', 
@@ -188,7 +174,7 @@ export default function HODDashboard() {
                                   boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
                                 }}
                                 itemStyle={{ color: '#818cf8', fontWeight: 'bold' }}
-                                formatter={(v) => [`${v}/10`, 'Avg. Rating']}
+                                formatter={(v) => [`${v}/7`, 'Avg. Rating']}
                               />
                               <Bar dataKey="avg_rating" radius={[0, 10, 10, 0]} barSize={24}>
                                 {(data.avgRatingPerFaculty || []).map((_, i) => (
@@ -207,29 +193,29 @@ export default function HODDashboard() {
                           key={f.id}
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-primary-500/40 rounded-[2.5rem] p-7 transition-all shadow-sm hover:shadow-2xl hover:shadow-primary-500/5 relative overflow-hidden"
+                          className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500/40 rounded-[2.5rem] p-7 transition-all shadow-sm hover:shadow-2xl hover:shadow-indigo-500/5 relative overflow-hidden"
                         >
                           <div className="flex items-center gap-6">
                             <div className={`h-16 w-16 rounded-2xl flex items-center justify-center text-xl font-black text-white shadow-xl transform group-hover:scale-110 transition-transform duration-500 ${
                               i === 0 ? 'bg-gradient-to-br from-amber-300 to-amber-600' : 
                               i === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-500' : 
                               i === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-700' : 
-                              'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                              'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700'
                             }`}>
                               {i + 1}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-black text-slate-900 dark:text-white text-lg truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{f.name}</h3>
-                              <div className="text-[10px] text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 font-black truncate uppercase tracking-[0.1em] mt-1.5">{f.total_responses} Evaluation Samples</div>
+                              <h3 className="font-black text-slate-900 dark:text-white text-lg truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{f.name}</h3>
+                              <div className="text-[10px] text-slate-400 dark:text-slate-500 font-black truncate uppercase tracking-[0.1em] mt-1.5">{f.total_responses} Evaluation Samples</div>
                             </div>
                           </div>
                           <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
                              <div className="flex items-center gap-1.5">
                                 <Star size={18} className="text-amber-400 fill-amber-400" />
-                                <span className={`text-2xl font-black ${f.avg_rating >= 7.0 ? 'text-emerald-500' : f.avg_rating >= 5.0 ? 'text-amber-500' : 'text-accent-500'}`}>
+                                <span className={`text-2xl font-black ${f.avg_rating >= 5 ? 'text-emerald-500' : f.avg_rating >= 3.5 ? 'text-amber-500' : 'text-rose-500'}`}>
                                   {f.avg_rating.toFixed(1)}
                                 </span>
-                                <span className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase">Rating</span>
+                                <span className="text-xs text-slate-400 font-bold uppercase">Rating</span>
                              </div>
                           </div>
                         </motion.div>
@@ -246,14 +232,14 @@ export default function HODDashboard() {
                         <div className="flex items-start justify-between mb-6">
                           <div className="min-w-0">
                             <div className="flex items-center gap-3 mb-2">
-                              <span className="text-[10px] font-black bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 px-2.5 py-1 rounded-lg border border-primary-100 dark:border-primary-800/30 uppercase tracking-tighter">{c.course_code}</span>
-                              <h4 className="text-base font-black text-slate-900 dark:text-[var(--text-main)] truncate group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{c.course_name}</h4>
+                              <span className="text-[10px] font-black bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-lg border border-indigo-100 dark:border-indigo-800/30 uppercase tracking-tighter">{c.course_code}</span>
+                              <h4 className="text-base font-black text-slate-900 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{c.course_name}</h4>
                             </div>
-                            <p className="text-[10px] text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest">{c.department_name}</p>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">{c.department_name}</p>
                           </div>
                           <div className="text-right shrink-0 ml-4">
-                            <span className={`text-3xl font-black ${c.rate >= 70 ? 'text-emerald-500' : c.rate >= 40 ? 'text-amber-500' : 'text-accent-500'}`}>{c.rate}%</span>
-                            <div className="text-[9px] font-black text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">Submission Rate</div>
+                            <span className={`text-3xl font-black ${c.rate >= 70 ? 'text-emerald-500' : c.rate >= 40 ? 'text-amber-500' : 'text-rose-500'}`}>{c.rate}%</span>
+                            <div className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Submission Rate</div>
                           </div>
                         </div>
                         <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
@@ -261,16 +247,16 @@ export default function HODDashboard() {
                             initial={{ width: 0 }}
                             animate={{ width: `${c.rate}%` }}
                             transition={{ duration: 1, ease: 'easeOut' }}
-                            className={`h-full rounded-full ${c.rate >= 70 ? 'bg-emerald-500' : c.rate >= 40 ? 'bg-amber-500' : 'bg-accent-500'}`}
+                            className={`h-full rounded-full ${c.rate >= 70 ? 'bg-emerald-500' : c.rate >= 40 ? 'bg-amber-500' : 'bg-rose-500'}`}
                           />
                         </div>
                         <div className="flex gap-6 mt-6 pt-4 border-t border-slate-50 dark:border-slate-800/50 text-[10px] font-black uppercase tracking-[0.1em]">
-                          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400">
+                          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                              <div className="h-2 w-2 rounded-full bg-slate-300 dark:bg-slate-700" />
                              <span>{c.enrolled} Enrolled</span>
                           </div>
-                          <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400">
-                             <div className="h-2 w-2 rounded-full bg-primary-500" />
+                          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                             <div className="h-2 w-2 rounded-full bg-indigo-500" />
                              <span>{c.submitted} Received</span>
                           </div>
                         </div>
@@ -280,75 +266,46 @@ export default function HODDashboard() {
                 )}
 
                 {/* COMMENTS TAB */}
-                {activeTab === 'comments' && (() => {
-                  const uniqueFaculty = Array.from(new Set((data.recentComments || []).map(c => c.faculty_name).filter(Boolean)));
-                  const filteredComments = selectedFacultyFilter === 'all'
-                    ? (data.recentComments || [])
-                    : (data.recentComments || []).filter(c => c.faculty_name === selectedFacultyFilter);
-
-                  return (
-                    <div className="flex flex-col gap-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 card-main p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl">
-                        <div>
-                          <h3 className="text-sm font-black text-slate-800 dark:text-[var(--text-main)] uppercase tracking-wider">Feedback Insights</h3>
-                          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Filter feedback narrative comments by instructor</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-600 dark:text-slate-400 font-black uppercase tracking-wider">Faculty:</span>
-                          <select
-                            value={selectedFacultyFilter}
-                            onChange={e => setSelectedFacultyFilter(e.target.value)}
-                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs font-black text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer min-w-[200px]"
-                          >
-                            <option value="all">All Faculty</option>
-                            {uniqueFaculty.map(fac => (
-                              <option key={fac} value={fac}>{fac}</option>
-                            ))}
-                          </select>
-                        </div>
+                {activeTab === 'comments' && (
+                  <div className="flex flex-col gap-6">
+                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40 rounded-2xl p-5 flex items-center gap-4 text-xs font-bold text-amber-700 dark:text-amber-400">
+                      <div className="h-10 w-10 bg-amber-100 dark:bg-amber-900/50 rounded-xl flex items-center justify-center shrink-0">
+                         <MessageSquare size={20} />
                       </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {filteredComments.length === 0 ? (
-                          <div className="col-span-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center shadow-sm">
-                             <MessageSquare size={48} className="text-[var(--text-main)] dark:text-slate-700 mx-auto mb-6" />
-                             <p className="text-slate-500 dark:text-slate-400 dark:text-slate-600 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">No feedback narratives received yet.</p>
-                          </div>
-                        ) : (
-                          filteredComments.map((c, i) => (
-                            <motion.div 
-                              key={i} 
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-all"
-                            >
-                              <div className="flex justify-between items-center mb-6">
-                                 <div className="flex items-center gap-2">
-                                    <div className="h-1.5 w-1.5 rounded-full bg-primary-500" />
-                                    <span className="text-[10px] font-black text-slate-600 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-widest">{c.faculty_name}</span>
-                                 </div>
-                                 <span className="flex items-center gap-1.5 text-[9px] font-black bg-primary-500/10 text-primary-600 dark:text-primary-400 px-3 py-1 rounded-xl border border-primary-500/20 tracking-wider uppercase">
-                                   <Lock size={10} /> {c.anonymous_id || 'ANONYMOUS'}
-                                 </span>
-                              </div>
-                              <p className="text-sm text-slate-700 dark:text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">"{c.comment}"</p>
-                              <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-50 dark:border-slate-800/50 text-[10px] font-black text-slate-600 dark:text-slate-400 dark:text-slate-600 uppercase tracking-widest">
-                                <span className="truncate max-w-[150px]">{c.course_name}</span>
-                                <span>{new Date(c.submitted_at).toLocaleDateString()}</span>
-                              </div>
-                            </motion.div>
-                          ))
-                        )}
-                      </div>
+                      All student feedback narratives are fully anonymous. Systems ensure zero identity traceability for subjective responses.
                     </div>
-                  );
-                })()}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {(data.recentComments || []).length === 0 ? (
+                        <div className="col-span-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-20 text-center shadow-sm">
+                           <MessageSquare size={48} className="text-slate-200 dark:text-slate-700 mx-auto mb-6" />
+                           <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">No feedback narratives received yet.</p>
+                        </div>
+                      ) : (
+                        (data.recentComments || []).map((c, i) => (
+                          <motion.div 
+                            key={i} 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-all"
+                          >
+                            <div className="flex items-center gap-2 mb-6">
+                               <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                               <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{c.faculty_name}</span>
+                            </div>
+                            <p className="text-sm text-slate-700 dark:text-slate-300 italic leading-relaxed font-medium">"{c.comment}"</p>
+                            <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-50 dark:border-slate-800/50 text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">
+                              <span className="truncate max-w-[150px]">{c.course_name}</span>
+                              <span>{new Date(c.submitted_at).toLocaleDateString()}</span>
+                            </div>
+                          </motion.div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </motion.div>
-                  <footer className="mt-8 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-slate-500 w-full">
-            <p className="text-xs">© 2026 Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.</p>
-          </footer>
         </main>
       </div>
     </div>

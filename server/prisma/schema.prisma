@@ -66,13 +66,16 @@ model Section {
   semester       Int
   label          String
   department_id  String
+  created_by     String?
   enrollments    Enrollment[]
   department     Department       @relation(fields: [department_id], references: [id])
+  creator        User?            @relation("SectionCreator", fields: [created_by], references: [id])
   sectionFaculty SectionFaculty[]
   tlfqs          Tlfq[]
   users          User[]
 
   @@index([department_id])
+  @@index([created_by])
 }
 
 model User {
@@ -98,6 +101,7 @@ model User {
   section               Section?         @relation(fields: [section_id], references: [id])
   academic_session      AcademicSession? @relation(fields: [academic_session_id], references: [id])
   promotedLogs          PromotionLog[]   @relation("PromotionActor")
+  sectionsCreated       Section[]        @relation("SectionCreator")
 
   @@index([role])
   @@index([status])
