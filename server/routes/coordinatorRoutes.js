@@ -17,10 +17,11 @@ router.get('/departments',         guard, getDepartments);
 router.post('/departments',        [authenticate, authorize('super_admin')], createDepartment);
 router.delete('/departments/:id',  [authenticate, authorize('super_admin')], deleteDepartment);
 
-// Sections
-router.get('/sections',            guard, getSections);
+// Sections (coordinator, super_admin, and hod can manage)
+const sectionGuard = [authenticate, authorize('coordinator', 'super_admin', 'hod')];
+router.get('/sections',            sectionGuard, getSections);
 router.post('/sections',           guard, createSection);
-router.delete('/sections/:id',     guard, deleteSection);
+router.delete('/sections/:id',     sectionGuard, deleteSection);
 
 // Courses
 router.get('/courses',             guard, getCourses);
