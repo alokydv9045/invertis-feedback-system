@@ -1,4 +1,4 @@
-import { supabase } from '../db.js';
+import { User, Section } from '../db.js';
 import bcrypt from 'bcryptjs';
 
 // ── Create Super Admin (only Supreme Authority can do this) ──────────────
@@ -10,15 +10,14 @@ export const createSuperAdmin = async (req, res) => {
     }
     if (password.length < 8) return res.status(400).json({ message: 'Password must be at least 8 characters.' });
     const hashed = await bcrypt.hash(password, 10);
-    const { data, error } = await supabase.from('users').insert({
-      name, email: email.toLowerCase(), password: hashed, role: 'super_admin', status: 'active'
-    }).select().single();
-    if (error) {
-      if (error.code === '23505') return res.status(400).json({ message: 'Email already in use.' });
-      throw error;
-    }
+    const data = await User.create({
+      data: { name, email: email.toLowerCase(), password: hashed, role: 'super_admin', status: 'active' }
+    });
     return res.status(201).json({ id: data.id, name: data.name, email: data.email, role: 'super_admin' });
-  } catch { return res.status(500).json({ message: 'Internal Server Error' }); }
+  } catch (err) {
+    if (err?.code === 'P2002') return res.status(400).json({ message: 'Email already in use.' });
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
 
 // ── Create HOD ─────────────────────────────────────────────────────────────
@@ -29,15 +28,14 @@ export const createHod = async (req, res) => {
       return res.status(400).json({ message: 'name, email, password, department_id required' });
     }
     const hashed = await bcrypt.hash(password, 10);
-    const { data, error } = await supabase.from('users').insert({
-      name, email: email.toLowerCase(), password: hashed, role: 'hod', department_id, status: 'active'
-    }).select().single();
-    if (error) {
-      if (error.code === '23505') return res.status(400).json({ message: 'Email already in use.' });
-      throw error;
-    }
+    const data = await User.create({
+      data: { name, email: email.toLowerCase(), password: hashed, role: 'hod', department_id, status: 'active' }
+    });
     return res.status(201).json({ id: data.id, name: data.name, email: data.email, role: 'hod' });
-  } catch { return res.status(500).json({ message: 'Internal Server Error' }); }
+  } catch (err) {
+    if (err?.code === 'P2002') return res.status(400).json({ message: 'Email already in use.' });
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
 
 // ── Create Coordinator ─────────────────────────────────────────────────────
@@ -48,22 +46,23 @@ export const createCoordinator = async (req, res) => {
       return res.status(400).json({ message: 'name, email, password required' });
     }
     const hashed = await bcrypt.hash(password, 10);
-    const { data, error } = await supabase.from('users').insert({
-      name, email: email.toLowerCase(), password: hashed, role: 'coordinator', status: 'active'
-    }).select().single();
-    if (error) {
-      if (error.code === '23505') return res.status(400).json({ message: 'Email already in use.' });
-      throw error;
-    }
+    const data = await User.create({
+      data: { name, email: email.toLowerCase(), password: hashed, role: 'coordinator', status: 'active' }
+    });
     return res.status(201).json({ id: data.id, name: data.name, email: data.email, role: 'coordinator' });
-  } catch { return res.status(500).json({ message: 'Internal Server Error' }); }
+  } catch (err) {
+    if (err?.code === 'P2002') return res.status(400).json({ message: 'Email already in use.' });
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
 
 // ── Get all staff ──────────────────────────────────────────────────────────
 export const getStaff = async (req, res) => {
   try {
-    const { data, error } = await supabase.from('users').select('id, name, email, role, department_id').in('role', ['super_admin', 'hod', 'coordinator']);
-    if (error) throw error;
+    const data = await User.findMany({
+      where: { role: { in: ['super_admin', 'hod', 'coordinator'] } },
+      select: { id: true, name: true, email: true, role: true, department_id: true }
+    });
     return res.json(data || []);
   } catch { return res.status(500).json({ message: 'Internal Server Error' }); }
 };
@@ -73,23 +72,17 @@ export const revealStudentByAnonId = async (req, res) => {
   try {
     const { anon_id } = req.query;
     if (!anon_id) return res.status(400).json({ message: 'anon_id query parameter is required.' });
-    const { data: student } = await supabase
-      .from('users')
-      .select('*')
-      .eq('unique_feedback_id', anon_id.trim().toUpperCase())
-      .eq('role', 'student')
-      .single();
+    const student = await User.findFirst({
+      where: { unique_feedback_id: anon_id.trim().toUpperCase(), role: 'student' },
+      include: { section: { select: { name: true } } }
+    });
     if (!student) return res.status(404).json({ message: 'No student found with that Anonymous ID.' });
-    let section_name = null;
-    if (student.section_id) {
-      const { data: sec } = await supabase.from('sections').select('name').eq('id', student.section_id).single();
-      section_name = sec?.name || null;
-    }
     return res.json({
       id: student.id, name: student.name, email: student.email,
       student_id: student.student_id, unique_feedback_id: student.unique_feedback_id,
       status: student.status, semester: student.semester,
-      batch: student.batch, points: student.points, section_name,
+      batch: student.batch, points: student.points,
+      section_name: student.section?.name || null,
     });
   } catch (err) {
     console.error(err);
@@ -106,8 +99,8 @@ export const updateUser = async (req, res) => {
     if (email) updates.email = email.toLowerCase();
     if (department_id) updates.department_id = department_id;
     if (password) updates.password = await bcrypt.hash(password, 10);
-    const { data, error } = await supabase.from('users').update(updates).eq('id', req.params.id).select().single();
-    if (error || !data) return res.status(404).json({ message: 'User not found' });
+    const data = await User.update({ where: { id: req.params.id }, data: updates });
+    if (!data) return res.status(404).json({ message: 'User not found' });
     return res.json({ id: data.id, name: data.name, email: data.email, role: data.role });
   } catch { return res.status(500).json({ message: 'Internal Server Error' }); }
 };
@@ -115,7 +108,7 @@ export const updateUser = async (req, res) => {
 // ── Delete user ────────────────────────────────────────────────────────────
 export const deleteUser = async (req, res) => {
   try {
-    await supabase.from('users').delete().eq('id', req.params.id);
+    await User.delete({ where: { id: req.params.id } });
     return res.json({ message: 'User deleted' });
   } catch { return res.status(500).json({ message: 'Internal Server Error' }); }
 };
