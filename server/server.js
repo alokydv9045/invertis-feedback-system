@@ -65,8 +65,8 @@ app.options('*', cors(corsOptions));
 
 app.use(compression());
 
-// ── Body size limits — prevent memory exhaustion attacks ─────────
-app.use(express.json({ limit: '2mb' }));
+// ── Body size limits — allow photo uploads (base64) ─────────
+app.use(express.json({ limit: '5mb' }));
 
 // ── Request timeout — prevent hung requests from blocking workers ─────────
 app.use((req, res, next) => {

@@ -6,6 +6,7 @@ import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { Plus, Trash2, Check, X, Users, BookOpen, GraduationCap, Link2, Building2, ChevronDown, Key, Upload, FileText, Info, Layers } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const TABS = [
   { id: 'sections', label: 'Sections', icon: Link2 },
@@ -103,6 +104,8 @@ function DepartmentsTab({ departments, onRefresh }) {
 
 // ── Sections Tab ──────────────────────────────────────────────────────────────
 function SectionsTab({ departments, sections, onRefresh }) {
+  const { user } = useAuth();
+  const canDelete = ['super_admin', 'supreme'].includes(user?.role);
   const [deptId, setDeptId] = useState(''); const [sem, setSem] = useState('3'); const [label, setLabel] = useState('A');
   const create = async () => {
     try { await api.post('/coordinator/sections', { department_id: deptId, semester: sem, label }); onRefresh(); toast.success('Section created.'); }
@@ -143,7 +146,7 @@ function SectionsTab({ departments, sections, onRefresh }) {
               <div className="text-sm font-bold text-[var(--text-main)]">{s.name}</div>
               <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{s.department_name} • Semester {s.semester}</div>
             </div>
-            <Btn variant="danger" onClick={() => del(s.id)}><Trash2 size={14} /></Btn>
+            {canDelete && <Btn variant="danger" onClick={() => del(s.id)}><Trash2 size={14} /></Btn>}
           </Card>
         ))}
       </div>

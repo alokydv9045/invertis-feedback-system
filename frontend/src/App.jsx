@@ -14,6 +14,7 @@ import Leaderboard      from './pages/Leaderboard';
 import IdentityReveal   from './pages/IdentityReveal';
 import ManageStudents     from './pages/ManageStudents';
 import ProtectedRoute   from './components/ProtectedRoute';
+import ProfilePopup     from './components/ProfilePopup';
 import { Toaster }      from 'sonner';
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
       <SidebarProvider>
       <Toaster position="top-center" richColors expand={false} closeButton />
       <Router>
+        <ProfilePopup />
         <Routes>
           {/* Public */}
           <Route path="/login" element={<Login />} />

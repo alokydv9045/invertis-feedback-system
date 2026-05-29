@@ -123,9 +123,47 @@ export const createSection = async (req, res) => {
   }
 };
 
+// ── GET /api/hod/sections/:id/delete-preview — show affected records before deletion
+export const getSectionDeletePreview = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const section = await Section.findUnique({ where: { id }, include: { department: true } });
+    if (!section) return res.status(404).json({ message: 'Section not found' });
+
+    // HOD can only preview sections in their own department
+    if (req.user.role === 'hod' && section.department_id !== req.user.department_id) {
+      return res.status(403).json({ message: 'You can only manage sections in your department' });
+    }
+
+    const [tlfqCount, enrollmentCount, studentCount, assignmentCount] = await Promise.all([
+      Tlfq.count({ where: { section_id: id } }),
+      Enrollment.count({ where: { section_id: id } }),
+      User.count({ where: { section_id: id } }),
+      SectionFaculty.count({ where: { section_id: id } }),
+    ]);
+
+    return res.json({
+      section_name: section.name || `${section.department?.code || '?'}-${section.semester}${section.label}`,
+      department_name: section.department?.name || 'Unknown',
+      affected: { tlfqs: tlfqCount, enrollments: enrollmentCount, students: studentCount, assignments: assignmentCount },
+    });
+  } catch (err) {
+    console.error('getSectionDeletePreview error:', err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 export const deleteSection = async (req, res) => {
   try {
     const id = req.params.id;
+    const section = await Section.findUnique({ where: { id } });
+    if (!section) return res.status(404).json({ message: 'Section not found' });
+
+    // HOD can only delete sections in their own department
+    if (req.user.role === 'hod' && section.department_id !== req.user.department_id) {
+      return res.status(403).json({ message: 'You can only delete sections in your department' });
+    }
+
     await Tlfq.updateMany({ where: { section_id: id }, data: { is_active: false } });
     await Enrollment.deleteMany({ where: { section_id: id } });
     await User.updateMany({ where: { section_id: id }, data: { section_id: null } });

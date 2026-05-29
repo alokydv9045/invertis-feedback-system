@@ -93,7 +93,7 @@ export default function AdminPanel() {
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col transition-colors duration-500">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1 min-h-0">
+      <div className="flex flex-row flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-auto">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-10 max-w-5xl mx-auto w-full">

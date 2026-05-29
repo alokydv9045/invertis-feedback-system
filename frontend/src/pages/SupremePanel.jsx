@@ -70,7 +70,7 @@ export default function SupremePanel() {
   return (
     <div className="min-h-screen bg-transparent text-[var(--text-main)] flex flex-col">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1 min-h-0">
+      <div className="flex flex-row flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-4xl overflow-auto">
 

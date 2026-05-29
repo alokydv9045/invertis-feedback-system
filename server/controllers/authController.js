@@ -1,7 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User, Section, FEEDBACK_ID_PREFIX } from '../db.js';
+import { User, Section, Department, Tlfq, SectionFaculty, Course, Enrollment, FEEDBACK_ID_PREFIX } from '../db.js';
 import crypto from 'crypto';
+import multer from 'multer';
 
 const SECRET = process.env.JWT_SECRET;
 if (!SECRET) {
@@ -31,6 +32,7 @@ function safeUser(user) {
     points: user.points || 0,
     batch: user.batch || null,
     semester: user.semester || null,
+    profile_photo: user.profile_photo || null,
   };
 }
 
@@ -152,11 +154,125 @@ export const login = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     const user = await User.findUnique({ 
-      where: { id: req.user.id } 
+      where: { id: req.user.id },
+      include: { department: true, section: true }
     });
     if (!user) return res.status(404).json({ message: 'User not found' });
-    return res.status(200).json({ user: safeUser(user) });
+    return res.status(200).json({ 
+      user: {
+        ...safeUser(user),
+        department_name: user.department?.name || null,
+        section_name: user.section?.name || null,
+      }
+    });
   } catch (err) {
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+// ── Profile photo upload (base64 in DB — works on ephemeral FS like Render) ──
+export const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max for DB storage
+  fileFilter: (req, file, cb) => {
+    const allowed = /jpeg|jpg|png|webp|gif/;
+    if (allowed.test(file.mimetype)) return cb(null, true);
+    cb(new Error('Only image files (jpg, png, webp, gif) are allowed'));
+  }
+});
+
+export const uploadProfilePhoto = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded.' });
+    
+    // Convert buffer to base64 data URL
+    const base64 = req.file.buffer.toString('base64');
+    const dataUrl = `data:${req.file.mimetype};base64,${base64}`;
+    
+    await User.update({
+      where: { id: req.user.id },
+      data: { profile_photo: dataUrl }
+    });
+    
+    return res.json({ message: 'Photo uploaded successfully.', profile_photo: dataUrl });
+  } catch (err) {
+    console.error('Upload error:', err);
+    return res.status(500).json({ message: 'Failed to upload photo.' });
+  }
+};
+
+// ── Profile data (role-specific stats for profile popup) ────────────────────
+export const getProfileData = async (req, res) => {
+  try {
+    const user = await User.findUnique({
+      where: { id: req.user.id },
+      include: { department: true, section: true }
+    });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const base = {
+      ...safeUser(user),
+      department_name: user.department?.name || null,
+      section_name: user.section?.name || null,
+    };
+
+    let stats = {};
+    let accessLevel = '';
+    let quickActions = [];
+
+    const role = user.role;
+    const deptId = user.department_id;
+
+    if (role === 'coordinator' || role === 'super_admin' || role === 'supreme') {
+      const where = (role === 'coordinator' && deptId) ? { department_id: deptId } : {};
+      const [sections, courses, faculty, students, assignments] = await Promise.all([
+        Section.count({ where }),
+        Course.count({ where }),
+        User.count({ where: { ...where, role: 'hod' } }).catch(() => 0),
+        User.count({ where: { ...where, role: 'student' } }),
+        SectionFaculty.count(where.department_id ? { where: { section: { department_id: where.department_id } } } : {}),
+      ]);
+      stats = { sections, courses, faculty, students, assignments, systemStatus: 'Online' };
+      accessLevel = role === 'coordinator' ? 'Department-wide — Sections, Faculty & Student Management' 
+                  : 'University-wide — Sections, Faculty & Student Management';
+      quickActions = [
+        { label: 'Manage Sections & Faculty', to: '/coordinator?tab=sections' },
+        { label: 'Manage Students', to: '/coordinator?tab=students' },
+        { label: 'View Leaderboard', to: '/leaderboard' },
+      ];
+    } else if (role === 'hod') {
+      const [sections, courses, faculty, students, myForms, openForms] = await Promise.all([
+        Section.count({ where: { department_id: deptId } }),
+        Course.count({ where: { department_id: deptId } }),
+        SectionFaculty.count({ where: { section: { department_id: deptId } } }),
+        User.count({ where: { department_id: deptId, role: 'student' } }),
+        Tlfq.count({ where: { created_by: user.id } }),
+        Tlfq.count({ where: { created_by: user.id, is_active: true } }),
+      ]);
+      stats = { sections, courses, faculty, students, myForms, openForms };
+      accessLevel = 'Department-level — Evaluation Forms, Analytics & Portal Control';
+      quickActions = [
+        { label: 'Create Evaluation Form', to: '/hod?tab=create' },
+        { label: 'View Analytics', to: '/analytics' },
+        { label: 'View Leaderboard', to: '/leaderboard' },
+      ];
+    } else {
+      // Student
+      const [formsSubmitted, enrollmentCount] = await Promise.all([
+        Tlfq.count({ where: { responses: { some: { student_id: user.id } } } }).catch(() => 0),
+        Enrollment.count({ where: { student_id: user.id } }),
+      ]);
+      stats = { formsSubmitted, enrollments: enrollmentCount, points: user.points };
+      accessLevel = 'Student — Feedback Submission & Leaderboard';
+      quickActions = [
+        { label: 'My Dashboard', to: '/dashboard' },
+        { label: 'View Leaderboard', to: '/leaderboard' },
+      ];
+    }
+
+    return res.json({ user: base, stats, accessLevel, quickActions });
+  } catch (err) {
+    console.error('getProfileData error:', err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };

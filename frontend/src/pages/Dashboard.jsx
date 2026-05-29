@@ -14,7 +14,7 @@ import {
 const PageShell = ({ children }) => (
   <div className="min-h-screen flex flex-col bg-transparent text-[#212529]">
     <Navbar />
-    <div className="flex flex-col md:flex-row flex-1 min-h-0">
+    <div className="flex flex-row flex-1 min-h-0">
       <Sidebar />
       <main className="flex-1 p-4 sm:p-5 md:p-7 overflow-auto flex flex-col justify-between">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex-1">

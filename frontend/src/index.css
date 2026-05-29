@@ -535,9 +535,38 @@
 }
 
 .admin-layout {
-  @apply flex flex-col md:flex-row min-h-[calc(100vh-64px)] min-h-0 min-w-0;
+  @apply flex flex-row min-h-[calc(100vh-56px)] min-h-0 min-w-0 relative;
 }
 
 .admin-content {
   @apply flex-1 p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto w-full overflow-auto min-w-0;
+}
+
+/* ── Sidebar Styles ──────────────────────────────────────────────────── */
+.sidebar-panel {
+  @apply w-56 shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-y-auto overflow-x-hidden;
+  min-height: 100%;
+}
+
+/* Desktop sidebar wrapper — smooth width transition */
+.sidebar-wrapper {
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sidebar-wrapper-open {
+  width: 14rem; /* w-56 */
+}
+
+.sidebar-wrapper-closed {
+  width: 0;
+}
+
+/* Mobile sidebar — full height overlay */
+@media (max-width: 768px) {
+  .sidebar-panel {
+    min-height: 100vh;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+  }
 }
