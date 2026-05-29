@@ -1,42 +1,57 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LogIn, Lock, User, ChevronRight, Eye, EyeOff,
-  GraduationCap, Building2, Shield, Users, ArrowRight, ChevronLeft
+  User as UserIcon, AlertCircle, ShieldCheck, Lock, Mail, ArrowLeft
 } from 'lucide-react';
+import { Button, Input, Alert } from '../components/ui';
 import api from '../services/api';
 
 const roleHint = (id) => {
   if (!id) return null;
-  if (id.includes('@')) {
-    if (id.includes('admin')) return { icon: Shield, label: 'Super Admin', color: 'text-rose-500' };
-    if (id.includes('coordinator')) return { icon: Users, label: 'Coordinator', color: 'text-violet-500' };
-    if (id.includes('hod')) return { icon: Building2, label: 'Head of Department', color: 'text-blue-500' };
-    return { icon: User, label: 'Staff Account', color: 'text-indigo-500' };
-  }
-  if (/^[A-Z]{2,4}\d{4}_\d+$/.test(id.toUpperCase())) {
-    return { icon: GraduationCap, label: 'Student Account', color: 'text-emerald-500' };
+  const upperId = id.toUpperCase();
+  if (upperId.startsWith('SUPAUTH')) return { label: 'Management' };
+  if (upperId.startsWith('SUPADMIN')) return { label: 'Super Admin' };
+  if (upperId.startsWith('COORD')) return { label: 'Coordinator' };
+  if (upperId.startsWith('HOD')) return { label: 'Head of Department' };
+  if (/^[A-Z]{2,4}\d{4}_\d+$/.test(upperId)) {
+    return { label: 'Student Account' };
   }
   return null;
 };
+
+const slides = [
+  '/ib2.jpg',
+  'https://www.invertisuniversity.ac.in/images/home-university.webp'
+  
+
+];
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Step 1: identifier, Step 2: password, Step 3: Registration
   const [step, setStep] = useState(1);
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // For pending students
   const [pendingStudent, setPendingStudent] = useState(null);
   const [regEmail, setRegEmail] = useState('');
   const [regPass, setRegPass] = useState('');
   const [regConfirm, setRegConfirm] = useState('');
-  const [showRegPass, setShowRegPass] = useState(false);
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   const hint = roleHint(identifier);
 
@@ -44,24 +59,21 @@ export default function Login() {
     e.preventDefault();
     setError('');
     const id = identifier.trim();
-    if (!id) { setError('Please enter your email or Student ID.'); return; }
-    if (!id.includes('@')) {
-      setLoading(true);
-      try {
-        const res = await api.post('/auth/check-student', { student_id: id.toUpperCase() });
-        if (res.data.status === 'pending') {
-          setPendingStudent({ student_id: id.toUpperCase(), name: res.data.name });
-          setStep(3);
-          return;
-        }
-        setStep(2);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Student ID not found. Contact your coordinator.');
-      } finally {
-        setLoading(false);
+    if (!id) { setError('Please enter your ID.'); return; }
+
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/check-student', { student_id: id.toUpperCase() });
+      if (res.data.status === 'pending') {
+        setPendingStudent({ student_id: id.toUpperCase(), name: res.data.name });
+        setStep(3);
+        return;
       }
-    } else {
       setStep(2);
+    } catch (err) {
+      setError(err.response?.data?.message || 'User ID not found.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,226 +123,233 @@ export default function Login() {
     setRegEmail(''); setRegPass(''); setRegConfirm('');
   };
 
-  const inputClass = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-invertis-blue/20 focus:border-invertis-blue transition-all";
-
   return (
-    <div className="min-h-screen flex">
-      {/* Left Panel — Branding */}
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden items-center justify-center p-12">
-        {/* Campus background */}
-        <img src="/campus/hemburgure-image.webp" alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-invertis-navy/90 via-invertis-blue/85 to-blue-600/80" />
-        <div className="relative z-10 text-white flex flex-col items-start">
-          {/* Large professional logo */}
-          <div className="bg-white rounded-2xl p-4 shadow-lg shadow-black/20 mb-8">
-            <img src="/logo.png" alt="Invertis University Bareilly" className="w-52 h-auto object-contain" />
-          </div>
-          <h1 className="text-4xl font-bold leading-tight mb-4">
-            Feedback<br />System
-          </h1>
-          <p className="text-blue-100 text-base leading-relaxed max-w-md">
-            Empowering academic excellence through structured, anonymous, and actionable student feedback.
-          </p>
+    <div className="min-h-screen flex flex-col bg-[#F1FAEE] font-sans">
+      {/* Header */}
+      <div className="w-full bg-white px-4 sm:px-6 py-3.5 flex items-center justify-between border-b-[3px] border-[#FF2A00] shadow-sm z-20">
+        <div className="flex items-center">
+          <img src="/main logo.png" alt="Invertis University Logo" className="h-10 sm:h-12 object-contain" />
         </div>
-        {/* Decorative circles */}
-        <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full" />
-        <div className="absolute right-20 -bottom-32 w-48 h-48 bg-white/5 rounded-full" />
-        <div className="absolute -left-10 bottom-20 w-32 h-32 bg-white/5 rounded-full" />
+        <div className="flex items-center gap-1.5 border border-slate-200 rounded-full px-3 py-1.5 bg-slate-50/50 shadow-sm">
+          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[9px] font-bold text-slate-700 uppercase tracking-widest">ERP Secure Access</span>
+        </div>
       </div>
 
-      {/* Right Panel — Login Form with campus image */}
-      <div className="flex-1 flex items-center justify-center p-8 relative overflow-hidden bg-gray-50">
-        {/* Campus image on the right side */}
-        <img src="/campus/gate.jpg" alt="" className="absolute inset-0 w-full h-full object-cover opacity-15 pointer-events-none select-none" />
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="w-full max-w-md relative z-10 bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg shadow-black/5 border border-gray-100">
+      {/* Main content area */}
+      <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Slideshow background */}
+        {slides.map((slide, index) => (
+          <div
+            key={slide}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out"
+            style={{
+              backgroundImage: `url(${slide})`,
+              opacity: index === currentSlide ? 1 : 0
+            }}
+          />
+        ))}
+        {/* Soft overlay */}
+        <div className="absolute inset-0 bg-black/10" />
 
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-8">
-            <img src="/logo.png" alt="Invertis" className="w-10 h-10 rounded-lg object-contain" />
-            <div>
-              <h2 className="text-invertis-blue font-bold text-sm">Invertis Feedback System</h2>
-              <p className="text-gray-400 text-xs">Teaching-Learning Feedback</p>
+        <div className="w-full max-w-lg relative z-10 p-2 sm:p-4">
+          <div className="bg-white rounded-[2rem] shadow-2xl border-t-[5px] border-t-[#FF2A00] border-x border-b border-slate-100/50 overflow-hidden px-6 sm:px-8 py-8 space-y-6">
+            
+            {/* Title / Subtitle */}
+            <div className="text-center flex flex-col items-center">
+              <div className="flex flex-col items-center gap-1 mb-4">
+                <h1 className="text-xs sm:text-sm font-black text-[#1D3557] tracking-wider uppercase leading-tight">Invertis University</h1>
+                <p className="text-[9px] sm:text-[10px] font-bold text-slate-500 tracking-wider uppercase leading-none mt-0.5">Feedback Portal</p>
+              </div>
+              <h2 className="text-2xl font-black text-[#1D3557] tracking-tight">
+                {step === 1 && 'Authentication'}
+                {step === 2 && 'Security Verification'}
+                {step === 3 && 'Complete Registration'}
+              </h2>
+              <p className="text-[11px] text-slate-500 font-bold mt-1.5 tracking-wider uppercase">
+                {step === 3 ? `Registration for ${pendingStudent?.name}` : 'Teaching-Learning Feedback System'}
+              </p>
             </div>
-          </div>
 
-          {/* Step indicator */}
-          <div className="flex items-center gap-2 mb-6">
-            {[1, 2, 3].slice(0, pendingStudent || step === 3 ? 3 : 2).map(s => (
-              <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= s ? 'bg-invertis-blue' : 'bg-gray-200'}`} />
-            ))}
-          </div>
+            {error && <Alert variant="error" closeable onClose={() => setError('')}>{error}</Alert>}
 
-          <div className="mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
-                  Step {step} of {pendingStudent || step === 3 ? 3 : 2}
-                </p>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {step === 1 && 'Sign In'}
-                  {step === 2 && 'Enter Password'}
-                  {step === 3 && `Welcome, ${pendingStudent?.name?.split(' ')[0]}!`}
-                </h2>
-                <p className="text-gray-500 text-sm mt-1">
-                  {step === 1 && 'Enter your email or student ID to continue'}
-                  {step === 2 && 'Enter your password to access your portal'}
-                  {step === 3 && 'Set up your account to get started'}
+            {/* Step 1: Username / ID */}
+            {step === 1 && (
+              <form onSubmit={handleNext} className="space-y-5">
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Login ID
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Enter you ID"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    disabled={loading}
+                    leadingIcon={UserIcon}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
+                    hint={hint?.label}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="ghost"
+                  disabled={loading}
+                  loading={loading}
+                  fullWidth
+                  className="!rounded-full !py-3.5 bg-[#1D3557] hover:bg-[#152741] text-white font-bold"
+                >
+                  Proceed
+                </Button>
+              </form>
+            )}
+
+            {/* Step 2: Password */}
+            {step === 2 && (
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div className="space-y-1.5 bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-4 text-left">
+                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-wider">Signing in as</p>
+                  <p className="text-sm font-bold text-[#1D3557] truncate">{identifier}</p>
+                </div>
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Password
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    leadingIcon={Lock}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={resetToStep1}
+                    disabled={loading}
+                    className="w-full sm:w-1/3 !rounded-full !py-3.5 !border-slate-300 !text-slate-700 hover:!bg-slate-50"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    disabled={loading}
+                    loading={loading}
+                    className="flex-1 !rounded-full !py-3.5 bg-[#1D3557] hover:bg-[#152741] text-white"
+                  >
+                    Sign In
+                  </Button>
+                </div>
+              </form>
+            )}
+
+            {/* Step 3: Registration */}
+            {step === 3 && (
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="space-y-1.5 bg-emerald-50 p-4 rounded-2xl border border-emerald-100 mb-2 text-left">
+                  <p className="text-[10px] text-emerald-700 uppercase font-black tracking-wider">Welcome,</p>
+                  <p className="text-sm font-bold text-emerald-900 truncate">{pendingStudent?.name} ({pendingStudent?.student_id})</p>
+                </div>
+                
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Email Address
+                  </label>
+                  <Input
+                    type="email"
+                    placeholder="Your current email"
+                    value={regEmail}
+                    onChange={(e) => setRegEmail(e.target.value)}
+                    leadingIcon={Mail}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
+                  />
+                </div>
+
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Password
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="Min 8 chars"
+                    value={regPass}
+                    onChange={(e) => setRegPass(e.target.value)}
+                    leadingIcon={Lock}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
+                  />
+                </div>
+
+                <div className="space-y-1.5 text-left">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block pl-1">
+                    Confirm Password
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="Confirm password"
+                    value={regConfirm}
+                    onChange={(e) => setRegConfirm(e.target.value)}
+                    leadingIcon={Lock}
+                    className="!rounded-full !py-3.5 !border-slate-200 focus:!border-[#1D3557] focus:!ring-[#1D3557]/10"
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={resetToStep1}
+                    disabled={loading}
+                    className="w-full sm:w-1/3 !rounded-full !py-3.5 !border-slate-300 !text-slate-700 hover:!bg-slate-50"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    disabled={loading}
+                    loading={loading}
+                    className="flex-1 !rounded-full !py-3.5 bg-[#1D3557] hover:bg-[#152741] text-white"
+                  >
+                    Activate & Login
+                  </Button>
+                </div>
+              </form>
+            )}
+
+            {/* Bottom info messages */}
+            <div className="pt-6 border-t border-slate-100 space-y-3.5 text-left">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="w-4 h-4 text-[#FF2A00] mt-0.5 shrink-0" />
+                <p className="text-[11px] text-slate-500 leading-normal font-semibold">
+                  Your responses are strictly anonymous to faculty members. Individual submissions cannot be traced back to you.
                 </p>
               </div>
-              {step > 1 && (
-                <button onClick={resetToStep1}
-                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-invertis-blue transition-colors cursor-pointer">
-                  <ChevronLeft size={14} /> Back
-                </button>
-              )}
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="w-4 h-4 text-[#FF2A00] mt-0.5 shrink-0" />
+                <p className="text-[11px] text-slate-500 leading-normal font-semibold">
+                  System audit controls apply. Global configuration is managed by authorized university officers.
+                </p>
+              </div>
             </div>
+
           </div>
 
-          {/* Error */}
-          <AnimatePresence>
-            {error && (
-              <motion.div key="err" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-400 flex-shrink-0 animate-pulse" />
-                {error}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence mode="wait">
-
-            {/* STEP 1: Identifier */}
-            {step === 1 && (
-              <motion.form key="s1" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}
-                onSubmit={handleNext} className="space-y-5">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email or Student ID</label>
-                  <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                      type="text" value={identifier}
-                      onChange={e => { setIdentifier(e.target.value); setError(''); }}
-                      placeholder="email@invertis.edu.in  or  BCS2025_01"
-                      autoFocus
-                      className={`${inputClass} pl-10 pr-10`}
-                    />
-                    {hint && <hint.icon className={`absolute right-3.5 top-1/2 -translate-y-1/2 ${hint.color}`} size={16} />}
-                  </div>
-                  {hint && (
-                    <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
-                      className={`flex items-center gap-1.5 text-xs font-semibold mt-1.5 ${hint.color}`}>
-                      <hint.icon size={12} /> {hint.label}
-                    </motion.div>
-                  )}
-                </div>
-
-                <button type="submit" disabled={loading}
-                  className="w-full bg-invertis-blue text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-sm shadow-invertis-blue/25 disabled:opacity-50 cursor-pointer">
-                  {loading
-                    ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    : <><span>Continue</span><ChevronRight size={16} /></>
-                  }
-                </button>
-
-                <p className="text-center text-xs text-gray-400">
-                  Enter your university email or student roll number
-                </p>
-              </motion.form>
-            )}
-
-            {/* STEP 2: Password */}
-            {step === 2 && (
-              <motion.form key="s2" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}
-                onSubmit={handleLogin} className="space-y-5">
-
-                {/* Who is logging in */}
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-200">
-                  {hint && <hint.icon size={16} className={hint.color} />}
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold text-gray-900 truncate">{identifier}</div>
-                    {hint && <div className={`text-xs font-medium ${hint.color}`}>{hint.label}</div>}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                      type={showPass ? 'text' : 'password'} value={password}
-                      onChange={e => { setPassword(e.target.value); setError(''); }}
-                      placeholder="Enter your password" autoFocus
-                      className={`${inputClass} pl-10 pr-11`}
-                    />
-                    <button type="button" onClick={() => setShowPass(!showPass)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer">
-                      {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
-
-                <button type="submit" disabled={loading}
-                  className="w-full bg-invertis-blue text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-sm shadow-invertis-blue/25 disabled:opacity-50 cursor-pointer">
-                  {loading
-                    ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    : <><LogIn size={16} /><span>Sign In</span></>
-                  }
-                </button>
-              </motion.form>
-            )}
-
-            {/* STEP 3: Registration */}
-            {step === 3 && (
-              <motion.form key="s3" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}
-                onSubmit={handleRegister} className="space-y-4">
-
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-700">
-                  Your account is pending activation. Set your email and create a password to get started.
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Your Email Address</label>
-                  <input type="email" value={regEmail} onChange={e => { setRegEmail(e.target.value); setError(''); }}
-                    placeholder="yourname@email.com" autoFocus className={inputClass} />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Create Password</label>
-                  <div className="relative">
-                    <input type={showRegPass ? 'text' : 'password'} value={regPass}
-                      onChange={e => { setRegPass(e.target.value); setError(''); }}
-                      placeholder="Min. 8 characters" className={`${inputClass} pr-11`} />
-                    <button type="button" onClick={() => setShowRegPass(!showRegPass)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer">
-                      {showRegPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Confirm Password</label>
-                  <input type="password" value={regConfirm} onChange={e => { setRegConfirm(e.target.value); setError(''); }}
-                    placeholder="Re-enter password" className={inputClass} />
-                </div>
-
-                <button type="submit" disabled={loading}
-                  className="w-full bg-emerald-500 text-white py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:bg-emerald-600 transition-all shadow-sm shadow-emerald-500/25 disabled:opacity-50 cursor-pointer mt-1">
-                  {loading
-                    ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    : <><ArrowRight size={16} /><span>Activate Account & Login</span></>
-                  }
-                </button>
-              </motion.form>
-            )}
-
-          </AnimatePresence>
-
-          <p className="text-center text-[10px] text-gray-400 mt-8">
-            Invertis University, Bareilly &nbsp;·&nbsp; TLFQ v2.0 &nbsp;·&nbsp; © 2025
-          </p>
-        </motion.div>
+          {/* Bottom small text overlay */}
+          <div className="text-center mt-6">
+            <p className="text-[10px] font-black text-white/90 uppercase tracking-widest drop-shadow-md">
+              INVERTIS TLFQ SYSTEM V2.0
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+

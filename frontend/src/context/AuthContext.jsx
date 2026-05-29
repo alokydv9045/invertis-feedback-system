@@ -8,6 +8,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('dark');
+    localStorage.removeItem('tlfq_theme');
+  }, []);
+
+
+  useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('tlfq_platform_session');
       if (!token || token === 'null' || token === 'undefined' || token.length < 10) {
@@ -33,10 +40,10 @@ export const AuthProvider = ({ children }) => {
     return res.data.user;
   };
 
-  const logout = () => {
+  function logout() {
     localStorage.removeItem('tlfq_platform_session');
     setUser(null);
-  };
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>

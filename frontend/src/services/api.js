@@ -1,11 +1,18 @@
 import axios from 'axios';
 
 // In a production Vite build, import.meta.env.PROD is true.
-// VITE_API_URL can be set in Vercel environment variables to override.
+// VITE_API_URL can be set in Render environment variables to override.
+let envApiUrl = import.meta.env.VITE_API_URL;
+// Ensure that the URL always ends with /api if it doesn't already
+if (envApiUrl && !envApiUrl.endsWith('/api')) {
+  // Strip trailing slash if present before appending /api
+  envApiUrl = envApiUrl.replace(/\/$/, '') + '/api';
+}
+
 const baseURL =
-  import.meta.env.VITE_API_URL ||
+  envApiUrl ||
   (import.meta.env.PROD
-    ? 'https://invertis-feedback-system-1.onrender.com/api'
+    ? 'https://invertis-feedback-system-0chx.onrender.com/api'
     : 'http://localhost:5000/api');
 
 const api = axios.create({ baseURL });

@@ -85,14 +85,6 @@ async function bootstrapPromotionSchema() {
   await pool.query(`
     CREATE INDEX IF NOT EXISTS "PromotionLog_promoted_at_idx" ON "PromotionLog"("promoted_at");
   `);
-
-  // ── Section ownership: track who created each section ──
-  await pool.query(`
-    ALTER TABLE "Section" ADD COLUMN IF NOT EXISTS "created_by" TEXT;
-  `);
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS "Section_created_by_idx" ON "Section"("created_by");
-  `);
 }
 
 async function withDbRetry(operation, label, attempts = 5) {

@@ -6,9 +6,9 @@ export default function ProtectedRoute({ children, allowedRoles }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-        <div className="h-10 w-10 border-4 border-invertis-blue border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-sm text-gray-400 mt-3 animate-pulse">Authenticating...</p>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center">
+        <div className="h-10 w-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 animate-pulse">Authenticating...</p>
       </div>
     );
   }

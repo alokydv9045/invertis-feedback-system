@@ -6,7 +6,8 @@ import {
   getCourses, createCourse, deleteCourse,
   getFaculty, createFaculty, deleteFaculty,
   assignFacultyToSection, removeAssignment,
-  getStudents, preCreateStudent, resetStudentPassword, updateStudent
+  getStudents, preCreateStudent, resetStudentPassword, updateStudent,
+  bulkImportStudents
 } from '../controllers/coordinatorController.js';
 
 const router = express.Router();
@@ -17,11 +18,10 @@ router.get('/departments',         guard, getDepartments);
 router.post('/departments',        [authenticate, authorize('super_admin')], createDepartment);
 router.delete('/departments/:id',  [authenticate, authorize('super_admin')], deleteDepartment);
 
-// Sections (coordinator, super_admin, and hod can manage)
-const sectionGuard = [authenticate, authorize('coordinator', 'super_admin', 'hod')];
-router.get('/sections',            sectionGuard, getSections);
+// Sections
+router.get('/sections',            guard, getSections);
 router.post('/sections',           guard, createSection);
-router.delete('/sections/:id',     sectionGuard, deleteSection);
+router.delete('/sections/:id',     guard, deleteSection);
 
 // Courses
 router.get('/courses',             guard, getCourses);
@@ -41,6 +41,7 @@ router.delete('/assignments/:id',  guard, removeAssignment);
 router.get('/students',            guard, getStudents);
 router.post('/students',           guard, preCreateStudent);
 router.put('/students/:id',        guard, updateStudent);
+router.post('/students/bulk',   guard, bulkImportStudents);
 router.put('/students/:id/reset-password', guard, resetStudentPassword);
 
 export default router;

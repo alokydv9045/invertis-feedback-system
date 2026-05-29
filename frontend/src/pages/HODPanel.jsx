@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { LayoutDashboard, Plus, ToggleLeft, ToggleRight, Clock, FileText, BarChart2, Check, X, Users, BookOpen, GraduationCap, Link2, Trash2 } from 'lucide-react';
+import { LayoutDashboard, Plus, ToggleLeft, ToggleRight, Clock, FileText, BarChart2, Check, X, Users, BookOpen, GraduationCap, Link2 } from 'lucide-react';
 
 const STD_QUESTIONS = [
   'The instructor explains course material clearly and effectively.',
@@ -17,7 +17,6 @@ const STD_QUESTIONS = [
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'sections', label: 'Sections', icon: Link2 },
   { id: 'create', label: 'Create Form', icon: Plus },
   { id: 'forms', label: 'My Forms', icon: FileText },
 ];
@@ -26,7 +25,6 @@ export default function HODPanel() {
   const [tab, setTab] = useState('dashboard');
   const [stats, setStats] = useState(null);
   const [sections, setSections] = useState([]);
-  const [deptSections, setDeptSections] = useState([]);
   const [forms, setForms] = useState([]);
   const [portal, setPortal] = useState(null);
 
@@ -52,15 +50,6 @@ export default function HODPanel() {
       setForms(rForms.data);
       setPortal(rPortal.data);
     } catch { }
-
-    // Fetch department sections separately (coordinator endpoint)
-    try {
-      const rDeptSections = await api.get('/coordinator/sections');
-      setDeptSections(rDeptSections.data);
-    } catch (err) {
-      console.error('Failed to load department sections:', err?.response?.data || err.message);
-      setDeptSections([]);
-    }
   };
 
   useEffect(() => { loadData(); }, []);
@@ -183,46 +172,6 @@ export default function HODPanel() {
                         className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer w-full sm:w-auto flex-shrink-0 ${portal.portal_open ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-700 hover:bg-slate-600 text-[var(--text-main)] shadow-lg shadow-slate-700/20'}`}>
                         {portal.portal_open ? <><ToggleRight size={20} /> Portal Open</> : <><ToggleLeft size={20} /> Portal Closed</>}
                       </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* SECTIONS TAB */}
-              {tab === 'sections' && (
-                <div className="flex flex-col gap-4">
-                  <div className="card-main rounded-2xl p-5">
-                    <h3 className="text-sm font-bold text-[#1D3557] mb-1">Department Sections</h3>
-                    <p className="text-xs text-slate-500">Manage sections in your department. Deleting a section will remove all associated enrollments and faculty assignments.</p>
-                  </div>
-                  {deptSections.length === 0 ? (
-                    <div className="card-main rounded-2xl p-12 text-center text-slate-600 text-sm">
-                      No sections found in your department.
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                      {deptSections.map(s => (
-                        <div key={s.id} className="card-main rounded-2xl p-4 flex items-center justify-between">
-                          <div>
-                            <div className="text-sm font-bold text-[#1D3557]">{s.name}</div>
-                            <div className="text-xs text-slate-500 mt-0.5">{s.department_name} &bull; Semester {s.semester}</div>
-                          </div>
-                          <button
-                            onClick={async () => {
-                              try {
-                                await api.delete(`/coordinator/sections/${s.id}`);
-                                toast.success('Section deleted.');
-                                loadData();
-                              } catch (e) {
-                                toast.error(e.response?.data?.message || 'Failed to delete section.');
-                              }
-                            }}
-                            className="flex items-center justify-center h-8 w-8 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 transition-all cursor-pointer"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      ))}
                     </div>
                   )}
                 </div>
