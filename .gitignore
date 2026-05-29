@@ -32,6 +32,10 @@ pnpm-debug.log*
 
 # Scratch / temp files
 scratch_test.js
+fix-layouts.ps1
 
 # Local credentials — NEVER commit
 CREDENTIALS.md
+
+# Uploaded files (profile photos etc.)
+server/uploads/

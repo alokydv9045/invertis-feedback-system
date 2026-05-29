@@ -1,10 +1,12 @@
 import { useAuth } from '../context/AuthContext';
+import { useSidebar } from '../context/SidebarContext';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, GraduationCap, BarChart2, Trophy, Shield,
   Users, Layers, Building2, Crown, Fingerprint,
   Award, Activity, TrendingUp, BookOpen, MessageSquare,
-  ArrowUpCircle, Search, ChevronRight
+  ArrowUpCircle, Search, ChevronRight, User, X
 } from 'lucide-react';
 
 // ── Primary page nav per role ─────────────────────────────
@@ -74,6 +76,7 @@ const SUB_NAV = {
 
 export default function Sidebar() {
   const { user } = useAuth();
+  const { isOpen, closeSidebar, isMobile, toggleProfile } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -94,26 +97,40 @@ export default function Sidebar() {
     navigate(currentRouteKey + '?tab=' + tab, { replace: true });
   };
 
-  return (
-    <aside className="w-full md:w-48 shrink-0 bg-white border-r border-gray-200 flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto md:overflow-x-hidden no-scrollbar md:min-h-[calc(100vh-67px)]">
+  const handleNavClick = () => {
+    if (isMobile) closeSidebar();
+  };
 
-      {/* ── User card (desktop only) ──────────────────────── */}
-      <div className="hidden md:block bg-[#1D3557] px-3 py-3 shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-full bg-[#FF2A00] flex items-center justify-center text-white font-bold text-sm shrink-0">
-            {user?.name?.charAt(0) || 'U'}
+  const sidebarContent = (
+    <aside className={`sidebar-panel ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+      {/* ── User card (top of sidebar) ──────────────────────── */}
+      <div className="bg-[#1D3557] px-3 py-3 shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="h-8 w-8 rounded-full bg-[#FF2A00] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
+              {user?.profile_photo ? (
+                <img src={user.profile_photo} alt="" className="h-full w-full object-cover" />
+              ) : (
+                user?.name?.charAt(0) || 'U'
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-white text-xs font-bold truncate leading-tight">{user?.name}</p>
+              <p className="text-white/50 text-[9px] uppercase tracking-widest mt-0.5 truncate">{role?.replace('_', ' ')}</p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-white text-xs font-bold truncate leading-tight">{user?.name}</p>
-            <p className="text-white/50 text-[9px] uppercase tracking-widest mt-0.5 truncate">{role?.replace('_', ' ')}</p>
-          </div>
+          {isMobile && (
+            <button onClick={closeSidebar} className="text-white/50 hover:text-white cursor-pointer ml-2">
+              <X size={16} />
+            </button>
+          )}
         </div>
       </div>
 
       {/* ── Primary navigation ───────────────────────────── */}
-      <div className="flex flex-row md:flex-col shrink-0">
+      <div className="flex flex-col shrink-0">
         {links.map(({ to, icon: Icon, label, end }) => (
-          <NavLink key={to} to={to} end={end} className="block shrink-0">
+          <NavLink key={to} to={to} end={end} className="block shrink-0" onClick={handleNavClick}>
             {({ isActive }) => (
               <div className={`flex items-center gap-2 px-3.5 py-2.5 text-[12px] font-semibold transition-all cursor-pointer border-b border-gray-100 whitespace-nowrap ${
                 isActive
@@ -130,7 +147,7 @@ export default function Sidebar() {
 
       {/* ── Contextual sub-navigation ────────────────────── */}
       {subItems.length > 0 && (
-        <div className="hidden md:flex flex-col shrink-0 border-t border-gray-200 mt-1">
+        <div className="flex flex-col shrink-0 border-t border-gray-200 mt-1">
           <div className="px-3.5 py-2 bg-gray-50 border-b border-gray-100">
             <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">On This Page</p>
           </div>
@@ -139,7 +156,7 @@ export default function Sidebar() {
             return (
               <button
                 key={tab}
-                onClick={() => goTab(tab)}
+                onClick={() => { goTab(tab); handleNavClick(); }}
                 className={`flex items-center gap-2 px-3.5 py-2 text-[11px] font-medium transition-all cursor-pointer border-b border-gray-50 text-left w-full ${
                   isActive
                     ? 'bg-[#FF2A00]/10 text-[#FF2A00] font-bold border-l-2 border-l-[#FF2A00]'
@@ -155,8 +172,60 @@ export default function Sidebar() {
         </div>
       )}
 
-      {/* Footer spacer */}
-      <div className="hidden md:block flex-1" />
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* ── Profile button at bottom ──────────────────────── */}
+      <div className="border-t border-gray-200 p-3 shrink-0">
+        <button
+          onClick={() => { toggleProfile(); handleNavClick(); }}
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-slate-50 hover:bg-[#1D3557] hover:text-white text-slate-600 transition-all cursor-pointer border border-slate-200 hover:border-[#1D3557] group"
+        >
+          <div className="h-7 w-7 rounded-full bg-[#1D3557] group-hover:bg-white group-hover:text-[#1D3557] text-white flex items-center justify-center text-xs font-bold shrink-0 transition-all">
+            <User size={13} />
+          </div>
+          <span className="text-xs font-bold truncate">My Profile</span>
+        </button>
+      </div>
     </aside>
+  );
+
+  return (
+    <>
+      {/* Mobile overlay backdrop */}
+      <AnimatePresence>
+        {isMobile && isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 bg-black/50"
+            onClick={closeSidebar}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      {isMobile ? (
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'tween', duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+              className="fixed top-0 left-0 h-full z-50"
+            >
+              {sidebarContent}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      ) : (
+        <div className={`sidebar-wrapper ${isOpen ? 'sidebar-wrapper-open' : 'sidebar-wrapper-closed'}`}>
+          {sidebarContent}
+        </div>
+      )}
+    </>
   );
 }

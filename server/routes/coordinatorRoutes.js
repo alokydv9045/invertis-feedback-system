@@ -2,7 +2,7 @@ import express from 'express';
 import { authenticate, authorize } from '../middleware/auth.js';
 import {
   getDepartments, createDepartment, deleteDepartment,
-  getSections, createSection, deleteSection,
+  getSections, createSection,
   getCourses, createCourse, deleteCourse,
   getFaculty, createFaculty, deleteFaculty,
   assignFacultyToSection, removeAssignment,
@@ -18,10 +18,9 @@ router.get('/departments',         guard, getDepartments);
 router.post('/departments',        [authenticate, authorize('super_admin')], createDepartment);
 router.delete('/departments/:id',  [authenticate, authorize('super_admin')], deleteDepartment);
 
-// Sections
+// Sections (coordinator can create + view; delete moved to HOD route)
 router.get('/sections',            guard, getSections);
 router.post('/sections',           guard, createSection);
-router.delete('/sections/:id',     guard, deleteSection);
 
 // Courses
 router.get('/courses',             guard, getCourses);

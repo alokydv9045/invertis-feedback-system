@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { LayoutDashboard, Plus, ToggleLeft, ToggleRight, Clock, FileText, BarChart2, Check, X, Users, BookOpen, GraduationCap, Link2 } from 'lucide-react';
+import { LayoutDashboard, Plus, ToggleLeft, ToggleRight, Clock, FileText, BarChart2, Check, X, Users, BookOpen, GraduationCap, Link2, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
 
 const STD_QUESTIONS = [
   'The instructor explains course material clearly and effectively.',
@@ -17,6 +17,7 @@ const STD_QUESTIONS = [
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'sections', label: 'Sections', icon: Link2 },
   { id: 'create', label: 'Create Form', icon: Plus },
   { id: 'forms', label: 'My Forms', icon: FileText },
 ];
@@ -101,12 +102,38 @@ export default function HODPanel() {
     } catch { toast.error('Failed to update portal status.'); }
   };
 
+  // Section delete with confirmation
+  const [deletePreview, setDeletePreview] = useState(null);
+  const [deletingSection, setDeletingSection] = useState(false);
+
+  const previewDelete = async (id) => {
+    try {
+      const res = await api.get(`/hod/sections/${id}/delete-preview`);
+      setDeletePreview({ id, ...res.data });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to load preview.');
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deletePreview) return;
+    setDeletingSection(true);
+    try {
+      await api.delete(`/hod/sections/${deletePreview.id}`);
+      toast.success('Section deleted successfully.');
+      setDeletePreview(null);
+      loadData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete section.');
+    } finally { setDeletingSection(false); }
+  };
+
   const statusColor = s => s === 'open' ? 'text-emerald-400 bg-emerald-900/30 border-emerald-800/40' : s === 'expired' ? 'text-slate-500 dark:text-slate-400 bg-slate-800/40 border-slate-700/40' : 'text-amber-400 bg-amber-900/30 border-amber-800/40';
 
   return (
     <div className="min-h-screen bg-transparent text-[var(--text-main)] flex flex-col">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1 min-h-0">
+      <div className="flex flex-row flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-5xl overflow-auto">
           <div className="flex items-center gap-4 mb-6">
@@ -172,6 +199,79 @@ export default function HODPanel() {
                         className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer w-full sm:w-auto flex-shrink-0 ${portal.portal_open ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-700 hover:bg-slate-600 text-[var(--text-main)] shadow-lg shadow-slate-700/20'}`}>
                         {portal.portal_open ? <><ToggleRight size={20} /> Portal Open</> : <><ToggleLeft size={20} /> Portal Closed</>}
                       </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SECTIONS TAB */}
+              {tab === 'sections' && (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Link2 size={18} className="text-blue-500" />
+                    <h2 className="text-base font-bold text-[#1D3557]">Department Sections</h2>
+                    <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg font-bold">{sections.length} total</span>
+                  </div>
+                  {sections.length === 0 ? (
+                    <div className="card-main rounded-2xl p-12 text-center text-slate-500 text-sm">
+                      No sections found in your department.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {sections.map(s => (
+                        <div key={s.id} className="card-main rounded-2xl p-5 flex items-center justify-between">
+                          <div>
+                            <div className="text-sm font-bold text-[#1D3557]">{s.name || `Sem ${s.semester} — ${s.label}`}</div>
+                            <div className="text-xs text-slate-500 mt-0.5">Semester {s.semester} • Section {s.label}</div>
+                          </div>
+                          <button onClick={() => previewDelete(s.id)}
+                            className="h-9 w-9 flex items-center justify-center rounded-xl bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 border border-red-200 transition-all cursor-pointer">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Delete confirmation modal */}
+                  {deletePreview && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+                      style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}
+                      onClick={e => e.target === e.currentTarget && setDeletePreview(null)}>
+                      <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden">
+                        <div className="bg-red-600 px-5 py-3.5 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle size={16} className="text-white" />
+                            <span className="text-white font-bold text-sm">Confirm Deletion</span>
+                          </div>
+                          <button onClick={() => setDeletePreview(null)} className="text-white/60 hover:text-white cursor-pointer"><X size={15} /></button>
+                        </div>
+                        <div className="p-5">
+                          <p className="text-sm text-slate-700 mb-4">
+                            Are you sure you want to delete <strong>{deletePreview.section_name}</strong>?
+                          </p>
+                          <div className="grid grid-cols-2 gap-2 mb-4">
+                            {[['TLFQs', deletePreview.affected.tlfqs], ['Enrollments', deletePreview.affected.enrollments],
+                              ['Students', deletePreview.affected.students], ['Assignments', deletePreview.affected.assignments]
+                            ].map(([label, count]) => (
+                              <div key={label} className="bg-red-50 border border-red-100 rounded-xl p-3 text-center">
+                                <div className="text-lg font-black text-red-600">{count}</div>
+                                <div className="text-[10px] font-bold text-red-400 uppercase tracking-wider">{label}</div>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-xs text-slate-500 mb-4">This action is irreversible. All related data will be removed or deactivated.</p>
+                          <div className="flex gap-2">
+                            <button onClick={() => setDeletePreview(null)}
+                              className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer">Cancel</button>
+                            <button onClick={confirmDelete} disabled={deletingSection}
+                              className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2">
+                              {deletingSection ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>

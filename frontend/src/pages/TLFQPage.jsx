@@ -104,7 +104,7 @@ export default function TLFQPage() {
     return (
     <div className="min-h-screen bg-transparent text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
         <Navbar />
-        <div className="flex flex-col md:flex-row flex-1">
+        <div className="flex flex-row flex-1 min-h-0">
           <Sidebar />
           <main className="flex-1 p-6 flex items-center justify-center">
             <motion.div
@@ -141,7 +141,7 @@ export default function TLFQPage() {
   return (
     <div className="min-h-screen bg-transparent text-slate-900 dark:text-[var(--text-main)] flex flex-col transition-colors duration-500">
       <Navbar />
-      <div className="flex flex-col md:flex-row flex-1">
+      <div className="flex flex-row flex-1 min-h-0">
         <Sidebar />
         <main className="flex-1 p-6 md:p-10">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-10 max-w-4xl mx-auto w-full">
