@@ -9,7 +9,7 @@ async function testApi() {
   const adminLogin = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ identifier: 'admin@invertis.edu.in', password: 'admin123' })
+    body: JSON.stringify({ identifier: 'admin@invertis.edu.in', password: 'Admin@2025' })
   });
   const adminData = await adminLogin.json();
   if (adminLogin.status === 200 && adminData.token) {
@@ -49,7 +49,7 @@ async function testApi() {
   const hodLogin = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ identifier: 'hod.cse@invertis.edu.in', password: 'staff123' })
+    body: JSON.stringify({ identifier: 'hod.bcs@invertis.edu.in', password: 'Hod@2025' })
   });
   const hodData = await hodLogin.json();
   if (hodLogin.status === 200) {
@@ -77,7 +77,7 @@ async function testApi() {
   const studentLogin = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ identifier: '2024001', password: 'student123' })
+    body: JSON.stringify({ identifier: 'BCS2025_01', password: 'Student@2025' })
   });
   const studentData = await studentLogin.json();
   if (studentLogin.status === 200) {

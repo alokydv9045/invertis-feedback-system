@@ -1,42 +1,64 @@
-import { supabase } from '../db.js';
+import { prisma, Department, Section, Course, Faculty, Tlfq, Question, Response, Answer, User, Enrollment, REWARD_POINTS } from '../db.js';
+import cache from '../cache.js';
 
 // ── Student: GET courses + TLFQs for their section ─────────────────────────
 export const getStudentCourses = async (req, res) => {
   try {
     const { id: userId, department_id } = req.user;
-    const { data: student } = await supabase.from('users').select('*').eq('id', userId).single();
+    const student = await User.findUnique({ where: { id: userId } });
     if (!student) return res.status(404).json({ message: 'Student not found' });
+    if (student.status !== 'active') {
+      return res.status(403).json({ message: 'Only active students can access feedback forms.' });
+    }
 
-    const { data: dept } = await supabase.from('departments').select('portal_open').eq('id', department_id).single();
+    const dept = await Department.findUnique({ where: { id: department_id } });
     if (dept && !dept.portal_open) {
       return res.status(200).json({ portal_closed: true, message: 'The feedback portal is currently closed by your HOD.' });
     }
 
-    const now = new Date().toISOString();
     const section_id = student.section_id;
     if (!section_id) return res.json([]);
 
-    const { data: tlfqs } = await supabase.from('tlfqs').select('*').eq('section_id', section_id).eq('is_active', true).gt('closing_time', now);
+    const tlfqs = await Tlfq.findMany({
+      where: {
+        section_id,
+        is_active: true,
+        closing_time: { gt: new Date() }
+      },
+      include: {
+        course: true,
+        faculty: true,
+        responses: {
+          where: { student_id: userId },
+          select: { id: true } // Only need existence check, not full data
+        }
+      }
+    });
 
     const courseMap = {};
-    for (const tlfq of (tlfqs || [])) {
+    for (const tlfq of tlfqs) {
       const courseId = tlfq.course_id;
       if (!courseMap[courseId]) {
-        const { data: course } = await supabase.from('courses').select('*').eq('id', tlfq.course_id).single();
-        courseMap[courseId] = { ...course, id: courseId, tlfqs: [], pending_count: 0, completed_count: 0 };
+        courseMap[courseId] = { 
+          ...tlfq.course, 
+          tlfqs: [], 
+          pending_count: 0, 
+          completed_count: 0 
+        };
       }
-      const { data: faculty } = await supabase.from('faculty').select('name').eq('id', tlfq.faculty_id).single();
-      const { data: resp } = await supabase.from('responses').select('id').eq('student_id', userId).eq('tlfq_id', tlfq.id).single();
+      
+      const isCompleted = tlfq.responses.length > 0;
       const entry = {
-        ...tlfq, id: tlfq.id,
-        faculty_name: faculty?.name || 'Unknown',
-        completed: !!resp,
-        closing_time: tlfq.closing_time
+        ...tlfq,
+        faculty_name: tlfq.faculty ? tlfq.faculty.name : 'Unknown',
+        completed: isCompleted
       };
+      
       courseMap[courseId].tlfqs.push(entry);
-      if (resp) courseMap[courseId].completed_count++;
+      if (isCompleted) courseMap[courseId].completed_count++;
       else courseMap[courseId].pending_count++;
     }
+    
     return res.json(Object.values(courseMap));
   } catch (err) {
     console.error(err);
@@ -47,160 +69,362 @@ export const getStudentCourses = async (req, res) => {
 // ── GET specific evaluation form ───────────────────────────────────────────
 export const getEvaluation = async (req, res) => {
   try {
-    const { data: tlfq } = await supabase.from('tlfqs').select('*').eq('id', req.params.tlfqId).single();
+    const tlfq = await Tlfq.findUnique({
+      where: { id: req.params.tlfqId },
+      include: {
+        faculty: true,
+        course: true,
+        section: true,
+        questions: true
+      }
+    });
+
     if (!tlfq) return res.status(404).json({ message: 'Form not found.' });
-    if (!tlfq.is_active || new Date(tlfq.closing_time) < new Date()) {
+    if (!tlfq.is_active || tlfq.closing_time < new Date()) {
       return res.status(403).json({ message: 'This evaluation is closed or expired.' });
     }
-    const { data: faculty } = await supabase.from('faculty').select('name').eq('id', tlfq.faculty_id).single();
-    const { data: course } = await supabase.from('courses').select('name, code').eq('id', tlfq.course_id).single();
-    const { data: section } = await supabase.from('sections').select('name').eq('id', tlfq.section_id).single();
-    const { data: questions } = await supabase.from('questions').select('*').eq('tlfq_id', tlfq.id);
+
     return res.json({
-      ...tlfq, id: tlfq.id,
-      faculty_name: faculty?.name || 'Unknown',
-      course_name: course?.name || 'Unknown',
-      course_code: course?.code || '',
-      section_name: section?.name || '',
-      questions: questions || []
+      ...tlfq,
+      faculty_name: tlfq.faculty?.name || 'Unknown',
+      course_name:  tlfq.course?.name  || 'Unknown',
+      course_code:  tlfq.course?.code  || '',
+      section_name: tlfq.section?.name || '',
+      questions: tlfq.questions
     });
-  } catch { return res.status(500).json({ message: 'Internal Server Error' }); }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
 
-// ── POST /api/student/submit ────────────────────────────────────────────────
+// ── POST /api/student/submit — FIXED: uses transaction to prevent race condition ─
 export const submitResponse = async (req, res) => {
   try {
     const { id: student_id, department_id } = req.user;
     const { tlfq_id, answers, comment } = req.body;
 
-    const { data: dept } = await supabase.from('departments').select('portal_open').eq('id', department_id).single();
+    if (!tlfq_id || !answers || !Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({ message: 'tlfq_id and answers array are required.' });
+    }
+
+    // Validate ratings are within bounds
+    for (const a of answers) {
+      if (!a.question_id || !a.rating || a.rating < 1 || a.rating > 10) {
+        return res.status(400).json({ message: 'Each answer must have question_id and rating (1-10).' });
+      }
+    }
+
+    const student = await User.findUnique({ where: { id: student_id } });
+    if (!student || student.status !== 'active') {
+      return res.status(403).json({ message: 'Only active students can submit feedback.' });
+    }
+
+    const dept = await Department.findUnique({ where: { id: department_id } });
     if (dept && !dept.portal_open) {
       return res.status(403).json({ message: 'The feedback portal is currently closed.' });
     }
 
-    const { data: tlfq } = await supabase.from('tlfqs').select('*').eq('id', tlfq_id).single();
-    if (!tlfq || !tlfq.is_active || new Date(tlfq.closing_time) < new Date()) {
+    const tlfq = await Tlfq.findUnique({ where: { id: tlfq_id } });
+    if (!tlfq || !tlfq.is_active || tlfq.closing_time < new Date()) {
       return res.status(403).json({ message: 'This evaluation form is closed or expired.' });
     }
 
-    const { data: existing } = await supabase.from('responses').select('id').eq('student_id', student_id).eq('tlfq_id', tlfq_id).single();
-    if (existing) return res.status(400).json({ message: 'Evaluation already submitted.' });
+    // Use a transaction to atomically check + insert (prevents race condition)
+    try {
+      await prisma.$transaction(async (tx) => {
+        // Check for existing submission inside transaction
+        const existing = await tx.response.findUnique({
+          where: { student_id_tlfq_id: { student_id, tlfq_id } }
+        });
+        if (existing) {
+          throw new Error('ALREADY_SUBMITTED');
+        }
 
-    const { data: resp, error } = await supabase.from('responses').insert({
-      student_id, tlfq_id, submitted_at: new Date().toISOString(), comment: comment || ''
-    }).select().single();
-    if (error) throw error;
+        // Create response + answers atomically
+        await tx.response.create({
+          data: {
+            student_id,
+            tlfq_id,
+            submitted_at: new Date().toISOString(),
+            comment: comment || '',
+            answers: {
+              create: answers.map(a => ({
+                question_id: a.question_id,
+                rating: Number(a.rating)
+              }))
+            }
+          }
+        });
 
-    if (answers && Array.isArray(answers)) {
-      const answerRows = answers.map(({ question_id, rating }) => ({
-        response_id: resp.id, question_id, rating: Number(rating)
-      }));
-      await supabase.from('answers').insert(answerRows);
+        // Award points
+        await tx.user.update({
+          where: { id: student_id },
+          data: { points: { increment: REWARD_POINTS } }
+        });
+      });
+    } catch (txErr) {
+      if (txErr.message === 'ALREADY_SUBMITTED') {
+        return res.status(400).json({ message: 'Evaluation already submitted.' });
+      }
+      // P2002 = unique constraint violation (DB-level duplicate prevention)
+      if (txErr.code === 'P2002') {
+        return res.status(400).json({ message: 'Evaluation already submitted.' });
+      }
+      throw txErr;
     }
 
-    // Increment student points
-    const { data: student } = await supabase.from('users').select('points').eq('id', student_id).single();
-    await supabase.from('users').update({ points: (student?.points || 0) + 10 }).eq('id', student_id);
+    // Invalidate leaderboard cache since points changed
+    cache.invalidatePrefix('leaderboard');
 
-    return res.status(201).json({ message: 'Feedback submitted successfully. +10 points!' });
+    return res.status(201).json({ message: `Feedback submitted successfully. +${REWARD_POINTS} points!` });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-// ── Analytics (super_admin) ─────────────────────────────────────────────────
+// ── Analytics — REWRITTEN for 20k student scale ─────────────────────────────
+// Uses targeted queries with filters instead of loading entire DB into memory
 export const getAnalytics = async (req, res) => {
   try {
     const { department_id } = req.query;
 
-    const { data: allDepts } = await supabase.from('departments').select('*');
-    const { data: allResponses } = await supabase.from('responses').select('*');
-    const responseIds = (allResponses || []).map(r => r.id);
-    const { data: allAnswers } = responseIds.length > 0
-      ? await supabase.from('answers').select('*').in('response_id', responseIds)
-      : { data: [] };
+    // Check cache first (analytics is expensive)
+    const cacheKey = `analytics:${department_id || 'all'}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return res.json(cached);
 
-    let facultyQuery = supabase.from('faculty').select('*');
-    if (department_id) facultyQuery = facultyQuery.eq('department_id', department_id);
-    const { data: allFaculty } = await facultyQuery;
-    const { data: allTlfqs } = await supabase.from('tlfqs').select('*');
+    // 1. Submission Rates — query only needed dept's courses
+    const courseFilter = department_id ? { department_id } : {};
+    const courses = await Course.findMany({
+      where: courseFilter,
+      include: { department: true }
+    });
 
-    const facultyMap = {};
-    for (const f of (allFaculty || [])) {
-      facultyMap[f.id] = {
-        id: f.id, name: f.name,
-        department_id: f.department_id,
-        teacher_type: f.teacher_type || 'college_faculty',
-        total_responses: 0, total_rating: 0
+    const submissionRates = await Promise.all(courses.map(async (course) => {
+      const [enrolled, submittedRows] = await Promise.all([
+        Enrollment.count({ where: { course_id: course.id } }),
+        Response.findMany({
+          where: { tlfq: { course_id: course.id } },
+          select: { student_id: true },
+          distinct: ['student_id']
+        })
+      ]);
+
+      const submitted = submittedRows.length;
+      return {
+        course_id: course.id,
+        course_name: course.name,
+        course_code: course.code,
+        department_id: course.department_id,
+        enrolled,
+        submitted,
+        rate: enrolled > 0 ? Math.round((submitted / enrolled) * 100) : 0
       };
+    }));
+
+    // 2. Faculty Rankings — use aggregation instead of loading all responses
+    const facultyFilter = department_id ? { department_id } : {};
+    const facultyList = await Faculty.findMany({
+      where: facultyFilter,
+      include: { department: true }
+    });
+
+    const allQuestions = await Question.findMany({
+      select: { id: true, question_text: true }
+    });
+    const questionMap = {};
+    for (const q of allQuestions) {
+      questionMap[q.id] = q.question_text;
     }
 
-    for (const tlfq of (allTlfqs || [])) {
-      const fId = tlfq.faculty_id;
-      if (!facultyMap[fId]) continue;
-      const tlfqResponses = (allResponses || []).filter(r => r.tlfq_id === tlfq.id);
-      for (const resp of tlfqResponses) {
-        const respAnswers = (allAnswers || []).filter(a => a.response_id === resp.id);
-        if (respAnswers.length > 0) {
-          const avg = respAnswers.reduce((s, a) => s + a.rating, 0) / respAnswers.length;
-          facultyMap[fId].total_rating += avg;
-          facultyMap[fId].total_responses++;
-        }
-      }
-    }
+    const avgRatingPerFaculty = (await Promise.all(facultyList.map(async (f) => {
+      const agg = await Answer.aggregate({
+        where: { response: { tlfq: { faculty_id: f.id } } },
+        _avg: { rating: true },
+        _count: { rating: true }
+      });
+      
+      const count = agg._count.rating || 0;
+      if (count === 0) return null;
+      
+      const responseCount = await Response.count({ where: { tlfq: { faculty_id: f.id } } });
 
-    const avgRatingPerFaculty = Object.values(facultyMap)
-      .filter(f => f.total_responses > 0)
-      .map(f => ({ ...f, avg_rating: parseFloat((f.total_rating / f.total_responses).toFixed(2)) }))
+      const facultyAnswerGroup = await Answer.groupBy({
+        by: ['question_id'],
+        where: { response: { tlfq: { faculty_id: f.id } } },
+        _avg: { rating: true }
+      });
+
+      const attributes = facultyAnswerGroup.map(ag => ({
+        question_text: questionMap[ag.question_id] || 'Unknown Attribute',
+        avg_rating: ag._avg.rating ? parseFloat(ag._avg.rating.toFixed(2)) : 0
+      }));
+
+      return {
+        id: f.id,
+        name: f.name,
+        department_id: f.department_id,
+        teacher_type: f.teacher_type,
+        total_responses: responseCount,
+        avg_rating: agg._avg.rating ? parseFloat(agg._avg.rating.toFixed(2)) : 0,
+        attributes
+      };
+    }))).filter(Boolean).filter(f => f.total_responses > 0)
       .sort((a, b) => b.avg_rating - a.avg_rating);
 
-    const filteredTlfqIds = (allTlfqs || [])
-      .filter(t => !department_id || (allFaculty || []).some(f => f.id === t.faculty_id))
-      .map(t => t.id);
-    const recentResponses = (allResponses || []).filter(r => r.comment && filteredTlfqIds.includes(r.tlfq_id)).slice(-20);
-    const recentComments = await Promise.all(recentResponses.map(async r => {
-      const tlfq = (allTlfqs || []).find(t => t.id === r.tlfq_id);
-      const faculty = tlfq ? (allFaculty || []).find(f => f.id === tlfq.faculty_id) : null;
-      let course = null, section = null, deptObj = null;
-      if (tlfq) {
-        const { data: c } = await supabase.from('courses').select('name').eq('id', tlfq.course_id).single();
-        const { data: s } = await supabase.from('sections').select('name').eq('id', tlfq.section_id).single();
-        course = c; section = s;
+    // 3. Attribute Analysis — only for filtered faculty
+    const facultyIds = avgRatingPerFaculty.map(f => f.id);
+    const questionAgg = facultyIds.length > 0 ? await Answer.groupBy({
+      by: ['question_id'],
+      where: { response: { tlfq: { faculty_id: { in: facultyIds } } } },
+      _avg: { rating: true },
+      _count: { rating: true }
+    }) : [];
+
+    const qIds = questionAgg.map(q => q.question_id);
+    const questions = qIds.length > 0 ? await Question.findMany({
+      where: { id: { in: qIds } },
+      select: { id: true, question_text: true }
+    }) : [];
+    const qMap = {};
+    for (const q of questions) { qMap[q.id] = q.question_text; }
+
+    const attrMap = {};
+    for (const agg of questionAgg) {
+      const qText = qMap[agg.question_id];
+      const avg = agg._avg.rating;
+      const cnt = agg._count.rating || 0;
+      if (qText && avg && cnt > 0) {
+        if (!attrMap[qText]) attrMap[qText] = { total: 0, weight: 0 };
+        attrMap[qText].total += avg * cnt;
+        attrMap[qText].weight += cnt;
       }
-      if (faculty) deptObj = (allDepts || []).find(d => d.id === faculty.department_id);
+    }
+
+    const attributeAnalytics = Object.keys(attrMap).map(key => ({
+      attribute: key.length > 20 ? key.substring(0, 17) + '...' : key,
+      score: parseFloat((attrMap[key].total / attrMap[key].weight).toFixed(2)),
+      full_text: key
+    }));
+
+    // 4. Department Overview — lightweight
+    const allDepts = await Department.findMany();
+    const deptOverview = allDepts.map(d => {
+      const deptFaculty = avgRatingPerFaculty.filter(f => f.department_id === d.id);
+      const avgDeptRating = deptFaculty.length > 0 
+        ? parseFloat((deptFaculty.reduce((s, f) => s + f.avg_rating, 0) / deptFaculty.length).toFixed(2))
+        : 0;
+
       return {
-        comment: r.comment, submitted_at: r.submitted_at,
-        faculty_name: faculty?.name, course_name: course?.name,
-        section_name: section?.name,
-        department_id: deptObj?.id
+        id: d.id, name: d.name, code: d.code, portal_open: d.portal_open,
+        avg_rating: avgDeptRating, faculty_count: deptFaculty.length
       };
+    });
+
+    // 5. Timeline — only recent 90 days, limited query
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+    const timelineResponses = await Response.findMany({
+      where: {
+        submitted_at: { gte: ninetyDaysAgo },
+        ...(department_id ? { tlfq: { faculty: { department_id } } } : {})
+      },
+      select: { submitted_at: true }
+    });
+
+    const trendMap = {};
+    for (const r of timelineResponses) {
+      try {
+        const date = new Date(r.submitted_at).toISOString().split('T')[0];
+        trendMap[date] = (trendMap[date] || 0) + 1;
+      } catch (_) { /* skip malformed */ }
+    }
+
+    const timelineData = Object.keys(trendMap)
+      .map(date => ({ date, count: trendMap[date] }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // 6. Recent comments — limited to 20
+    const recentResponses = await Response.findMany({
+      where: {
+        comment: { not: "" },
+        tlfq: { faculty: department_id ? { department_id } : {} }
+      },
+      include: {
+        student: { select: { unique_feedback_id: true } },
+        tlfq: {
+          include: {
+            faculty: { select: { name: true, department_id: true } },
+            course: { select: { name: true } },
+            section: { select: { name: true } }
+          }
+        }
+      },
+      orderBy: { id: 'desc' },
+      take: 20
+    });
+
+    const recentComments = recentResponses.map(r => ({
+      comment: r.comment,
+      submitted_at: r.submitted_at,
+      faculty_name: r.tlfq.faculty?.name,
+      course_name: r.tlfq.course?.name,
+      section_name: r.tlfq.section?.name,
+      department_id: r.tlfq.faculty?.department_id,
+      anonymous_id: r.student?.unique_feedback_id || (r.student_id ? `ANO-${r.student_id.split('-')[0].toUpperCase()}` : 'ANONYMOUS')
     }));
 
-    const deptOverview = (allDepts || []).map(d => ({
-      id: d.id, name: d.name, code: d.code, portal_open: d.portal_open
-    }));
+    const result = { 
+      avgRatingPerFaculty, submissionRates, recentComments, 
+      deptOverview, attributeAnalytics, timelineData
+    };
 
-    return res.json({ avgRatingPerFaculty, recentComments, deptOverview });
+    // Cache for 30 seconds — prevents hammering on dashboard refresh
+    cache.set(cacheKey, result, 30);
+
+    return res.json(result);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-// ── Leaderboard ─────────────────────────────────────────────────────────────
+// ── Leaderboard — with caching ──────────────────────────────────────────────
 export const getLeaderboard = async (req, res) => {
   try {
     const { role, department_id } = req.user;
-    let query = supabase.from('users').select('unique_feedback_id, points, batch').eq('role', 'student').gt('points', 0).order('points', { ascending: false }).limit(50);
-    if (role === 'hod') query = query.eq('department_id', department_id);
-    const { data: students, error } = await query;
-    if (error) throw error;
-    return res.json((students || []).map((s, i) => ({
+    const cacheKey = `leaderboard:${role}:${department_id || 'all'}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return res.json(cached);
+
+    const where = { role: 'student', points: { gt: 0 } };
+    if (role === 'hod') where.department_id = department_id;
+
+    const students = await User.findMany({
+      where,
+      orderBy: { points: 'desc' },
+      take: 50,
+      select: {
+        name: true,
+        unique_feedback_id: true,
+        points: true,
+        batch: true
+      }
+    });
+
+    const result = students.map((s, i) => ({
       rank: i + 1,
+      name: s.name,
       unique_feedback_id: s.unique_feedback_id || 'ANO-?????',
       points: s.points,
       batch: s.batch,
-    })));
-  } catch { return res.status(500).json({ message: 'Internal Server Error' }); }
+    }));
+
+    cache.set(cacheKey, result, 60); // 1 min cache
+    return res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };

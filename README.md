@@ -153,15 +153,13 @@ cp CREDENTIALS.example.md CREDENTIALS.md
 | POST | `/auth/complete-registration` | Public | Activate pending student account |
 | POST | `/auth/login` | Public | Unified login (email or student_id + password) |
 | GET | `/auth/me` | Authenticated | Get current user profile |
-| GET | `/auth/profile-stats` | Authenticated | Get role-specific profile statistics |
 | PUT | `/auth/change-password` | supreme, super_admin, hod | Change own password |
 
 ### Coordinator (`/api/coordinator`)
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
 | GET/POST | `/coordinator/departments` | coordinator, super_admin, supreme | List / create departments |
-| GET/POST | `/coordinator/sections` | coordinator, super_admin, hod, supreme | List / create sections |
-| DELETE | `/coordinator/sections/:id` | coordinator (own only), hod (dept), super_admin, supreme | Delete section |
+| GET/POST | `/coordinator/sections` | coordinator, super_admin, supreme | List / create sections |
 | GET/POST | `/coordinator/courses` | coordinator, super_admin, supreme | List / create courses |
 | GET/POST | `/coordinator/faculty` | coordinator, super_admin, supreme | List / add faculty (with teacher_type) |
 | POST/DELETE | `/coordinator/assignments` | coordinator, super_admin, supreme | Assign / remove faculty from section |
@@ -190,11 +188,6 @@ cp CREDENTIALS.example.md CREDENTIALS.md
 | PUT | `/hod/tlfq/:id/deadline` | hod | Extend form deadline |
 | GET/PUT | `/hod/portal` | hod | View / toggle department portal |
 
-### Auth (`/api/auth`)
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | `/auth/profile-stats` | Authenticated | Get role-specific profile statistics |
-
 ### Student (`/api/student`)
 | Method | Endpoint | Access | Description |
 |--------|----------|--------|-------------|
@@ -216,8 +209,8 @@ invertis-feedback-system/
 │
 ├── server/
 │   ├── controllers/
-│   │   ├── authController.js           # 2-step auth, JWT, password change, profile stats
-│   │   ├── coordinatorController.js    # Sections (with ownership), faculty, students
+│   │   ├── authController.js           # 2-step auth, JWT, password change
+│   │   ├── coordinatorController.js    # Sections, faculty, students
 │   │   ├── hodController.js            # TLFQ forms, portal control
 │   │   ├── superadminController.js     # Staff management, identity reveal
 │   │   └── responseController.js       # Feedback submission, analytics, leaderboard
@@ -244,14 +237,13 @@ invertis-feedback-system/
         │   ├── SuperAdminPanel.jsx # Super Admin: departments, HODs, coordinators, student lookup
         │   ├── IdentityReveal.jsx  # 🔍 Reveal student identity by ANO- ID (super+supreme)
         │   ├── CoordinatorPanel.jsx # 6-tab: sections, courses, faculty, students
-        │   ├── HODPanel.jsx        # HOD: form creation, portal mgmt, section management
+        │   ├── HODPanel.jsx        # HOD: form creation & portal management
         │   ├── Analytics.jsx       # Dept-wise analytics with faculty/trainer filter
         │   ├── Leaderboard.jsx     # Anonymous leaderboard (ANO- IDs only)
         │   └── TLFQPage.jsx        # Student feedback evaluation form
         ├── components/
-        │   ├── Navbar.jsx          # Topbar with hamburger toggle, role badge, password change
-        │   ├── Sidebar.jsx         # Slide-out sidebar (inline on desktop, overlay on mobile)
-        │   ├── ProfileModal.jsx    # Role-specific profile modal with stats
+        │   ├── Navbar.jsx          # Glassmorphism topbar, role badge, theme toggle, password change
+        │   ├── Sidebar.jsx         # Role-filtered navigation
         │   └── ProtectedRoute.jsx  # JWT + role guard
         ├── context/
         │   └── AuthContext.jsx     # Global auth + theme state
@@ -265,8 +257,6 @@ invertis-feedback-system/
 
 - **JWT Authentication** — all protected routes require a valid Bearer token
 - **5-Tier RBAC** — Supreme → Super Admin → Coordinator → HOD → Student; each tier strictly scoped
-- **Section Ownership** — Coordinators can only delete sections they created (`created_by` field)
-- **HOD Department Scoping** — HODs can view and delete sections only within their own department
 - **Student Anonymity** — `unique_feedback_id` (`ANO-XXXXXX`) is the only public identifier; real identity (name, roll no., email) requires explicit admin reveal with confirmation
 - **Section Isolation** — students only see TLFQs matching their exact `section_id` and `semester`
 - **Portal Gate** — HOD can disable all feedback submission for their department instantly
@@ -279,7 +269,7 @@ invertis-feedback-system/
 ## 🧩 Data Model
 
 ```
-Department ──► Sections (code, semester, label A/B/C, created_by)
+Department ──► Sections (code, semester, label A/B/C)
                   │
                   ├──► SectionFaculty (Faculty × Course per Section)
                   │          │
@@ -311,13 +301,13 @@ node prisma/seed.js # Manual re-seed if needed
 ## 📦 Tech Stack
 
 | Layer | Technology |
-|-------|-----------| 
+|-------|-----------|
 | **Frontend** | React 18, Vite, TailwindCSS v3, Framer Motion, Recharts, **Sonner** |
 | **Backend** | Node.js 18+, Express.js |
 | **Database** | PostgreSQL (Supabase) via **Prisma ORM** |
 | **Auth** | JSON Web Tokens (JWT), bcryptjs |
 | **UI Icons** | Lucide React |
-| **Design** | Glassmorphism design with campus visuals |
+| **Design** | Glassmorphism dark theme + light mode toggle |
 
 ---
 
@@ -337,33 +327,19 @@ cd frontend && npm run build
 
 ---
 
-### 🆕 Recent Changes
+### 🆕 Recent Frontend Improvements
 
-#### Profile System
-- Added **Profile Modal** with role-specific stats (forms created, sections managed, feedback submitted, etc.)
-- Profile accessible from both the Sidebar and Navbar
-- Dynamic stats pulled from a dedicated `/auth/profile-stats` API endpoint
-
-#### Section Ownership & Permissions
-- Sections now track **who created them** via `created_by` field
-- **Coordinators** can only delete sections they created (not others')
-- **HODs** can view and delete **all sections in their department**
-- **Super Admins** retain global section delete access
-- HOD Panel now has a dedicated **Sections tab** showing department-scoped section management
-
-#### Sidebar Overhaul
-- Converted sidebar to a **slide-out drawer** triggered by a hamburger (☰) button in the top navbar
-- **Desktop**: Sidebar is **open by default** (inline, pushes content); hamburger toggles it closed for full-width view
-- **Mobile**: Sidebar is **hidden by default**; opens as a fixed overlay with backdrop blur
-- HOD sidebar shows their **department name** (📍 Department of CS)
-- Auto-closes on navigation (mobile) and stays persistent (desktop)
-
-#### UI Improvements
-- Enhanced **Login Page UI** with cleaner layout and refined authentication flow
-- Updated **Navbar Design** with integrated hamburger toggle, role badge, and user actions
-- Improved **Anonymous Leaderboard UI** with better visual hierarchy
-- Refined dashboard pages (Super Admin, Supreme, HOD, Identity Reveal)
-- Added campus visuals and polished interface elements
+- Enhanced **Login Page UI** with cleaner layout, improved responsiveness, and refined authentication flow
+- Updated **Navbar Design** across multiple dashboards for a more modern and consistent user experience
+- Improved **Anonymous Leaderboard UI** with better visual hierarchy and smoother interactions
+- Refined dashboard pages including:
+  - Super Admin Panel
+  - Supreme Panel
+  - HOD Dashboard
+  - Identity Reveal Page
+- Improved sidebar navigation and overall frontend consistency
+- Added campus visuals and polished interface elements for a more professional university portal appearance
+- Optimized frontend structure and reusable UI components for better maintainability
 
 ## 📝 License
 

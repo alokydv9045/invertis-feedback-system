@@ -1,6 +1,10 @@
 import jwt from 'jsonwebtoken';
 
-const SECRET = process.env.JWT_SECRET || 'supersecretkey';
+const SECRET = process.env.JWT_SECRET;
+if (!SECRET) {
+  console.error('FATAL: JWT_SECRET not found in environment variables');
+  process.exit(1);
+}
 
 export const authenticate = (req, res, next) => {
   try {

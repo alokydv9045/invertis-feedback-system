@@ -1,23 +1,52 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 import api from '../services/api';
-import { StatsCard } from '../components/ui/StatsCard';
-import { Card, CardBody } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { EmptyState } from '../components/ui/EmptyState';
-import { Skeleton } from '../components/ui/Skeleton';
+import { motion } from 'framer-motion';
 import {
   GraduationCap, Users, BookOpen, Building2, BarChart2,
   ArrowRight, CheckCircle2, Clock, ClipboardList, Shield,
-  Layers, TrendingUp, ChevronRight
+  PlusCircle, Layers, TrendingUp, Activity, ArrowUpCircle
 } from 'lucide-react';
 
-// ── SUPER ADMIN DASHBOARD ────────────────────────────────────────────────
+const PageShell = ({ children }) => (
+  <div className="min-h-screen flex flex-col bg-transparent text-[#212529]">
+    <Navbar />
+    <div className="flex flex-col md:flex-row flex-1 min-h-0">
+      <Sidebar />
+      <main className="flex-1 p-4 sm:p-5 md:p-7 overflow-auto flex flex-col justify-between">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex-1">
+          {children}
+        </motion.div>
+        <footer className="mt-8 pt-4 border-t border-slate-200 text-center text-slate-500 w-full">
+          <p className="text-xs">© 2026 Invertis University, Invertis Village, Bareilly-Lucknow National Highway, NH-24, Bareilly-243123, Uttar Pradesh.</p>
+        </footer>
+      </main>
+    </div>
+  </div>
+);
+
+function StatCard({ icon: Icon, label, value }) {
+  return (
+    <motion.div whileHover={{ y: -3 }} className="card-hover p-4 sm:p-5 flex items-center gap-4 rounded-2xl">
+      <div className="h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/30">
+        <Icon size={19} className="text-blue-600 dark:text-blue-400" />
+      </div>
+      <div>
+        <div className="text-xl sm:text-2xl font-black text-[#1D3557] tracking-tight">{value ?? '—'}</div>
+        <div className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">{label}</div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── SUPER ADMIN DASHBOARD ───────────────────────────────────────────────────
 function AdminDashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
+  const [promotionOverview, setPromotionOverview] = useState(null);
 
   useEffect(() => {
     api.get('/responses/analytics').then(r => {
@@ -27,128 +56,116 @@ function AdminDashboard() {
         faculty: d.avgRatingPerFaculty?.length ?? 0,
       });
     }).catch(() => {});
+    // also fetch promotion overview for Control Tower
+    api.get('/superadmin/promotion/overview')
+      .then(r => setPromotionOverview(r.data))
+      .catch(() => {});
   }, []);
 
+  const cards = [
+    { icon: Building2,    label: 'Departments',        value: stats?.depts,   color: 'bg-primary-600', glow: 'rgba(29, 78, 137, 0.5)' },
+    { icon: GraduationCap,label: 'Faculty Evaluated',  value: stats?.faculty, color: 'bg-accent-600',  glow: 'rgba(198, 40, 40, 0.5)' },
+  ];
+
+  const promotionCards = [
+    { icon: ArrowUpCircle, label: 'Current Session', value: promotionOverview?.active_session?.name || '—', color: 'bg-emerald-600', glow: 'rgba(16, 185, 129, 0.45)' },
+    { icon: Activity, label: 'Last Promotion', value: promotionOverview?.recent_logs?.[0] ? `${promotionOverview.recent_logs[0].promoted_count} promoted` : 'No history yet', color: 'bg-teal-600', glow: 'rgba(20, 184, 166, 0.45)' },
+  ];
+
   const actions = [
-    { label: 'User Management',   desc: 'Create HODs & coordinators', path: '/superadmin',  icon: Shield,    color: 'blue' },
-    { label: 'Coordinator Panel', desc: 'Sections, courses, faculty',  path: '/coordinator', icon: Layers,    color: 'purple' },
-    { label: 'Analytics',         desc: 'University-wide insights',    path: '/analytics',   icon: BarChart2, color: 'green' },
+    { label: 'User Management',    desc: 'Create HODs & coordinators', path: '/superadmin',  icon: Shield,       glow: '#0F2D52' },
+    { label: 'Coordinator Panel',  desc: 'Sections, courses, faculty', path: '/coordinator', icon: Layers,       glow: '#1D4E89' },
+    { label: 'Analytics',          desc: 'University-wide insights',   path: '/analytics',   icon: BarChart2,    glow: '#C62828' },
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in relative">
-      <div className="absolute -inset-6 overflow-hidden pointer-events-none select-none">
-        <img src="/campus/academic-block-2.jpg" alt="" className="w-full h-full object-cover opacity-15" />
-      </div>
-      <div className="relative z-10">
+    <div className="flex flex-col gap-6 max-w-4xl">
       <div>
-        <span className="text-xs font-bold text-invertis-orange uppercase tracking-wider">Super Admin</span>
-        <h1 className="text-2xl font-bold text-gray-900 mt-1">Control Tower</h1>
-        <p className="text-sm text-gray-500 mt-1">University-wide system overview and management.</p>
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-2 w-2 rounded-full bg-accent-400 shadow-sm shadow-accent-400/50" />
+          <span className="text-[10px] font-bold text-accent-400 uppercase tracking-widest">Super Admin</span>
+        </div>
+        <h1 className="text-2xl font-black text-[#212529]">Control Tower</h1>
+        <p className="text-sm text-slate-600 mt-1">University-wide system overview and management.</p>
       </div>
 
-      {stats ? (
-        <div className="grid grid-cols-2 gap-4">
-          <StatsCard icon={Building2} label="Departments" value={stats.depts} color="purple" />
-          <StatsCard icon={GraduationCap} label="Faculty Evaluated" value={stats.faculty} color="blue" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-4">
-          {[1, 2].map(n => (
-            <div key={n} className="bg-white rounded-2xl border border-gray-200/60 p-5 space-y-3">
-              <Skeleton className="h-10 w-10" rounded="rounded-lg" />
-              <Skeleton className="h-7 w-16" />
-              <Skeleton className="h-4 w-24" />
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {cards.map((c, i) => <StatCard key={`stat-${i}`} {...c} />)}
+        {promotionCards.map((c, i) => <StatCard key={`promo-${i}`} {...c} />)}
+      </div>
 
       <div>
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Quick Actions</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {actions.map(({ label, desc, path, icon: Icon, color }, idx) => (
-            <motion.div
-              key={path}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.08 }}
-            >
-              <Card hover>
-                <button onClick={() => navigate(path)} className="w-full text-left p-5 cursor-pointer">
-                  <div className={`w-10 h-10 rounded-xl bg-${color === 'blue' ? 'blue' : color === 'purple' ? 'purple' : 'emerald'}-50 flex items-center justify-center mb-4`}>
-                    <Icon size={18} className={`text-${color === 'blue' ? 'blue' : color === 'purple' ? 'purple' : 'emerald'}-500`} />
-                  </div>
-                  <div className="text-sm font-bold text-gray-900">{label}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{desc}</div>
-                  <ArrowRight size={14} className="text-gray-300 mt-3" />
-                </button>
-              </Card>
-            </motion.div>
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Quick Actions</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {actions.map(({ label, desc, path, icon: Icon }) => (
+            <motion.button key={path} whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}
+              onClick={() => navigate(path)}
+              className="card-hover p-4 text-left flex flex-col gap-3 cursor-pointer group rounded-2xl w-full">
+              <div className="h-9 w-9 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/30">
+                <Icon size={17} className="text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-[#1D3557] transition-colors">{label}</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">{desc}</div>
+              </div>
+              <ArrowRight size={14} className="text-slate-500 group-hover:text-accent-500 transition-colors mt-auto" />
+            </motion.button>
           ))}
         </div>
       </div>
-      </div>{/* close z-10 wrapper */}
     </div>
   );
 }
 
-// ── HOD OVERVIEW ─────────────────────────────────────────────────────────
+// ── HOD OVERVIEW ────────────────────────────────────────────────────────────
 function HODOverview() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const cards = [
-    { label: 'Create Forms', desc: 'Design & assign evaluation forms', path: '/hod',       icon: ClipboardList, color: 'blue' },
-    { label: 'Analytics',    desc: 'Department performance insights',  path: '/analytics', icon: BarChart2,     color: 'purple' },
+    { label: 'Create Forms',  desc: 'Design & assign evaluation forms', path: '/hod',       icon: ClipboardList, glow: '#1D4E89' },
+    { label: 'Analytics',     desc: 'Department performance insights',   path: '/analytics', icon: BarChart2,     glow: '#C62828' },
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in max-w-3xl relative">
-      <div className="absolute -inset-6 overflow-hidden pointer-events-none select-none">
-        <img src="/campus/gate.jpg" alt="" className="w-full h-full object-cover opacity-15" />
-      </div>
-      <div className="relative z-10">
+    <div className="flex flex-col gap-6 max-w-3xl">
       <div>
-        <span className="text-xs font-bold text-invertis-blue uppercase tracking-wider">Head of Department</span>
-        <h1 className="text-2xl font-bold text-gray-900 mt-1">Welcome back, {user?.name?.split(' ')[1] || user?.name}</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your department's feedback cycle.</p>
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-2 w-2 rounded-full bg-[#FF2A00] shadow-sm shadow-red-400/50" />
+          <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Head of Department</span>
+        </div>
+        <h1 className="text-2xl font-black text-[#212529]">Welcome back, {user?.name?.split(' ')[1] || user?.name}</h1>
+        <p className="text-sm text-slate-600 mt-1">Manage your department's feedback cycle.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {cards.map(({ label, desc, path, icon: Icon }, idx) => (
-          <motion.div
-            key={path}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-          >
-            <Card hover>
-              <button onClick={() => navigate(path)} className="w-full text-left p-5 cursor-pointer">
-                <div className="w-10 h-10 rounded-xl bg-invertis-blue/10 flex items-center justify-center mb-4">
-                  <Icon size={18} className="text-invertis-blue" />
-                </div>
-                <div className="text-sm font-bold text-gray-900">{label}</div>
-                <div className="text-xs text-gray-400 mt-0.5">{desc}</div>
-                <ArrowRight size={14} className="text-gray-300 mt-3" />
-              </button>
-            </Card>
-          </motion.div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {cards.map(({ label, desc, path, icon: Icon }) => (
+          <motion.button key={path} whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}
+            onClick={() => navigate(path)}
+            className="card-hover p-5 text-left flex flex-col gap-4 cursor-pointer group rounded-2xl w-full">
+            <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/30">
+              <Icon size={18} className="text-blue-600 dark:text-blue-400" />
+            </div>
+              <div>
+                <div className="text-sm font-bold text-[#1D3557]">{label}</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">{desc}</div>
+              </div>
+            <ArrowRight size={14} className="text-slate-500 group-hover:text-accent-500 transition-colors" />
+          </motion.button>
         ))}
       </div>
-      </div>{/* close z-10 */}
     </div>
   );
 }
 
-// ── COORDINATOR REDIRECT ─────────────────────────────────────────────────
+// ── COORDINATOR REDIRECT ──────────────────────────────────────────────────
 function CoordinatorRedirect() {
   const navigate = useNavigate();
   useEffect(() => { navigate('/coordinator'); }, [navigate]);
   return null;
 }
 
-// ── STUDENT DASHBOARD ────────────────────────────────────────────────────
+// ── STUDENT DASHBOARD ──────────────────────────────────────────────────────
 function StudentDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -171,147 +188,125 @@ function StudentDashboard() {
   const progress       = total > 0 ? Math.round((completedCount / total) * 100) : 0;
 
   return (
-    <div className="space-y-6 animate-fade-in max-w-4xl relative">
-      <div className="absolute -inset-6 overflow-hidden pointer-events-none select-none">
-        <img src="/campus/academic-block.jpg" alt="" className="w-full h-full object-cover opacity-15" />
-      </div>
-      <div className="relative z-10">
+    <div className="flex flex-col gap-6 max-w-3xl">
       {/* Header */}
       <div>
-        <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Student Dashboard</span>
-        <h1 className="text-2xl font-bold text-gray-900 mt-1">Hey, {user?.name?.split(' ')[0]} 👋</h1>
-        <p className="text-sm text-gray-500 mt-1">Your section's feedback forms for this semester.</p>
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-2 w-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
+          <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Student Dashboard</span>
+        </div>
+        <h1 className="text-2xl font-black text-[#212529]">Hey, {user?.name?.split(' ')[0]} 👋</h1>
+        <p className="text-sm text-slate-600 mt-1">Your section's feedback forms for this semester.</p>
       </div>
 
       {/* Stats strip */}
-      <div className="grid grid-cols-3 gap-4">
-        <StatsCard icon={Clock} label="Pending" value={pendingCount} color="orange" />
-        <StatsCard icon={CheckCircle2} label="Completed" value={completedCount} color="green" />
-        <StatsCard icon={TrendingUp} label="Progress" value={`${progress}%`} color="blue" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          { icon: Clock,          label: 'Pending',   value: pendingCount,   color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/20 border-amber-100/50 dark:border-amber-900/30' },
+          { icon: CheckCircle2,   label: 'Completed', value: completedCount, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100/50 dark:border-emerald-900/30' },
+          { icon: TrendingUp,     label: 'Progress',  value: `${progress}%`, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/20 border-blue-100/50 dark:border-blue-900/30' },
+        ].map(({ icon: Icon, label, value, color, bg }) => (
+          <div key={label} className="card-hover p-4 rounded-2xl flex items-center sm:flex-col sm:items-start justify-between sm:justify-normal gap-2 w-full border border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-2 sm:gap-1.5">
+              <div className={`h-8 w-8 rounded-xl flex items-center justify-center border ${bg}`}>
+                <Icon size={14} className={color} />
+              </div>
+              <div className="text-xs font-bold text-slate-500 sm:hidden uppercase tracking-wider">{label}</div>
+            </div>
+            <div className="text-right sm:text-left">
+              <div className={`text-xl sm:text-2xl font-black ${color}`}>{value}</div>
+              <div className="hidden sm:block text-[10px] text-slate-500 font-bold uppercase tracking-wider">{label}</div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Progress bar */}
       {total > 0 && (
-        <Card>
-          <CardBody>
-            <div className="flex justify-between text-xs text-gray-500 mb-2">
-              <span>Completion</span>
-              <span>{completedCount}/{total} forms</span>
-            </div>
-            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-              <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.8, ease: 'easeOut' }}
-                className="h-full rounded-full bg-gradient-to-r from-invertis-blue to-invertis-light-blue" />
-            </div>
-          </CardBody>
-        </Card>
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+            <span>Overall Feedback Completion</span>
+            <span>{completedCount} of {total} forms completed</span>
+          </div>
+          <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-300/50 dark:border-slate-700/50">
+            <motion.div initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.8, ease: 'easeOut' }}
+              className="h-full rounded-full bg-gradient-to-r from-primary-600 to-emerald-500 shadow-sm" />
+          </div>
+        </div>
       )}
 
       {/* Courses */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[1, 2, 3].map(n => (
-            <div key={n} className="p-6 rounded-2xl border border-gray-200/60 space-y-4 bg-white">
-              <Skeleton className="h-5 w-20" rounded="rounded-full" />
-              <Skeleton className="h-5 w-3/4" />
-              <div className="space-y-2 pt-2">
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-              </div>
-            </div>
-          ))}
+          {[1,2,3].map(n => <div key={n} className="h-44 skeleton rounded-2xl" />)}
         </div>
       ) : courses.length === 0 ? (
-        <Card>
-          <EmptyState icon={GraduationCap} title="No active feedback forms" message="Forms appear here when opened by your HOD." />
-        </Card>
+        <div className="card border border-white/7 p-12 text-center flex flex-col items-center gap-3">
+          <div className="h-14 w-14 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center">
+            <GraduationCap size={26} className="text-slate-600" />
+          </div>
+          <p className="text-slate-600 dark:text-slate-400 text-sm font-bold">No active feedback forms for your section right now.</p>
+          <p className="text-slate-500 dark:text-slate-500 text-xs">Forms appear here when opened by your HOD.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {courses.map((course, idx) => {
-            const courseProgress = course.total > 0 ? Math.round((course.completed_count / course.total) * 100) : 0;
+          {courses.map(course => (
+            <motion.div key={course.id} whileHover={{ y: -4 }} className="card-main p-4 sm:p-5 flex flex-col gap-4">
+              {/* Course header */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold bg-primary-500/15 text-primary-300 border border-primary-500/20 px-2 py-1 rounded-lg font-mono-styled">
+                    {course.code}
+                  </span>
+                  <h2 className="text-sm font-bold text-[#1D3557] mt-2 line-clamp-1">{course.name}</h2>
+                </div>
+                <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                  {course.pending_count > 0 && (
+                    <span className="badge-pending flex items-center gap-1">
+                      <Clock size={10} /> {course.pending_count}
+                    </span>
+                  )}
+                  {course.completed_count > 0 && (
+                    <span className="badge-active flex items-center gap-1">
+                      <CheckCircle2 size={10} /> {course.completed_count}
+                    </span>
+                  )}
+                </div>
+              </div>
 
-            return (
-              <motion.div
-                key={course.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.06 }}
-              >
-                <Card hover className="group">
-                  <CardBody>
-                    {/* Course header */}
-                    <div className="flex items-start justify-between gap-2 mb-3">
+              {/* TLFQs */}
+              {(course.tlfqs || []).length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {course.tlfqs.map(tlfq => (
+                    <button key={tlfq.id}
+                      onClick={() => !tlfq.completed && navigate(`/courses/${course.id}/tlfq/${tlfq.id}`)}
+                      disabled={tlfq.completed}
+                      className={`flex items-center justify-between p-3 rounded-xl text-left text-xs border transition-all ${
+                        tlfq.completed
+                          ? 'bg-white/3 border-white/5 text-slate-500 dark:text-slate-400 cursor-default'
+                          : 'bg-primary-500/5 border-primary-500/20 hover:border-primary-400/40 hover:bg-primary-500/10 text-[var(--text-main)] cursor-pointer'
+                      }`}>
                       <div className="min-w-0">
-                        <span className="text-xs font-semibold text-invertis-blue uppercase tracking-wider">{course.code}</span>
-                        <h2 className="text-base font-bold text-gray-900 mt-0.5 line-clamp-1">{course.name}</h2>
+                        <div className="font-semibold truncate">{tlfq.faculty_name}</div>
+                        <div className="text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">{tlfq.title}</div>
                       </div>
-                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                        {course.pending_count > 0 && (
-                          <Badge color="orange">{course.pending_count} pending</Badge>
-                        )}
-                        {course.completed_count > 0 && course.pending_count === 0 && (
-                          <Badge color="green">Complete</Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Progress bar */}
-                    {course.total > 0 && (
-                      <div className="mb-4">
-                        <div className="flex justify-between text-xs text-gray-500 mb-1.5">
-                          <span>{course.completed_count} of {course.total} forms</span>
-                          <span>{courseProgress}%</span>
-                        </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-invertis-blue to-invertis-light-blue rounded-full"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${courseProgress}%` }}
-                            transition={{ duration: 0.8, ease: 'easeOut', delay: idx * 0.06 + 0.2 }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* TLFQs */}
-                    {(course.tlfqs || []).length > 0 && (
-                      <div className="space-y-2">
-                        {course.tlfqs.map(tlfq => (
-                          <button key={tlfq.id}
-                            onClick={() => !tlfq.completed && navigate(`/courses/${course.id}/tlfq/${tlfq.id}`)}
-                            disabled={tlfq.completed}
-                            className={`w-full flex items-center justify-between p-3 rounded-xl text-left text-xs border transition-all duration-200 group/link ${
-                              tlfq.completed
-                                ? 'bg-gray-50 border-gray-100 text-gray-400 cursor-default'
-                                : 'bg-blue-50/50 border-blue-200 hover:border-invertis-blue hover:bg-blue-50 text-gray-700 cursor-pointer hover:shadow-sm'
-                            }`}>
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${tlfq.completed ? 'bg-emerald-500' : 'bg-orange-400'}`} />
-                              <div className="min-w-0">
-                                <div className="font-semibold truncate">{tlfq.faculty_name}</div>
-                                <div className="text-gray-400 mt-0.5 line-clamp-1">{tlfq.title}</div>
-                              </div>
-                            </div>
-                            {tlfq.completed
-                              ? <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0 ml-2" />
-                              : <ChevronRight size={14} className="text-gray-400 group-hover/link:text-invertis-blue transition-colors flex-shrink-0 ml-2" />
-                            }
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </CardBody>
-                </Card>
-              </motion.div>
-            );
-          })}
+                      {tlfq.completed
+                        ? <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0 ml-2" />
+                        : <ArrowRight size={13} className="text-primary-400 flex-shrink-0 ml-2" />
+                      }
+                    </button>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          ))}
         </div>
       )}
-      </div>{/* close z-10 */}
     </div>
   );
 }
 
-// ── MAIN ──────────────────────────────────────────────────────────────────
+// ── MAIN ─────────────────────────────────────────────────────────────────────
 function SupremeRedirect() {
   const navigate = useNavigate();
   useEffect(() => { navigate('/supreme'); }, [navigate]);
@@ -328,5 +323,5 @@ export default function Dashboard() {
     coordinator: <CoordinatorRedirect />,
   }[user?.role] ?? <StudentDashboard />;
 
-  return content;
+  return <PageShell>{content}</PageShell>;
 }

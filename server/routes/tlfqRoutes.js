@@ -7,10 +7,12 @@ import {
   createTlfq, getStudents, createEnrollment, getAdminStats,
   getLeaderboard
 } from '../controllers/tlfqController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
-import { roleMiddleware } from '../middleware/roleMiddleware.js';
+import { authenticate, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
+
+const roleMiddleware = (roles) => authorize(...roles);
+const authMiddleware = authenticate;
 
 // ── Public (authenticated) endpoints
 router.get('/courses',                              authMiddleware, getCourses);
