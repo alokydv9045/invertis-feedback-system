@@ -241,7 +241,9 @@
     border: 1px solid rgba(29, 53, 87, 0.08);
     border-radius: 1.5rem;
     box-shadow: 0 10px 30px -10px rgba(15, 45, 82, 0.06);
-    @apply p-6;
+    @apply p-4 sm:p-6;
+    overflow: hidden;
+    will-change: transform;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -249,12 +251,6 @@
     box-shadow: 0 20px 40px -8px rgba(15, 45, 82, 0.12);
     transform: translateY(-4px);
     border-color: rgba(255, 42, 0, 0.25);
-  }
-
-  /* Prevent children from overflowing rounded corners and improve focus accessibility */
-  .card-main {
-    overflow: hidden;
-    will-change: transform;
   }
 
   .card-main:focus-visible {
@@ -539,7 +535,7 @@
 }
 
 .admin-content {
-  @apply flex-1 p-4 sm:p-6 md:p-8 max-w-[1600px] mx-auto w-full overflow-auto min-w-0;
+  @apply flex-1 p-3 sm:p-6 md:p-8 max-w-[1600px] mx-auto w-full overflow-auto min-w-0;
 }
 
 /* ── Sidebar Styles ──────────────────────────────────────────────────── */
@@ -568,5 +564,21 @@
   .sidebar-panel {
     min-height: 100vh;
     box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+  }
+
+  /* Prevent datetime-local picker from overflowing on mobile */
+  input[type="datetime-local"] {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+    font-size: 0.875rem;
+    box-sizing: border-box;
+  }
+
+  /* Ensure main page content is never clipped */
+  main {
+    min-width: 0;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 }
